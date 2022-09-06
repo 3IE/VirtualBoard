@@ -23,3 +23,4 @@
 
 # Other binary formats
 *.dll filter=lfs diff=lfs merge=lfs -text
+*.pdf filter=lfs diff=lfs merge=lfs -text
