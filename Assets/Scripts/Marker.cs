@@ -33,6 +33,16 @@ public class Marker : MonoBehaviour
     /// </summary>
     private void Draw()
     {
-
+        //TODO
     }
+
+    /// <summary>
+    /// Equivalent of the Draw method but with the base color of the board
+    /// </summary>
+    private void Erase()
+    {
+        // TODO
+    }
+
+    // TODO add other shapes ?
 }
