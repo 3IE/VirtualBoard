@@ -132,7 +132,8 @@ public class Marker : MonoBehaviour
     /// </summary>
     private void Erase()
     {
-        // TODO
+        _renderer.material.color = Color.white;
+        Draw();
     }
 
     // TODO add other shapes ?
