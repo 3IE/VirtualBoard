@@ -5,7 +5,7 @@ public class Marker : MonoBehaviour
 {
     [Tooltip("The tip of the marker")]
     [SerializeField]
-    private Transform tip;
+    private GameObject tip;
 
     [Tooltip("How many pixels we want to change around the tip of the marker")]
     [SerializeField] 
@@ -20,6 +20,7 @@ public class Marker : MonoBehaviour
     private Color[] _colors;
     private float _tipHeight;
 
+    private Transform tipTransform;
     private Board _board;
 
     private RaycastHit _touch;
@@ -31,8 +32,9 @@ public class Marker : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        _renderer = GetComponent<Renderer>();
-        _tipHeight = tip.localScale.y;
+        tipTransform = tip.transform;
+        _renderer = tip.GetComponent<Renderer>();
+        _tipHeight = tipTransform.localScale.y;
 
         _touchedLastFrame = false;
     }
@@ -41,18 +43,6 @@ public class Marker : MonoBehaviour
     {
         // TODO add tools
         Draw();
-    }
-
-    /// <summary>
-    /// We check if we are touching the board with the marker
-    /// </summary>
-    /// <returns>
-    /// True if we touch the board
-    /// False otherwise
-    /// </returns>
-    private bool Colliding()
-    {
-        return Physics.Raycast(tip.position, transform.up, out _touch, _tipHeight) && _touch.transform.CompareTag("Board");
     }
 
     /// <summary>
@@ -77,7 +67,8 @@ public class Marker : MonoBehaviour
     /// </summary>
     private void Draw()
     {
-        if (Colliding())
+        // We check if we are touching the board with the marker
+        if (Physics.Raycast(tipTransform.position, transform.up, out _touch, _tipHeight) && _touch.transform.CompareTag("Board"))
         {
             if (_board == null)
                 _board = _touch.transform.GetComponent<Board>();
