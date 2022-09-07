@@ -7,7 +7,7 @@ public class Launcher : MonoBehaviourPunCallbacks
     [SerializeField]
     private TMPro.TMP_InputField usernameInput;
 
-    private string gameVersion = "1";
+    private string _gameVersion = "1";
 
     [Tooltip("The maximum number of players per room. When a room is full, it can't be joined by new players, and so new room will be created")]
     [SerializeField]
@@ -40,7 +40,7 @@ public class Launcher : MonoBehaviourPunCallbacks
         {
             // #Critical, we must first and foremost connect to Photon Online Server.
             PhotonNetwork.ConnectUsingSettings();
-            PhotonNetwork.GameVersion = gameVersion;
+            PhotonNetwork.GameVersion = _gameVersion;
         }
     }
 
