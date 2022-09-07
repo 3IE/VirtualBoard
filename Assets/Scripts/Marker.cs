@@ -14,7 +14,7 @@ public class Marker : MonoBehaviour
     [Tooltip("How much we want to interpolate the draw between two frames (lower values means more data is covered)")]
     [Range(0.01f, 1.00f)]
     [SerializeField]
-    private float coverage;
+    private float coverage = 0.01f;
 
     private Renderer _renderer;
     private Color[] _colors;
@@ -146,7 +146,7 @@ public class Marker : MonoBehaviour
 
             float distance = Vector2Int.Distance(pos, center);
             
-            if (distance > penSize)
+            if (distance <= penSize)
                 _colors[i] = color;
         }
     }
