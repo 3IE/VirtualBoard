@@ -1,3 +1,6 @@
+using ExitGames.Client.Photon;
+using Photon.Pun;
+using Photon.Realtime;
 using System.Linq;
 using UnityEngine;
 
@@ -14,7 +17,7 @@ public class Marker : MonoBehaviour
     [Tooltip("How much we want to interpolate the draw between two frames (lower values means more data is covered)")]
     [Range(0.01f, 1.00f)]
     [SerializeField]
-    private float coverage;
+    private float coverage = 0.01f;
 
     private Renderer _renderer;
     private Color[] _colors;
@@ -28,6 +31,8 @@ public class Marker : MonoBehaviour
     private Vector2 _lastTouchPos;
     private Quaternion _lastTouchRot;
     private bool _touchedLastFrame;
+
+    public const byte SendNewTextureEventCode = 1;
 
     // Start is called before the first frame update
     void Start()
@@ -114,6 +119,10 @@ public class Marker : MonoBehaviour
             return;
         }
 
+        // TODO Uncomment to allow sending to the other clients
+        // if (_touchedLastFrame)
+        //     SendNewTextureEvent();
+
         _board = null;
         _touchedLastFrame = false;
     }
@@ -146,8 +155,20 @@ public class Marker : MonoBehaviour
 
             float distance = Vector2Int.Distance(pos, center);
             
-            if (distance > penSize)
+            if (distance <= penSize)
                 _colors[i] = color;
         }
+    }
+
+    private void SendNewTextureEvent()
+    {
+        // We send the whole texture
+        object[] content = new object[] { _board.texture };
+        
+        // We send the data to every other person in the room
+        RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
+
+        // We send the event
+        PhotonNetwork.RaiseEvent(SendNewTextureEventCode, content, raiseEventOptions, SendOptions.SendReliable);
     }
 }

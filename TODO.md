@@ -10,8 +10,18 @@ Tools to add:
 - [ ] Shapes (Square, Cricle, Triangle, ...)
 - [ ] Add objects (Cube, Sphere, ...) ?
 
+VR:
+- [ ] Add tool selector
+- [ ] Add color selector
+
 In room:
 - [ ] Add decor
 - [ ] Put camera on the player
 - [ ] Add tool selection / shape selection / color selection
 - [ ] Check interactions between marker and board
+- [ ] Add border to the board to avoid writing outside of texture
+
+
+Events:  
+    Sending textures each time the marker leaves the board for now  
+    If this method is not viable, we will switch to another approach by sending the groups of pixel modified each time 
