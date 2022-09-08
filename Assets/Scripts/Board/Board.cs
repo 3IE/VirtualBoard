@@ -3,7 +3,7 @@ using UnityEngine;
 public class Board : MonoBehaviour
 {
     public Texture2D texture;
-    public Vector2 textureSize = new Vector2(2048 * 1.5f, 2048 * 0.6f);
+    public Vector2 textureSize = new Vector2(2048 * 0.6f, 2048 * 1.5f);
     public Tools tools;
 
     // Start is called before the first frame update
