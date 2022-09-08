@@ -110,6 +110,15 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Thumbstick"",
+                    ""type"": ""Button"",
+                    ""id"": ""c80ba934-f027-4c57-9c08-080cc86c6b68"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -220,6 +229,17 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
                     ""processors"": """",
                     ""groups"": ""Generic XR Controller"",
                     ""action"": ""Tracking State"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""971f99a4-c011-4acd-b023-a5c0616e22ef"",
+                    ""path"": ""<XRController>{LeftHand}/thumbstickTouched"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Thumbstick"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1168,6 +1188,7 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
         m_XRILeftHand_Rotation = m_XRILeftHand.FindAction("Rotation", throwIfNotFound: true);
         m_XRILeftHand_TrackingState = m_XRILeftHand.FindAction("Tracking State", throwIfNotFound: true);
         m_XRILeftHand_HapticDevice = m_XRILeftHand.FindAction("Haptic Device", throwIfNotFound: true);
+        m_XRILeftHand_Thumbstick = m_XRILeftHand.FindAction("Thumbstick", throwIfNotFound: true);
         // XRI LeftHand Interaction
         m_XRILeftHandInteraction = asset.FindActionMap("XRI LeftHand Interaction", throwIfNotFound: true);
         m_XRILeftHandInteraction_Select = m_XRILeftHandInteraction.FindAction("Select", throwIfNotFound: true);
@@ -1312,6 +1333,7 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
     private readonly InputAction m_XRILeftHand_Rotation;
     private readonly InputAction m_XRILeftHand_TrackingState;
     private readonly InputAction m_XRILeftHand_HapticDevice;
+    private readonly InputAction m_XRILeftHand_Thumbstick;
     public struct XRILeftHandActions
     {
         private @XRIDefaultInputActions m_Wrapper;
@@ -1320,6 +1342,7 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
         public InputAction @Rotation => m_Wrapper.m_XRILeftHand_Rotation;
         public InputAction @TrackingState => m_Wrapper.m_XRILeftHand_TrackingState;
         public InputAction @HapticDevice => m_Wrapper.m_XRILeftHand_HapticDevice;
+        public InputAction @Thumbstick => m_Wrapper.m_XRILeftHand_Thumbstick;
         public InputActionMap Get() { return m_Wrapper.m_XRILeftHand; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1341,6 +1364,9 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
                 @HapticDevice.started -= m_Wrapper.m_XRILeftHandActionsCallbackInterface.OnHapticDevice;
                 @HapticDevice.performed -= m_Wrapper.m_XRILeftHandActionsCallbackInterface.OnHapticDevice;
                 @HapticDevice.canceled -= m_Wrapper.m_XRILeftHandActionsCallbackInterface.OnHapticDevice;
+                @Thumbstick.started -= m_Wrapper.m_XRILeftHandActionsCallbackInterface.OnThumbstick;
+                @Thumbstick.performed -= m_Wrapper.m_XRILeftHandActionsCallbackInterface.OnThumbstick;
+                @Thumbstick.canceled -= m_Wrapper.m_XRILeftHandActionsCallbackInterface.OnThumbstick;
             }
             m_Wrapper.m_XRILeftHandActionsCallbackInterface = instance;
             if (instance != null)
@@ -1357,6 +1383,9 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
                 @HapticDevice.started += instance.OnHapticDevice;
                 @HapticDevice.performed += instance.OnHapticDevice;
                 @HapticDevice.canceled += instance.OnHapticDevice;
+                @Thumbstick.started += instance.OnThumbstick;
+                @Thumbstick.performed += instance.OnThumbstick;
+                @Thumbstick.canceled += instance.OnThumbstick;
             }
         }
     }
@@ -1764,6 +1793,7 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
         void OnRotation(InputAction.CallbackContext context);
         void OnTrackingState(InputAction.CallbackContext context);
         void OnHapticDevice(InputAction.CallbackContext context);
+        void OnThumbstick(InputAction.CallbackContext context);
     }
     public interface IXRILeftHandInteractionActions
     {
