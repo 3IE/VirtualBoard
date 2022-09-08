@@ -1,16 +1,9 @@
 using UnityEngine;
 
-public class Marker : MonoBehaviour
+public class Eraser : MonoBehaviour
 {
-    [Tooltip("The tip of the marker")]
-    [SerializeField]
-    private GameObject tip;
-
-    private Renderer _renderer;
     private Color[] _colors;
-    private float _tipHeight;
 
-    private Transform tipTransform;
     private Board _board;
 
     private RaycastHit _touch;
@@ -22,10 +15,6 @@ public class Marker : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        tipTransform = tip.transform;
-        _renderer = tip.GetComponent<Renderer>();
-        _tipHeight = tipTransform.localScale.y;
-
         _touchedLastFrame = false;
     }
 
@@ -58,7 +47,7 @@ public class Marker : MonoBehaviour
     private void Draw()
     {
         // We check if we are touching the board with the marker
-        if (Physics.Raycast(tipTransform.position, transform.up, out _touch, 0.1f) && _touch.transform.CompareTag("Board"))
+        if (Physics.Raycast(transform.position, transform.up, out _touch, 0.1f) && _touch.transform.CompareTag("Board"))
         {
             if (_board == null)
                 _board = _touch.transform.GetComponent<Board>();
@@ -79,8 +68,8 @@ public class Marker : MonoBehaviour
                 // Interpolation
                 for (float f = 0.01f; f < 1.00f; f += _board.tools.coverage)
                 {
-                    int lerpX = (int) Mathf.Lerp(_lastTouchPos.x, x, f);
-                    int lerpY = (int) Mathf.Lerp(_lastTouchPos.y, y, f);
+                    int lerpX = (int)Mathf.Lerp(_lastTouchPos.x, x, f);
+                    int lerpY = (int)Mathf.Lerp(_lastTouchPos.y, y, f);
 
                     _board.texture.SetPixels(lerpX, lerpY, _board.tools.penSize, _board.tools.penSize, _colors);
                 }
@@ -93,7 +82,7 @@ public class Marker : MonoBehaviour
             }
             else
                 // TODO generate shape depending on selected one
-                _colors = Tools.generateSquare(_renderer.material.color, _board);
+                _colors = Tools.generateSquare(_board.tools.baseColor, _board);
 
             _lastTouchPos = new Vector2(x, y);
             _lastTouchRot = transform.rotation;
@@ -112,7 +101,7 @@ public class Marker : MonoBehaviour
 
     public void resetColors(Board board)
     {
-        _colors = Tools.generateSquare(_renderer.material.color, board);
+        _colors = Tools.generateSquare(board.tools.baseColor, board);
     }
 
     // TODO add other shapes ?

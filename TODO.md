@@ -13,12 +13,13 @@ Tools to add:
 VR:
 - [ ] Add tool selector
 - [ ] Add color selector
+- [ ] Add wrist menu ?
 
 In room:
 - [ ] Add decor
 - [ ] Put camera on the player
 - [ ] Add tool selection / shape selection / color selection
-- [ ] Check interactions between marker and board
+- [X] Check interactions between marker and board
 - [ ] Add border to the board to avoid writing outside of texture
 
 
