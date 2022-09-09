@@ -20,10 +20,24 @@ public class ToolWheelController : MonoBehaviour
     [SerializeField]
     private Sprite icon;
 
+    private bool hovered = false;
+
     // Start is called before the first frame update
     void Start()
     {
         anim = GetComponent<Animator>();
+    }
+
+    private void Update()
+    {
+        if (selected)
+        {
+            if (!hovered)
+                HoverEnter();
+        }
+        else if (hovered)
+            HoverExit();
+
     }
 
     void HoverEnter()
@@ -31,10 +45,12 @@ public class ToolWheelController : MonoBehaviour
         anim.SetBool("Hover", true);
         selectedItem.sprite = icon;
         itemText.text = item;
+        hovered = true;
     }
 
     void HoverExit()
     {
         anim.SetBool("Hover", false);
+        hovered = false;
     }
 }
