@@ -15,12 +15,6 @@ public class Tools : MonoBehaviour
 
     public Color baseColor;
 
-    #region EVENT_CODES
-
-    public const byte SendNewTextureEventCode = 1;
-
-    #endregion
-
     public static Color[] generateSquare(Color color, Board board)
     {
         return Enumerable.Repeat(color, board.tools.penSize * board.tools.penSize).ToArray();
@@ -55,6 +49,6 @@ public class Tools : MonoBehaviour
         RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
 
         // We send the event
-        PhotonNetwork.RaiseEvent(SendNewTextureEventCode, content, raiseEventOptions, SendOptions.SendReliable);
+        PhotonNetwork.RaiseEvent((byte) Event.SendNewTexture, content, raiseEventOptions, SendOptions.SendReliable);
     }
 }

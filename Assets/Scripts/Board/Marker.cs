@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Marker : MonoBehaviour
@@ -58,7 +59,7 @@ public class Marker : MonoBehaviour
     private void Draw()
     {
         // We check if we are touching the board with the marker
-        if (Physics.Raycast(tipTransform.position, transform.up, out _touch, 0.1f) && _touch.transform.CompareTag("Board"))
+        if (Physics.Raycast(tipTransform.position, transform.up, out _touch, _tipHeight) && _touch.transform.CompareTag("Board"))
         {
             if (_board == null)
                 _board = _touch.transform.GetComponent<Board>();
@@ -74,22 +75,36 @@ public class Marker : MonoBehaviour
 
             if (_touchedLastFrame)
             {
-                _board.texture.SetPixels(x, y, _board.tools.penSize, _board.tools.penSize, _colors);
-
-                // Interpolation
-                for (float f = 0.01f; f < 1.00f; f += _board.tools.coverage)
+                try
                 {
-                    int lerpX = (int) Mathf.Lerp(_lastTouchPos.x, x, f);
-                    int lerpY = (int) Mathf.Lerp(_lastTouchPos.y, y, f);
+                    _board.texture.SetPixels(x, y, _board.tools.penSize, _board.tools.penSize, _colors);
 
-                    _board.texture.SetPixels(lerpX, lerpY, _board.tools.penSize, _board.tools.penSize, _colors);
+                    // Interpolation
+                    for (float f = 0.01f; f < 1.00f; f += _board.tools.coverage)
+                    {
+                        int lerpX = (int)Mathf.Lerp(_lastTouchPos.x, x, f);
+                        int lerpY = (int)Mathf.Lerp(_lastTouchPos.y, y, f);
+
+                        _board.texture.SetPixels(lerpX, lerpY, _board.tools.penSize, _board.tools.penSize, _colors);
+                    }
+
+                    // We apply the changes
+                    _board.texture.Apply();
                 }
+                catch (ArgumentException e)
+                {
+                    #if UNITY_EDITOR
+                    PrintVar.PrintDebug("Eraser: went out of board");
+                    #endif
 
-                // We lock the rotation of the marker while it is in contact with the board
-                transform.rotation = _lastTouchRot;
-
-                // We apply the changes
-                _board.texture.Apply();
+                    _board = null;
+                    _touchedLastFrame = false;
+                }
+                finally
+                {
+                    // We lock the rotation of the marker while it is in contact with the board
+                    transform.rotation = _lastTouchRot;
+                }
             }
             else
                 // TODO generate shape depending on selected one
