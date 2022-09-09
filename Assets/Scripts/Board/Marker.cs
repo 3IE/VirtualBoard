@@ -87,10 +87,15 @@ public class Marker : MonoBehaviour
 
                         _board.texture.SetPixels(lerpX, lerpY, _board.tools.penSize, _board.tools.penSize, _colors);
                     }
+
+                    // We apply the changes
+                    _board.texture.Apply();
                 }
                 catch (ArgumentException e)
                 {
-                    Debug.LogError(e.Message);
+                    #if UNITY_EDITOR
+                    PrintVar.PrintDebug("Eraser: went out of board");
+                    #endif
 
                     _board = null;
                     _touchedLastFrame = false;
@@ -99,9 +104,6 @@ public class Marker : MonoBehaviour
                 {
                     // We lock the rotation of the marker while it is in contact with the board
                     transform.rotation = _lastTouchRot;
-
-                    // We apply the changes
-                    _board.texture.Apply();
                 }
             }
             else
