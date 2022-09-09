@@ -58,7 +58,7 @@ public class Marker : MonoBehaviour
     private void Draw()
     {
         // We check if we are touching the board with the marker
-        if (Physics.Raycast(tipTransform.position, transform.up, out _touch, 0.1f) && _touch.transform.CompareTag("Board"))
+        if (Physics.Raycast(tipTransform.position, transform.up, out _touch, _tipHeight) && _touch.transform.CompareTag("Board"))
         {
             if (_board == null)
                 _board = _touch.transform.GetComponent<Board>();
