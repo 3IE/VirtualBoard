@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Marker : MonoBehaviour
@@ -74,22 +75,34 @@ public class Marker : MonoBehaviour
 
             if (_touchedLastFrame)
             {
-                _board.texture.SetPixels(x, y, _board.tools.penSize, _board.tools.penSize, _colors);
-
-                // Interpolation
-                for (float f = 0.01f; f < 1.00f; f += _board.tools.coverage)
+                try
                 {
-                    int lerpX = (int) Mathf.Lerp(_lastTouchPos.x, x, f);
-                    int lerpY = (int) Mathf.Lerp(_lastTouchPos.y, y, f);
+                    _board.texture.SetPixels(x, y, _board.tools.penSize, _board.tools.penSize, _colors);
 
-                    _board.texture.SetPixels(lerpX, lerpY, _board.tools.penSize, _board.tools.penSize, _colors);
+                    // Interpolation
+                    for (float f = 0.01f; f < 1.00f; f += _board.tools.coverage)
+                    {
+                        int lerpX = (int)Mathf.Lerp(_lastTouchPos.x, x, f);
+                        int lerpY = (int)Mathf.Lerp(_lastTouchPos.y, y, f);
+
+                        _board.texture.SetPixels(lerpX, lerpY, _board.tools.penSize, _board.tools.penSize, _colors);
+                    }
                 }
+                catch (ArgumentException e)
+                {
+                    Debug.LogError(e.Message);
 
-                // We lock the rotation of the marker while it is in contact with the board
-                transform.rotation = _lastTouchRot;
+                    _board = null;
+                    _touchedLastFrame = false;
+                }
+                finally
+                {
+                    // We lock the rotation of the marker while it is in contact with the board
+                    transform.rotation = _lastTouchRot;
 
-                // We apply the changes
-                _board.texture.Apply();
+                    // We apply the changes
+                    _board.texture.Apply();
+                }
             }
             else
                 // TODO generate shape depending on selected one
