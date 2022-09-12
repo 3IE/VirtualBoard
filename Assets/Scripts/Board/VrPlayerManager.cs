@@ -1,13 +1,11 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 
 public class VrPlayerManager : MonoBehaviour
-{ // a attacher au XR Origin/Camera Offset
+{
+    // a attacher au XR Origin/Camera Offset
     private Transform VRCamTransform;
     
     [SerializeField] private float _refreshRate = 1f;
@@ -21,10 +19,10 @@ public class VrPlayerManager : MonoBehaviour
 
     private void SendNewPositionEvent()
     {
-        object[] content = {VRCamTransform.position, true};
+        object[] content = { VRCamTransform.position };
         
         var raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
 
-        PhotonNetwork.RaiseEvent((byte) Event.EventCode.SendNewPositionEventCode, content, raiseEventOptions, SendOptions.SendUnreliable);
+        PhotonNetwork.RaiseEvent((byte) Event.EventCode.SendNewPosition, content, raiseEventOptions, SendOptions.SendReliable);
     }
 }
