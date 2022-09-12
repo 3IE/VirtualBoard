@@ -65,11 +65,26 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
+        var hash = PhotonNetwork.LocalPlayer.CustomProperties;
+        hash.Add("device", device.VR);
+        PhotonNetwork.SetPlayerCustomProperties(hash);
         Debug.Log("PUN Launcher: OnJoinedRoom() called by PUN. Now this client is in a room.");
     }
 
+    public override void OnPlayerEnteredRoom(Player newPlayer)
+    {
+        base.OnPlayerEnteredRoom(newPlayer);
+        print($"A new player has joined in:\n\tUsername:{newPlayer.NickName}\n\tid:{newPlayer.ActorNumber}\n\tDevice:{newPlayer.CustomProperties["device"]}");
+    }
+    
     public void Cancel()
     {
         PhotonNetwork.Disconnect();
+    }
+    
+    public enum device : byte
+    {
+        VR = 0,
+        AR = 1
     }
 }
