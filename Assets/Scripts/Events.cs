@@ -7,8 +7,7 @@ public class Event
         RoomLaunch,
 
         // Player 1X
-        NewPlayer = 10,
-        SendNewPostItEventCode,
+        SendNewPostItEventCode = 10,
         SendNewPositionEventCode,
         PlayerLeave,
 
