@@ -31,6 +31,7 @@ public class Marker : MonoBehaviour
         _tipHeight = tipTransform.localScale.y;
 
         _touchedLastFrame = false;
+        _modifications = new Queue<Modification>();
     }
 
     private void Update()
@@ -84,7 +85,7 @@ public class Marker : MonoBehaviour
                 {
                     ModifyTexture(x, y, _lastTouchPos.x, _lastTouchPos.y, _colors, _board.tools.penSize);
                 }
-                catch (ArgumentException e)
+                catch (ArgumentException)
                 {
                     #if UNITY_EDITOR
                     PrintVar.PrintDebug("Eraser: went out of board");

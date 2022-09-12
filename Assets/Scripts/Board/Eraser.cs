@@ -20,6 +20,7 @@ public class Eraser : MonoBehaviour
     void Start()
     {
         _touchedLastFrame = false;
+        _modifications = new Queue<Modification>();
     }
 
     private void Update()
@@ -72,7 +73,7 @@ public class Eraser : MonoBehaviour
                 try {
                     ModifyTexture(x, y, _lastTouchPos.x, _lastTouchPos.y, _colors, _board.tools.penSize);
                 }
-                catch (ArgumentException e)
+                catch (ArgumentException)
                 {
                     #if UNITY_EDITOR
                     PrintVar.PrintDebug("Eraser: went out of board");
