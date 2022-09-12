@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Marker : MonoBehaviour
@@ -20,19 +21,24 @@ public class Marker : MonoBehaviour
     private Quaternion _lastTouchRot;
     private bool _touchedLastFrame;
 
+    private Queue<Modification> _modifications;
+
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         tipTransform = tip.transform;
         _renderer = tip.GetComponent<Renderer>();
         _tipHeight = tipTransform.localScale.y;
 
         _touchedLastFrame = false;
+        _modifications = new Queue<Modification>();
     }
 
     private void Update()
     {
-        // TODO add tools
+        if (_modifications.TryDequeue(out Modification mod))
+            ModifyTexture(mod);
+
         Draw();
     }
 
@@ -77,20 +83,13 @@ public class Marker : MonoBehaviour
             {
                 try
                 {
-                    _board.texture.SetPixels(x, y, _board.tools.penSize, _board.tools.penSize, _colors);
-
-                    // Interpolation
-                    for (float f = 0.01f; f < 1.00f; f += _board.tools.coverage)
-                    {
-                        int lerpX = (int)Mathf.Lerp(_lastTouchPos.x, x, f);
-                        int lerpY = (int)Mathf.Lerp(_lastTouchPos.y, y, f);
-
-                        _board.texture.SetPixels(lerpX, lerpY, _board.tools.penSize, _board.tools.penSize, _colors);
-                    }
+                    ModifyTexture(x, y, _lastTouchPos.x, _lastTouchPos.y, _colors, _board.tools.penSize);
                 }
-                catch (ArgumentException e)
+                catch (ArgumentException)
                 {
-                    Debug.LogError(e.Message);
+                    #if UNITY_EDITOR
+                    PrintVar.PrintDebug("Eraser: went out of board");
+                    #endif
 
                     _board = null;
                     _touchedLastFrame = false;
@@ -100,8 +99,7 @@ public class Marker : MonoBehaviour
                     // We lock the rotation of the marker while it is in contact with the board
                     transform.rotation = _lastTouchRot;
 
-                    // We apply the changes
-                    _board.texture.Apply();
+                    new Modification(x, y, _lastTouchPos.x, _lastTouchPos.y, _colors, _board.tools.penSize).Send(Event.EventCode.Marker);
                 }
             }
             else
@@ -115,15 +113,38 @@ public class Marker : MonoBehaviour
             return;
         }
 
-        // TODO Uncomment to allow sending to the other clients
-        // if (_touchedLastFrame)
-        //     Tools.SendNewTextureEvent(_board);
-
         _board = null;
         _touchedLastFrame = false;
     }
 
-    public void resetColors(Board board)
+    private void ModifyTexture(int x, int y, float destX, float destY, Color[] colors, int penSize)
+    {
+        _board.texture.SetPixels(x, y, penSize, penSize, colors);
+
+        // Interpolation
+        for (float f = 0.01f; f < 1.00f; f += _board.tools.coverage)
+        {
+            int lerpX = (int)Mathf.Lerp(_lastTouchPos.x, x, f);
+            int lerpY = (int)Mathf.Lerp(_lastTouchPos.y, y, f);
+
+            _board.texture.SetPixels(lerpX, lerpY, penSize, penSize, colors);
+        }
+
+        // We apply the changes
+        _board.texture.Apply();
+    }
+
+    private void ModifyTexture(Modification modification)
+    {
+        ModifyTexture(modification.x, modification.y, modification.destX, modification.destY, modification.colors, modification.penSize);
+    }
+
+    public void AddModification(Modification modification)
+    {
+        _modifications.Enqueue(modification);
+    }
+
+    public void ResetColors(Board board)
     {
         _colors = Tools.generateSquare(_renderer.material.color, board);
     }

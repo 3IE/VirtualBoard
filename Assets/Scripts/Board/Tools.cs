@@ -1,6 +1,7 @@
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
+using System;
 using System.Linq;
 using UnityEngine;
 
@@ -13,13 +14,10 @@ public class Tools : MonoBehaviour
     [Range(0.01f, 1.00f)]
     public float coverage = 0.01f;
 
+    public Marker marker;
+    public Eraser eraser;
+
     public Color baseColor;
-
-    #region EVENT_CODES
-
-    public const byte SendNewTextureEventCode = 1;
-
-    #endregion
 
     public static Color[] generateSquare(Color color, Board board)
     {
@@ -44,17 +42,5 @@ public class Tools : MonoBehaviour
         }
 
         return colors;
-    }
-
-    public static void SendNewTextureEvent(Board board)
-    {
-        // We send the whole texture
-        object[] content = new object[] { board.texture };
-
-        // We send the data to every other person in the room
-        RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
-
-        // We send the event
-        PhotonNetwork.RaiseEvent(SendNewTextureEventCode, content, raiseEventOptions, SendOptions.SendReliable);
     }
 }
