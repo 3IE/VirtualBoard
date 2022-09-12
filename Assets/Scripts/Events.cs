@@ -8,6 +8,9 @@ public class Event
 
         // Player 1X
         NewPlayer = 10,
+        SendNewPostItEventCode,
+        SendNewPositionEventCode,
+        SendNewPlayerInEventCode, 
         PlayerLeave,
 
         // Tools 2X
