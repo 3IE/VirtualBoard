@@ -8,12 +8,12 @@ public class VrPlayerManager : MonoBehaviour
     // a attacher au XR Origin/Camera Offset
     private Transform VRCamTransform;
     
-    [SerializeField] private float _refreshRate = 1f;
+    [SerializeField] private float _refreshRate = 0.5f;
 
     private void OnEnable()
     {
         VRCamTransform = GetComponentInChildren<Camera>().transform;
-        InvokeRepeating(nameof(SendNewPositionEvent), _refreshRate, _refreshRate);
+        //InvokeRepeating(nameof(SendNewPositionEvent), _refreshRate, _refreshRate);
     }
     private void OnDisable() => CancelInvoke();
 
