@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Marker : MonoBehaviour
+public class Marker : WritingTool
 {
     [Tooltip("The tip of the marker")]
     [SerializeField]
@@ -18,7 +18,6 @@ public class Marker : MonoBehaviour
     private RaycastHit _touch;
     private Vector2 _touchPos;
     private Vector2 _lastTouchPos;
-    private Quaternion _lastTouchRot;
     private bool _touchedLastFrame;
 
     private Queue<Modification> _modifications;
@@ -36,10 +35,13 @@ public class Marker : MonoBehaviour
 
     private void Update()
     {
+        UpdateRotation();
+
         if (_modifications.TryDequeue(out Modification mod))
             ModifyTexture(mod);
 
-        Draw();
+        if (canDraw)
+            Draw();
     }
 
     /// <summary>
@@ -65,7 +67,7 @@ public class Marker : MonoBehaviour
     private void Draw()
     {
         // We check if we are touching the board with the marker
-        if (Physics.Raycast(tipTransform.position, transform.up, out _touch, _tipHeight) && _touch.transform.CompareTag("Board"))
+        if (Physics.Raycast(tipTransform.position, transform.up, out _touch, .5f) && _touch.transform.CompareTag("Board"))
         {
             if (_board == null)
                 _board = _touch.transform.GetComponent<Board>();
@@ -96,9 +98,6 @@ public class Marker : MonoBehaviour
                 }
                 finally
                 {
-                    // We lock the rotation of the marker while it is in contact with the board
-                    transform.rotation = _lastTouchRot;
-
                     new Modification(x, y, _lastTouchPos.x, _lastTouchPos.y, _colors, _board.tools.penSize).Send(Event.EventCode.Marker);
                 }
             }
@@ -107,7 +106,6 @@ public class Marker : MonoBehaviour
                 _colors = Tools.generateSquare(_renderer.material.color, _board);
 
             _lastTouchPos = new Vector2(x, y);
-            _lastTouchRot = transform.rotation;
             _touchedLastFrame = true;
 
             return;

@@ -140,6 +140,7 @@ GameObject:
   - component: {fileID: 7143106209593597302}
   - component: {fileID: 7143106209593597301}
   - component: {fileID: 7143106209593597300}
+  - component: {fileID: 1978687141466471729}
   m_Layer: 0
   m_Name: Eraser
   m_TagString: Untagged
@@ -195,7 +196,6 @@ MonoBehaviour:
   m_InteractionManager: {fileID: 0}
   m_Colliders:
   - {fileID: 7143106208591965683}
-  - {fileID: 0}
   m_InteractionLayerMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -262,7 +262,7 @@ MonoBehaviour:
       m_Calls: []
   m_AttachTransform: {fileID: 7143106209212332641}
   m_AttachEaseInTime: 0.15
-  m_MovementType: 2
+  m_MovementType: 0
   m_VelocityDamping: 1
   m_VelocityScale: 1
   m_AngularVelocityDamping: 1
@@ -309,3 +309,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 375fde903808e474db8d2f76225e4c22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rotationLocked: 0
+--- !u!65 &1978687141466471729
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7143106209593597298}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.07044482, y: 0.16226953, z: 0.06076835}
+  m_Center: {x: -0.00052154064, y: 0.0008012727, z: -0.0018489026}

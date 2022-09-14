@@ -1,28 +1,18 @@
-Connection menu:
-- [X] Base menu (Done 06/09/2022)
-- [ ] Username for VR (add a virtual keyboard ?)
-- [ ] Room list ?
+Ping system
 
-Tools to add:  
-- [x] Marker (Done 07/09/2022)
-- [ ] Eraser
-- [ ] Bucket ?
-- [ ] Shapes (Square, Cricle, Triangle, ...)
-- [ ] Add objects (Cube, Sphere, ...) ?
+Let user ping every 2s  
+Ping fades 3s after appearing on screen  
+Direction of ping indicated via HUD  
 
-VR:
-- [ ] Add tool selector
-- [ ] Add color selector
-- [ ] Add wrist menu ?
+Possibility to ping objects ?
 
-In room:
-- [ ] Add decor
-- [ ] Put camera on the player
-- [ ] Add tool selection / shape selection / color selection
-- [X] Check interactions between marker and board
-- [ ] Add border to the board to avoid writing outside of texture
+Object system
 
+Phantom while aiming
+if 2 in contact, make it so that when one moves, the other does too ?
+raycast, if 
 
-Events:  
-    Sending textures each time the marker leaves the board for now  
-    If this method is not viable, we will switch to another approach by sending the groups of pixel modified each time 
+Pyramid
+
+4 - 5 vertex
+procedural mesh ?

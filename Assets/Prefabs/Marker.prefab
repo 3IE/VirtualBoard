@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 441707064233815579}
   - component: {fileID: 441707064233815576}
   - component: {fileID: 441707064233815577}
+  - component: {fileID: 6211745579641748902}
   m_Layer: 0
   m_Name: Handle
   m_TagString: Untagged
@@ -97,6 +98,19 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &6211745579641748902
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 441707064233815559}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ce3748add7b1014f9b05ecf8b2ce759, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mat: {fileID: 2100000, guid: 85a21e71f30819643ba7afe1f19dd888, type: 2}
 --- !u!1 &441707064651445001
 GameObject:
   m_ObjectHideFlags: 0
@@ -124,7 +138,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 441707064651445001}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.22499993, z: 0}
+  m_LocalPosition: {x: 0, y: 0.225, z: 0}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -206,9 +220,10 @@ GameObject:
   - component: {fileID: 441707065337096310}
   - component: {fileID: 441707065337096311}
   - component: {fileID: 441707065337096265}
+  - component: {fileID: 2229995121750660245}
   m_Layer: 0
   m_Name: Marker
-  m_TagString: Untagged
+  m_TagString: Tool
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -329,7 +344,7 @@ MonoBehaviour:
       m_Calls: []
   m_AttachTransform: {fileID: 441707065742839176}
   m_AttachEaseInTime: 0.15
-  m_MovementType: 2
+  m_MovementType: 0
   m_VelocityDamping: 1
   m_VelocityScale: 1
   m_AngularVelocityDamping: 1
@@ -376,7 +391,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eba61605954a820469184860028183ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rotationLocked: 0
   tip: {fileID: 441707064651445001}
+--- !u!65 &2229995121750660245
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 441707065337096309}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.119620524, y: 0.4665076, z: 0.12201271}
+  m_Center: {x: -0.00000013907751, y: 0.051435746, z: -0.0035883114}
 --- !u!1 &441707065742839177
 GameObject:
   m_ObjectHideFlags: 0
