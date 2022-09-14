@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Hovered Interactable
+  m_Name: Marker Handle
   m_Shader: {fileID: -6465566751694194690, guid: c8a933ce50b0a5f4da6fbf9ea334f90e, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -83,9 +83,9 @@ Material:
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _base_color: {r: 0.7075472, g: 0.7075472, b: 0.7075472, a: 0}
+    - _base_color: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
---- !u!114 &4633437464221364532
+--- !u!114 &5519883531565460627
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
