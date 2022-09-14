@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Eraser : MonoBehaviour
+public class Eraser : WritingTool
 {
     private Color[] _colors;
 
@@ -11,7 +11,6 @@ public class Eraser : MonoBehaviour
     private RaycastHit _touch;
     private Vector2 _touchPos;
     private Vector2 _lastTouchPos;
-    private Quaternion _lastTouchRot;
     private bool _touchedLastFrame;
 
     private Queue<Modification> _modifications;
@@ -25,10 +24,13 @@ public class Eraser : MonoBehaviour
 
     private void Update()
     {
+        UpdateRotation();
+
         if (_modifications.TryDequeue(out Modification mod))
             ModifyTexture(mod);
 
-        Draw();
+        if (canDraw)
+            Draw();
     }
 
     /// <summary>
@@ -54,7 +56,7 @@ public class Eraser : MonoBehaviour
     private void Draw()
     {
         // We check if we are touching the board with the marker
-        if (Physics.Raycast(transform.position, transform.up, out _touch, 0.1f) && _touch.transform.CompareTag("Board"))
+        if (Physics.Raycast(transform.position, transform.up, out _touch, 0.5f) && _touch.transform.CompareTag("Board"))
         {
             if (_board == null)
                 _board = _touch.transform.GetComponent<Board>();
@@ -83,11 +85,7 @@ public class Eraser : MonoBehaviour
                     _touchedLastFrame = false;
                 }
                 finally
-                {
-                    // We lock the rotation of the marker while it is in contact with the board
-                    transform.rotation = _lastTouchRot;
-
-                    new Modification(x, y, _lastTouchPos.x, _lastTouchPos.y, _colors, _board.tools.penSize).Send(Event.EventCode.Eraser);
+                {new Modification(x, y, _lastTouchPos.x, _lastTouchPos.y, _colors, _board.tools.penSize).Send(Event.EventCode.Eraser);
                 }
             }
             else
@@ -95,7 +93,6 @@ public class Eraser : MonoBehaviour
                 _colors = Tools.generateSquare(_board.tools.baseColor, _board);
 
             _lastTouchPos = new Vector2(x, y);
-            _lastTouchRot = transform.rotation;
             _touchedLastFrame = true;
 
             return;

@@ -20,7 +20,7 @@ public class ToolWheelController : MonoBehaviour
     [SerializeField]
     private Sprite icon;
 
-    private bool hovered = false;
+    public bool hovered = false;
 
     // Start is called before the first frame update
     void Start()
