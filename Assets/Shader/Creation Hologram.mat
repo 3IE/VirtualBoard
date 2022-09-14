@@ -21,7 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Creation Hologram
-  m_Shader: {fileID: -6465566751694194690, guid: 85dbd3e427f72484a8141353f81339b3, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: bfbd38f26290b7248945395af04e3c60, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
