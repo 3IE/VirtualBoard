@@ -16,7 +16,7 @@ public class VrPlayerManager : MonoBehaviour
 
     private void OnEnable()
     {
-        VRCamTransform = GetComponentInChildren<Camera>().transform;
+        VRCamTransform = Camera.main.transform;
         InvokeRepeating(nameof(SendNewPositionEvent), _refreshRate, _refreshRate);
     }
     private void OnDisable() => CancelInvoke();
