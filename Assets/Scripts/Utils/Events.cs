@@ -9,7 +9,8 @@ public class Event
         // Player 1X
         SendNewPostIt = 10,
         SendNewPosition,
-        SendNewPlayerIn, 
+        SendNewPlayerIn,
+        SendNewPing,
 
         // Tools 2X
         Marker = 20,
