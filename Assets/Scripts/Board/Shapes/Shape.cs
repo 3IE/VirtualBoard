@@ -13,6 +13,8 @@ namespace Board.Shapes
         protected float InitialDistance;
         protected Vector3 InitialScale;
 
+        protected int ColliderId;
+
         private bool _moving;
         private bool _resizing;
 
@@ -30,6 +32,7 @@ namespace Board.Shapes
         {
             _mat = GetComponent<Renderer>().material;
             Interactors = new List<IXRInteractor>(2);
+            ColliderId = GetComponent<Collider>().GetInstanceID();
 
             Create();
         }
@@ -98,6 +101,9 @@ namespace Board.Shapes
 
             Modify();
 
+            if (_moving)
+                InitialDistance = Vector3.Distance(transform.position, Interactors[0].transform.position);
+
             if (!_resizing) return;
             
             InitialDistance = Vector3.Distance(Interactors[0].transform.position, Interactors[1].transform.position);
@@ -114,61 +120,17 @@ namespace Board.Shapes
             _moving = Interactors.Count == 1;
             _resizing = false;
 
-            if (_moving) return;
-            
-            IsOwner = false;
-            Locked = false;
-            
-            //SendOwnership();
-        }
-
-#if UNITY_EDITOR
-
-        public void OnSelect(HoverEnterEventArgs args)
-        {
-            if (!IsOwner)
+            if (_moving)
             {
-                if (Locked)
-                    return;
-                
-                IsOwner = true;
-                Locked = true;
-
-                //SendOwnership();
+                InitialDistance = Vector3.Distance(transform.position, Interactors[0].transform.position);
+                return;
             }
-
-            Interactors.Add(args.interactorObject);
-
-            _moving = Interactors.Count == 1;
-            _resizing = Interactors.Count == 2;
-
-            Modify();
-
-            if (!_resizing) return;
-            
-            InitialDistance = Vector3.Distance(Interactors[0].transform.position, Interactors[1].transform.position);
-            if (InitialDistance == 0)
-                InitialDistance = 1;
-            
-            InitialScale = transform.localScale;
-        }
-
-        public void OnDeselect(HoverExitEventArgs args)
-        {
-            Interactors.Remove(args.interactorObject);
-
-            _moving = Interactors.Count == 1;
-            _resizing = false;
-
-            if (_moving) return;
             
             IsOwner = false;
             Locked = false;
             
             //SendOwnership();
         }
-
-#endif
 
         #endregion
 
