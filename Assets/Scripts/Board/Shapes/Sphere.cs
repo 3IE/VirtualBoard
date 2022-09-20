@@ -5,27 +5,49 @@ namespace Board.Shapes
 {
     public class Sphere : Shape
     {
+        private float radius = 1;
+
+        /// <summary>
+        /// Moves the object to where the controller points
+        /// TODO: Check potential collisions at the new position
+        /// </summary>
         protected override void Move()
         {
-            XRRayInteractor interactor = Interactors[0] as XRRayInteractor;
+            RaycastHit[] hits = Physics.RaycastAll(Interactors[0].transform.position,
+                Interactors[0].transform.forward, InitialDistance,
+                LayerMask.GetMask("Default", "Player"));
 
-            if (interactor!.TryGetCurrent3DRaycastHit(out RaycastHit hit) &&
-                hit.colliderInstanceID != ColliderId &&
-                hit.distance < InitialDistance)
-                transform.position = hit.point;
-            else
-                transform.position = interactor.transform.position + interactor.transform.forward * InitialDistance;
-            //throw new System.NotImplementedException();
+            bool positionFound = false;
+
+            for (int i = hits.Length - 1; i >= 0 && !positionFound; i--)
+            {
+                Vector3 position = hits[i].point + hits[i].normal * radius / 2;
+
+                if (!Physics.CheckSphere(position, radius / 2, LayerMask.GetMask("Default", "Player")))
+                {
+                    transform.position = position;
+                    positionFound = true;
+                }
+            }
+
+            if (!positionFound)
+                transform.position = Interactors[0].transform.position +
+                                     Interactors[0].transform.forward * InitialDistance;
+
+            SendTransform();
         }
 
         protected override void Resize()
         {
             if (Interactors[0].transform.position == Interactors[1].transform.position)
                 return;
-            
-            transform.localScale = 
+
+            transform.localScale =
                 InitialScale / InitialDistance
-                * UnityEngine.Vector3.Distance(Interactors[0].transform.position, Interactors[1].transform.position);
+                * Vector3.Distance(Interactors[0].transform.position, Interactors[1].transform.position);
+            radius = transform.localScale.x;
+
+            SendTransform();
         }
     }
 }

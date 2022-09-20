@@ -25,6 +25,9 @@ namespace Board.Shapes
         private static readonly int Create1 = Shader.PropertyToID("_Create");
         private static readonly int Modify1 = Shader.PropertyToID("_Modify");
         private static readonly int Destroy1 = Shader.PropertyToID("_Destroy");
+        
+        protected static int DefaultLayer;
+        private static int _shapesLayer;
 
         #region Unity
 
@@ -33,6 +36,9 @@ namespace Board.Shapes
             _mat = GetComponent<Renderer>().material;
             Interactors = new List<IXRInteractor>(2);
             ColliderId = GetComponent<Collider>().GetInstanceID();
+            
+            DefaultLayer = LayerMask.NameToLayer("Default");
+            _shapesLayer = LayerMask.NameToLayer("Shapes");
 
             Create();
         }
@@ -101,6 +107,8 @@ namespace Board.Shapes
 
             Modify();
 
+            gameObject.layer = _shapesLayer;
+
             if (_moving)
                 InitialDistance = Vector3.Distance(transform.position, Interactors[0].transform.position);
 
@@ -125,6 +133,8 @@ namespace Board.Shapes
                 InitialDistance = Vector3.Distance(transform.position, Interactors[0].transform.position);
                 return;
             }
+
+            gameObject.layer = DefaultLayer;
             
             IsOwner = false;
             Locked = false;
@@ -136,36 +146,58 @@ namespace Board.Shapes
 
         #region Networking
 
+        /// <summary>
+        /// Gets the new transform of the object from the server and applies it to the object.
+        /// TODO: Implement
+        /// </summary>
         public void UpdateTransform()
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Sends the new transform of the object to the other clients
+        /// TODO: Implement
+        /// </summary>
         public void SendTransform()
         {
             if (IsOwner && Locked)
-                throw new NotImplementedException();
+                ;
         }
 
+        /// <summary>
+        /// Tells the other clients to destroy this object
+        /// TODO: Implement
+        /// </summary>
         public void SendDestroy()
         {
             if (IsOwner && Locked)
-                throw new NotImplementedException();
+                ;
         }
 
+        /// <summary>
+        /// Destroy this object
+        /// TODO: Implement
+        /// </summary>
         public void ReceiveDestroy()
         {
             Destroy();
         }
 
+        /// <summary>
+        /// Warns the other clients that this object can't be modified
+        /// TODO: Implement 
+        /// </summary>
         public void SendOwnership()
         {
-            throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Update this object so that it can't be modified until told otherwise
+        /// TODO: Implement 
+        /// </summary>
         public void UpdateOwnership()
         {
-            throw new NotImplementedException();
         }
 
         #endregion
