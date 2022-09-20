@@ -2,6 +2,7 @@ using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
+using Event = Utils.Event;
 
 public class VrPlayerManager : MonoBehaviour
 {

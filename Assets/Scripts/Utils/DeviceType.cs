@@ -1,5 +1,8 @@
-public enum DeviceType : byte
+namespace Utils
 {
-	VR,
-	AR,
+	public enum DeviceType : byte
+	{
+		VR,
+		AR,
+	}
 }

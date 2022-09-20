@@ -1,15 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Wall : MonoBehaviour
+namespace Board
 {
-    [SerializeField]
-    private Vector2 position;
-
-    // Start is called before the first frame update
-    void Start()
+    public class Wall : MonoBehaviour
     {
-        GetComponent<Renderer>().material.SetVector("_Tile", position);
+        [SerializeField]
+        private Vector2 position;
+
+        private static readonly int Tile = Shader.PropertyToID("_Tile");
+
+        // Start is called before the first frame update
+        private void Start()
+        {
+            GetComponent<Renderer>().material.SetVector(Tile, position);
+        }
     }
 }
