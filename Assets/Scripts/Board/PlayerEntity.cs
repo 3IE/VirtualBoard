@@ -1,22 +1,25 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
+using DeviceType = Utils.DeviceType;
 
-public class PlayerEntity : MonoBehaviour
+namespace Board
 {
-    public string username;
-    public int photonId;
-    public DeviceType device;
-
-    public void SetValues(DeviceType device, int photonId, string username)
+    public class PlayerEntity : MonoBehaviour
     {
-        this.device = device;
-        this.photonId = photonId;
-        this.username = username;
-    }
+        public string username;
+        public int photonId;
+        public DeviceType device;
 
-    public void UpdateTransform(Vector3 position)
-    {
-        transform.position = position;
-        //this.transform.rotation = transform.rotation;
+        public void SetValues(DeviceType device, int photonId, string username)
+        {
+            this.device = device;
+            this.photonId = photonId;
+            this.username = username;
+        }
+
+        public void UpdateTransform(Vector3 position)
+        {
+            transform.position = position;
+            //this.transform.rotation = transform.rotation;
+        }
     }
 }

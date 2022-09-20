@@ -1,164 +1,225 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
-public abstract class Shape : MonoBehaviour
+namespace Board.Shapes
 {
-    [SerializeField]
-    protected bool selectedLeft = false;
-    [SerializeField]
-    protected bool selectedRight = false;
-
-    protected bool locked = false;
-    protected bool isOwner = false;
-
-    protected Transform transformLeft;
-    protected Transform transformRight;
-
-    protected float initialDistance;
-    protected Vector3 initialScale;
-
-    private bool moving = false;
-    private bool resizing = false;
-
-    private Material mat;
-
-    private List<IXRSelectInteractor> interactors;
-
-    #region Unity
-
-    private void Start()
+    public abstract class Shape : MonoBehaviour
     {
-        mat = GetComponent<Renderer>().material;
-        interactors = new List<IXRSelectInteractor>(2);
+        protected bool Locked;
+        protected bool IsOwner;
 
-        Create();
-    }
+        protected float InitialDistance;
+        protected Vector3 InitialScale;
 
-    private void Update()
-    {
-        if (moving)
-            Move();
-        if (resizing)
-            Resize();
-    }
+        private bool _moving;
+        private bool _resizing;
 
-    #endregion
+        private Material _mat;
 
-    #region Material
+        protected List<IXRInteractor> Interactors;
+        
+        private static readonly int Create1 = Shader.PropertyToID("_Create");
+        private static readonly int Modify1 = Shader.PropertyToID("_Modify");
+        private static readonly int Destroy1 = Shader.PropertyToID("_Destroy");
 
-    public void Create()
-    {
-        mat.SetFloat("_Create", 1);
-    }
+        #region Unity
 
-    public void Modify()
-    {
-        mat.SetFloat("_Modify", 1);
-    }
+        private void Start()
+        {
+            _mat = GetComponent<Renderer>().material;
+            Interactors = new List<IXRInteractor>(2);
 
-    public void Destroy()
-    {
-        mat.SetFloat("_Destroy", 1);
-    }
+            Create();
+        }
 
-    public void StopAction()
-    {
-        mat.SetFloat("_Create", 0);
-        mat.SetFloat("_Modify", 0);
-        mat.SetFloat("_Destroy", 0);
-    }
+        private void Update()
+        {
+            if (_moving)
+                Move();
+            if (_resizing)
+                Resize();
+        }
 
-    public void CreateAction()
-    {
-        StopAction();
-        locked = true;
-    }
+        #endregion
 
-    #endregion
+        #region Material
 
-    #region Selection
+        public void Create()
+        {
+            _mat.SetFloat(Create1, 1);
+        }
 
-    public void OnSelect(SelectEnterEventArgs args)
-    {
-        if (!isOwner && locked)
-            return;
+        public void Modify()
+        {
+            _mat.SetFloat(Modify1, 1);
+        }
 
-        isOwner = true;
-        locked = true;
+        public void Destroy()
+        {
+            _mat.SetFloat(Destroy1, 1);
+        }
 
-        SendOwnership();
+        public void StopAction()
+        {
+            _mat.SetFloat(Create1, 0);
+            _mat.SetFloat(Modify1, 0);
+            _mat.SetFloat(Destroy1, 0);
+        }
 
-        interactors.Add(args.interactorObject);
-    }
+        public void CreateAction()
+        {
+            StopAction();
+            Locked = true;
+        }
 
-    public void OnSelectLeft()
-    {
-        { 
-            if (nbSelected == 2)
+        #endregion
+
+        #region Selection
+
+        public void OnSelect(SelectEnterEventArgs args)
+        {
+            if (!IsOwner)
             {
-                resizing = true;
-                initialDistance = Vector3.Distance(transformLeft.position, transformRight.position);
-                initialScale = transform.localScale;
+                if (Locked)
+                    return;
+                
+                IsOwner = true;
+                Locked = true;
+
+                //SendOwnership();
             }
 
+            Interactors.Add(args.interactorObject);
+
+            _moving = Interactors.Count == 1;
+            _resizing = Interactors.Count == 2;
+
             Modify();
+
+            if (!_resizing) return;
+            
+            InitialDistance = Vector3.Distance(Interactors[0].transform.position, Interactors[1].transform.position);
+            if (InitialDistance == 0)
+                InitialDistance = 1;
+            
+            InitialScale = transform.localScale;
         }
+
+        public void OnDeselect(SelectExitEventArgs args)
+        {
+            Interactors.Remove(args.interactorObject);
+
+            _moving = Interactors.Count == 1;
+            _resizing = false;
+
+            if (_moving) return;
+            
+            IsOwner = false;
+            Locked = false;
+            
+            //SendOwnership();
+        }
+
+#if UNITY_EDITOR
+
+        public void OnSelect(HoverEnterEventArgs args)
+        {
+            if (!IsOwner)
+            {
+                if (Locked)
+                    return;
+                
+                IsOwner = true;
+                Locked = true;
+
+                //SendOwnership();
+            }
+
+            Interactors.Add(args.interactorObject);
+
+            _moving = Interactors.Count == 1;
+            _resizing = Interactors.Count == 2;
+
+            Modify();
+
+            if (!_resizing) return;
+            
+            InitialDistance = Vector3.Distance(Interactors[0].transform.position, Interactors[1].transform.position);
+            if (InitialDistance == 0)
+                InitialDistance = 1;
+            
+            InitialScale = transform.localScale;
+        }
+
+        public void OnDeselect(HoverExitEventArgs args)
+        {
+            Interactors.Remove(args.interactorObject);
+
+            _moving = Interactors.Count == 1;
+            _resizing = false;
+
+            if (_moving) return;
+            
+            IsOwner = false;
+            Locked = false;
+            
+            //SendOwnership();
+        }
+
+#endif
+
+        #endregion
+
+        #region Networking
+
+        public void UpdateTransform()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SendTransform()
+        {
+            if (IsOwner && Locked)
+                throw new NotImplementedException();
+        }
+
+        public void SendDestroy()
+        {
+            if (IsOwner && Locked)
+                throw new NotImplementedException();
+        }
+
+        public void ReceiveDestroy()
+        {
+            Destroy();
+        }
+
+        public void SendOwnership()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UpdateOwnership()
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
+        #region Abstract
+
+        /// <summary>
+        /// Moves the object along the ray of the controller selecting it
+        /// </summary>
+        protected abstract void Move();
+
+        /// <summary>
+        /// Resizes the object according to the distance between the two controllers
+        /// </summary>
+        protected abstract void Resize();
+
+        #endregion
     }
-
-    public void OnDeselect()
-    {
-    }
-
-    #endregion
-
-    #region Networking
-
-    public void UpdateTransform()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void SendTransform()
-    {
-        if (isOwner && locked)
-            throw new System.NotImplementedException();
-    }
-
-    public void SendDestroy()
-    {
-        if (isOwner && locked)
-            throw new System.NotImplementedException();
-    }
-
-    public void ReceiveDestroy()
-    {
-        Destroy();
-    }
-
-    public void SendOwnership()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void UpdateOwnership()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    #endregion
-
-    #region Abstract
-
-    /// <summary>
-    /// Moves the object along the ray of the controller selecting it
-    /// </summary>
-    protected abstract void Move();
-
-    /// <summary>
-    /// Resizes the object according to the distance between the two controllers
-    /// </summary>
-    protected abstract void Resize();
-
-    #endregion
 }

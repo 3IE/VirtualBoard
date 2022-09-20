@@ -2,40 +2,43 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
-public class ShapeSelector : MonoBehaviour
+namespace Board.Shapes
 {
-    [SerializeField]
-    private List<GameObject> shapes;
-
-    [SerializeField]
-    private XRRayInteractor leftInteractor;
-    [SerializeField]
-    private XRRayInteractor rightInteractor;
-
-    private byte index;
-
-    private void Start()
+    public class ShapeSelector : MonoBehaviour
     {
-        index = 0;
-    }
+        [SerializeField]
+        private List<GameObject> shapes;
 
-    public void SelectCube()
-    {
-        index = 0;
-    }
+        [SerializeField]
+        private XRRayInteractor leftInteractor;
+        [SerializeField]
+        private XRRayInteractor rightInteractor;
 
-    public void SelectCylinder()
-    {
-        index = 1;
-    }
+        private byte _index;
 
-    public void SelectSphere()
-    {
-        index = 2;
-    }
+        private void Start()
+        {
+            _index = 0;
+        }
 
-    public GameObject GetShape()
-    {
-        return shapes[index];
+        public void SelectCube()
+        {
+            _index = 0;
+        }
+
+        public void SelectCylinder()
+        {
+            _index = 1;
+        }
+
+        public void SelectSphere()
+        {
+            _index = 2;
+        }
+
+        public GameObject GetShape()
+        {
+            return shapes[_index];
+        }
     }
 }

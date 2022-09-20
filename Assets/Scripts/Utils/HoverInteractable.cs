@@ -1,17 +1,22 @@
 using UnityEngine;
 
-public class HoverInteractable : MonoBehaviour
+namespace Utils
 {
-    [SerializeField]
-    private Material mat;
-
-    public void Hover()
+    public class HoverInteractable : MonoBehaviour
     {
-        mat.SetInt("_hovered", 1);
-    }
+        [SerializeField]
+        private Material mat;
 
-    public void HoverExit()
-    {
-        mat.SetInt("_hovered", 0);
+        private static readonly int Hovered = Shader.PropertyToID("_hovered");
+
+        public void Hover()
+        {
+            mat.SetInt(Hovered, 1);
+        }
+
+        public void HoverExit()
+        {
+            mat.SetInt(Hovered, 0);
+        }
     }
 }

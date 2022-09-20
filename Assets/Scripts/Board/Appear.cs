@@ -1,16 +1,21 @@
 using UnityEngine;
 
-public class Appear : MonoBehaviour
+namespace Board
 {
-    [SerializeField]
-    private GameObject player;
-    private Material mat;
-
-    private void Start() => mat = GetComponent<Renderer>().material;
-
-    // Update is called once per frame
-    void Update()
+    public class Appear : MonoBehaviour
     {
-        mat.SetFloat("_Distance", Vector3.Distance(transform.position, player.transform.position));
+        [SerializeField]
+        private GameObject player;
+        private Material _mat;
+    
+        private static readonly int Distance = Shader.PropertyToID("_Distance");
+
+        private void Start() => _mat = GetComponent<Renderer>().material;
+
+        // Update is called once per frame
+        private void Update()
+        {
+            _mat.SetFloat(Distance, Vector3.Distance(transform.position, player.transform.position));
+        }
     }
 }
