@@ -1,16 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit;
 
 public class ShapeSelector : MonoBehaviour
 {
     [SerializeField]
     private List<GameObject> shapes;
-
-    [SerializeField]
-    private XRRayInteractor leftInteractor;
-    [SerializeField]
-    private XRRayInteractor rightInteractor;
 
     private byte index;
 
