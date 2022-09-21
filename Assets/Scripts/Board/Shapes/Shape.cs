@@ -41,6 +41,13 @@ namespace Board.Shapes
             _shapesLayer = LayerMask.NameToLayer("Shapes");
 
             Create();
+
+#if UNITY_EDITOR
+            Interactors.Add(GameObject.Find("RightHand Controller").GetComponent<XRRayInteractor>());
+            InitialDistance = 15;
+            gameObject.layer = _shapesLayer;
+            _moving = true;
+#endif
         }
 
         private void Update()
@@ -106,11 +113,12 @@ namespace Board.Shapes
             _resizing = Interactors.Count == 2;
 
             Modify();
-
-            gameObject.layer = _shapesLayer;
-
+            
             if (_moving)
+            {
                 InitialDistance = Vector3.Distance(transform.position, Interactors[0].transform.position);
+                gameObject.layer = _shapesLayer;
+            }
 
             if (!_resizing) return;
             
@@ -131,6 +139,8 @@ namespace Board.Shapes
             if (_moving)
             {
                 InitialDistance = Vector3.Distance(transform.position, Interactors[0].transform.position);
+                gameObject.layer = _shapesLayer;
+                
                 return;
             }
 

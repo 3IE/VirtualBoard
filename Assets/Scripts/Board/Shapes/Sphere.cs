@@ -1,33 +1,53 @@
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit;
 
 namespace Board.Shapes
 {
     public class Sphere : Shape
     {
-        private float radius = 1;
+        private float _radius = 0.5f;
+
+        private int _defaultMask;
+        private int _defaultPlayerMask;
+
+        private RaycastHit[] _hits;
+
+        private void Start()
+        {
+            _defaultMask = LayerMask.GetMask("Default");
+            _defaultPlayerMask = LayerMask.GetMask("Default", "Player");
+
+            _hits = new RaycastHit[20];
+        }
 
         /// <summary>
         /// Moves the object to where the controller points
-        /// TODO: Check potential collisions at the new position
         /// </summary>
         protected override void Move()
         {
-            RaycastHit[] hits = Physics.RaycastAll(Interactors[0].transform.position,
-                Interactors[0].transform.forward, InitialDistance,
-                LayerMask.GetMask("Default", "Player"));
-
-            bool positionFound = false;
-
-            for (int i = hits.Length - 1; i >= 0 && !positionFound; i--)
+            if (Physics.Raycast(Interactors[0].transform.position, Interactors[0].transform.forward,
+                    out var hit, InitialDistance, _defaultMask))
             {
-                Vector3 position = hits[i].point + hits[i].normal * radius / 2;
-
-                if (!Physics.CheckSphere(position, radius / 2, LayerMask.GetMask("Default", "Player")))
+                Vector3 position = hit.point + hit.normal * _radius;
+                if (!Physics.CheckSphere(position, _radius - 0.01f, _defaultPlayerMask))
                 {
                     transform.position = position;
-                    positionFound = true;
+                    return;
                 }
+            }
+
+            var size = Physics.SphereCastNonAlloc(Interactors[0].transform.position, _radius,
+                Interactors[0].transform.forward, _hits, InitialDistance, _defaultMask);
+            var positionFound = false;
+
+            for (int i = size - 1; i >= 0 && !positionFound; i--)
+            {
+                Vector3 position = _hits[i].point + _hits[i].normal * _radius;
+
+                if (Physics.CheckSphere(position, _radius - 0.01f, _defaultPlayerMask))
+                    continue;
+
+                transform.position = position;
+                positionFound = true;
             }
 
             if (!positionFound)
@@ -45,7 +65,7 @@ namespace Board.Shapes
             transform.localScale =
                 InitialScale / InitialDistance
                 * Vector3.Distance(Interactors[0].transform.position, Interactors[1].transform.position);
-            radius = transform.localScale.x;
+            _radius = transform.localScale.x / 2;
 
             SendTransform();
         }
