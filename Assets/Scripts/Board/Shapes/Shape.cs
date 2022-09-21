@@ -21,6 +21,7 @@ namespace Board.Shapes
         protected List<IXRInteractor> Interactors;
 
         private int _id;
+        private static int _counter;
 
         private bool _locked;
         private bool _isOwner;
@@ -30,37 +31,28 @@ namespace Board.Shapes
 
         private Material _mat;
 
-        private static readonly int Create1 = Shader.PropertyToID("_Create");
-        private static readonly int Modify1 = Shader.PropertyToID("_Modify");
-        private static readonly int Destroy1 = Shader.PropertyToID("_Destroy");
+        private static readonly int Create1 = Shader.PropertyToID("_Creating");
+        private static readonly int Modify1 = Shader.PropertyToID("_Modifying");
+        private static readonly int Destroy1 = Shader.PropertyToID("_Destroying");
 
         private static int _defaultLayer;
         private static int _shapesLayer;
 
-        private static readonly List<Shape> Shapes = new();
+        private static readonly Dictionary<int, Shape> Shapes = new();
 
         #region Unity
 
         private void Start()
         {
             _mat = GetComponent<Renderer>().material;
-            Interactors = new List<IXRInteractor>(2);
-            GetComponent<Collider>().GetInstanceID();
-
             _defaultLayer = LayerMask.NameToLayer("Default");
             _shapesLayer = LayerMask.NameToLayer("Shapes");
-
+            Interactors = new List<IXRInteractor>(2);
+            _id = _counter++;
+            
+            Shapes.Add(_id, this);            
+            
             Create();
-
-#if UNITY_EDITOR
-            Interactors.Add(GameObject.Find("RightHand Controller").GetComponent<XRRayInteractor>());
-            InitialDistance = 15;
-            gameObject.layer = _shapesLayer;
-            _moving = true;
-#endif
-
-            _id = Shapes.Count;
-            Shapes.Add(this);
         }
 
         private void Update()
@@ -75,17 +67,17 @@ namespace Board.Shapes
 
         #region Material
 
-        public void Create()
+        private void Create()
         {
             _mat.SetFloat(Create1, 1);
         }
 
-        public void Modify()
+        private void Modify()
         {
             _mat.SetFloat(Modify1, 1);
         }
 
-        public void Destroy()
+        private void Destroy()
         {
             _mat.SetFloat(Destroy1, 1);
         }
@@ -186,7 +178,7 @@ namespace Board.Shapes
             var rotation = (Quaternion)data[1];
             var shapeId = (byte)data[2];
 
-            var obj = Instantiate(Selector.GetShape(shapeId), position, rotation);
+            Instantiate(Selector.GetShape(shapeId), position, rotation);
         }
 
         /// <summary>
@@ -211,9 +203,11 @@ namespace Board.Shapes
             var scale = (Vector3)data[2];
             var id = (int)data[3];
 
-            Shapes[id].transform.position = position;
-            Shapes[id].transform.rotation = rotation;
-            Shapes[id].transform.localScale = scale;
+            var shape = Shapes[id].transform;
+
+            shape.position = position;
+            shape.rotation = rotation;
+            shape.localScale = scale;
         }
 
         /// <summary>
@@ -232,6 +226,7 @@ namespace Board.Shapes
         public static void ReceiveDestroy(int id)
         {
             Shapes[id].Destroy();
+            Shapes.Remove(id);
         }
 
         /// <summary>
@@ -278,6 +273,16 @@ namespace Board.Shapes
         /// </summary>
         protected abstract void Resize();
 
+        /// <summary>
+        /// Rotates the object according to the angle of the current controller
+        /// </summary>
+        protected abstract void Rotate();
+
         #endregion
+        
+        public static int NumberOfShapes()
+        {
+            return Shapes.Count;
+        }
     }
 }

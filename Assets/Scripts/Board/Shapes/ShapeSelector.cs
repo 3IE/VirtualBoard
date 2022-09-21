@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -13,12 +14,13 @@ namespace Board.Shapes
         [SerializeField]
         private List<GameObject> shapes;
 
-        [SerializeField]
-        private XRRayInteractor leftInteractor;
-        [SerializeField]
-        private XRRayInteractor rightInteractor;
+        public static XRInteractionManager InteractionManager;
 
         private byte _index;
+
+        private void Awake()
+        {
+        }
 
         private void Start()
         {

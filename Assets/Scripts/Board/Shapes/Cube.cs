@@ -1,20 +1,24 @@
+using System;
 using UnityEngine;
 
 namespace Board.Shapes
 {
-    public class Sphere : Shape
+    public class Cube : Shape
     {
-        private float _radius = 0.5f;
+        private Vector3 _size = Vector3.one / 2;
 
         private int _defaultMask;
         private int _defaultPlayerMask;
 
         private RaycastHit[] _hits;
+        
+        private Transform _transform;
 
         private void Start()
         {
             _defaultMask = LayerMask.GetMask("Default");
             _defaultPlayerMask = LayerMask.GetMask("Default", "Player");
+            _transform = transform;
 
             _hits = new RaycastHit[20];
 
@@ -28,31 +32,36 @@ namespace Board.Shapes
             if (Physics.Raycast(Interactors[0].transform.position, Interactors[0].transform.forward,
                     out var hit, InitialDistance, _defaultMask))
             {
-                Vector3 position = hit.point + hit.normal * _radius;
-                if (!Physics.CheckSphere(position, _radius - 0.01f, _defaultPlayerMask))
+                var direction = new Vector3(hit.normal.x * _size.x, hit.normal.y * _size.y, hit.normal.z * _size.z);
+                var position = hit.point + direction;
+                
+                var extents = new Vector3(_size.x - .001f, _size.y - .001f, _size.z - .001f);
+                if (!Physics.CheckBox(position, extents, _transform.rotation, _defaultPlayerMask))
                 {
-                    transform.position = position;
+                    _transform.position = position;
                     return;
                 }
             }
 
-            var size = Physics.SphereCastNonAlloc(Interactors[0].transform.position, _radius,
-                Interactors[0].transform.forward, _hits, InitialDistance, _defaultMask);
+            var size = Physics.BoxCastNonAlloc(Interactors[0].transform.position, _size,
+                Interactors[0].transform.forward, _hits, _transform.rotation, InitialDistance, _defaultMask);
             var positionFound = false;
 
             for (int i = size - 1; i >= 0 && !positionFound; i--)
             {
-                Vector3 position = _hits[i].point + _hits[i].normal * _radius;
+                var direction = new Vector3(_hits[i].normal.x * _size.x, _hits[i].normal.y * _size.y, _hits[i].normal.z * _size.z);
+                var position = _hits[i].point + direction;
 
-                if (Physics.CheckSphere(position, _radius - 0.01f, _defaultPlayerMask))
+                var extents = new Vector3(_size.x - .001f, _size.y - .001f, _size.z - .001f);
+                if (Physics.CheckBox(position, extents, _transform.rotation, _defaultPlayerMask))
                     continue;
 
-                transform.position = position;
+                _transform.position = position;
                 positionFound = true;
             }
 
             if (!positionFound)
-                transform.position = Interactors[0].transform.position +
+                _transform.position = Interactors[0].transform.position +
                                      Interactors[0].transform.forward * InitialDistance;
 
             SendTransform();
@@ -63,18 +72,17 @@ namespace Board.Shapes
             if (Interactors[0].transform.position == Interactors[1].transform.position)
                 return;
 
-            transform.localScale =
+            _transform.localScale =
                 InitialScale / InitialDistance
                 * Vector3.Distance(Interactors[0].transform.position, Interactors[1].transform.position);
-            _radius = transform.localScale.x / 2;
+            _size = _transform.localScale / 2;
 
             SendTransform();
         }
 
-        /// <summary>
-        /// This object does not need to be rotated as it is a sphere.
-        /// </summary>
         protected override void Rotate()
-        {}
+        {
+            throw new NotImplementedException();
+        }
     }
 }
