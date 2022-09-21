@@ -8,32 +8,30 @@ namespace Board
 {
     public class Modification
     {
-        public int x;
-        public int y;
-        public float destX;
-        public float destY;
-        public Color[] colors;
-        public int penSize;
+        public readonly int X;
+        public readonly int Y;
+        public readonly float DestX;
+        public readonly float DestY;
+        public readonly Color[] Colors;
+        public readonly int PenSize;
 
         public Modification(int x, int y, float destX, float destY, Color[] colors, int penSize)
         {
-            this.x = x;
-            this.y = y;
-            this.destX = destX;
-            this.destY = destY;
-            this.colors = colors;
-            this.penSize = penSize;
+            X = x;
+            Y = y;
+            DestX = destX;
+            DestY = destY;
+            Colors = colors;
+            PenSize = penSize;
         }
 
         internal void Send(Event.EventCode code)
         {
-            object[] content = { this };
-
             // We send the data to every other person in the room
             RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
 
             // We send the event
-            PhotonNetwork.RaiseEvent((byte) code, content, raiseEventOptions, SendOptions.SendReliable);
+            PhotonNetwork.RaiseEvent((byte) code, this, raiseEventOptions, SendOptions.SendReliable);
         }
     }
 }

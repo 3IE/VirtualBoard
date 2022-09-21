@@ -6,6 +6,10 @@ namespace Board.Shapes
 {
     public class ShapeSelector : MonoBehaviour
     {
+        public static readonly byte CubeId = 0;
+        public static readonly byte CylinderId = 0;
+        public static readonly byte SphereId = 0;
+        
         [SerializeField]
         private List<GameObject> shapes;
 
@@ -18,27 +22,34 @@ namespace Board.Shapes
 
         private void Start()
         {
-            _index = 0;
+            _index = CubeId;
+
+            Shape.Selector = this;
         }
 
         public void SelectCube()
         {
-            _index = 0;
+            _index = CubeId;
         }
 
         public void SelectCylinder()
         {
-            _index = 1;
+            _index = CylinderId;
         }
 
         public void SelectSphere()
         {
-            _index = 2;
+            _index = SphereId;
         }
 
         public GameObject GetShape()
         {
             return shapes[_index];
+        }
+
+        public GameObject GetShape(byte shapeId)
+        {
+            return shapes[shapeId];
         }
     }
 }

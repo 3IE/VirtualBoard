@@ -1,33 +1,43 @@
 using System;
 using System.Collections.Generic;
+using ExitGames.Client.Photon;
+using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
+using Event = Utils.Event;
 
 namespace Board.Shapes
 {
     public abstract class Shape : MonoBehaviour
     {
-        protected bool Locked;
-        protected bool IsOwner;
+        public static ShapeSelector Selector;
+
+        protected byte ShapeId;
 
         protected float InitialDistance;
         protected Vector3 InitialScale;
 
-        protected int ColliderId;
+        protected List<IXRInteractor> Interactors;
+
+        private int _id;
+
+        private bool _locked;
+        private bool _isOwner;
 
         private bool _moving;
         private bool _resizing;
 
         private Material _mat;
 
-        protected List<IXRInteractor> Interactors;
-        
         private static readonly int Create1 = Shader.PropertyToID("_Create");
         private static readonly int Modify1 = Shader.PropertyToID("_Modify");
         private static readonly int Destroy1 = Shader.PropertyToID("_Destroy");
-        
-        protected static int DefaultLayer;
+
+        private static int _defaultLayer;
         private static int _shapesLayer;
+
+        private static readonly List<Shape> Shapes = new();
 
         #region Unity
 
@@ -35,9 +45,9 @@ namespace Board.Shapes
         {
             _mat = GetComponent<Renderer>().material;
             Interactors = new List<IXRInteractor>(2);
-            ColliderId = GetComponent<Collider>().GetInstanceID();
-            
-            DefaultLayer = LayerMask.NameToLayer("Default");
+            GetComponent<Collider>().GetInstanceID();
+
+            _defaultLayer = LayerMask.NameToLayer("Default");
             _shapesLayer = LayerMask.NameToLayer("Shapes");
 
             Create();
@@ -48,6 +58,9 @@ namespace Board.Shapes
             gameObject.layer = _shapesLayer;
             _moving = true;
 #endif
+
+            _id = Shapes.Count;
+            Shapes.Add(this);
         }
 
         private void Update()
@@ -87,7 +100,7 @@ namespace Board.Shapes
         public void CreateAction()
         {
             StopAction();
-            Locked = true;
+            _locked = true;
         }
 
         #endregion
@@ -96,15 +109,15 @@ namespace Board.Shapes
 
         public void OnSelect(SelectEnterEventArgs args)
         {
-            if (!IsOwner)
+            if (!_isOwner)
             {
-                if (Locked)
+                if (_locked)
                     return;
-                
-                IsOwner = true;
-                Locked = true;
 
-                //SendOwnership();
+                _isOwner = true;
+                _locked = true;
+
+                SendOwnership();
             }
 
             Interactors.Add(args.interactorObject);
@@ -113,7 +126,7 @@ namespace Board.Shapes
             _resizing = Interactors.Count == 2;
 
             Modify();
-            
+
             if (_moving)
             {
                 InitialDistance = Vector3.Distance(transform.position, Interactors[0].transform.position);
@@ -121,11 +134,11 @@ namespace Board.Shapes
             }
 
             if (!_resizing) return;
-            
+
             InitialDistance = Vector3.Distance(Interactors[0].transform.position, Interactors[1].transform.position);
             if (InitialDistance == 0)
                 InitialDistance = 1;
-            
+
             InitialScale = transform.localScale;
         }
 
@@ -140,16 +153,16 @@ namespace Board.Shapes
             {
                 InitialDistance = Vector3.Distance(transform.position, Interactors[0].transform.position);
                 gameObject.layer = _shapesLayer;
-                
+
                 return;
             }
 
-            gameObject.layer = DefaultLayer;
-            
-            IsOwner = false;
-            Locked = false;
-            
-            //SendOwnership();
+            gameObject.layer = _defaultLayer;
+
+            _isOwner = false;
+            _locked = false;
+
+            SendOwnership();
         }
 
         #endregion
@@ -157,57 +170,98 @@ namespace Board.Shapes
         #region Networking
 
         /// <summary>
-        /// Gets the new transform of the object from the server and applies it to the object.
-        /// TODO: Implement
+        /// Sends a signal to create an object with these parameters
         /// </summary>
-        public void UpdateTransform()
+        protected void SendNewObject()
         {
-            throw new NotImplementedException();
+            var transform1 = transform;
+            var data = new object[] { transform1.position, transform1.rotation, ShapeId };
+
+            SendData(Event.EventCode.SendNewObject, data);
+        }
+
+        public static void ReceiveNewObject(object[] data)
+        {
+            var position = (Vector3)data[0];
+            var rotation = (Quaternion)data[1];
+            var shapeId = (byte)data[2];
+
+            var obj = Instantiate(Selector.GetShape(shapeId), position, rotation);
         }
 
         /// <summary>
         /// Sends the new transform of the object to the other clients
-        /// TODO: Implement
         /// </summary>
-        public void SendTransform()
+        protected void SendTransform()
         {
-            if (IsOwner && Locked)
-                ;
+            if (!_isOwner || !_locked) return;
+
+            var transform1 = transform;
+            object[] data = { transform1.position, transform1.rotation, transform1.localScale, _id };
+            SendData(Event.EventCode.SendTransform, data);
+        }
+
+        /// <summary>
+        /// Gets the new transform of the object from the server and applies it to the object.
+        /// </summary>
+        public static void ReceiveTransform(object[] data)
+        {
+            var position = (Vector3)data[0];
+            var rotation = (Quaternion)data[1];
+            var scale = (Vector3)data[2];
+            var id = (int)data[3];
+
+            Shapes[id].transform.position = position;
+            Shapes[id].transform.rotation = rotation;
+            Shapes[id].transform.localScale = scale;
         }
 
         /// <summary>
         /// Tells the other clients to destroy this object
-        /// TODO: Implement
         /// </summary>
-        public void SendDestroy()
+        protected void SendDestroy()
         {
-            if (IsOwner && Locked)
-                ;
+            if (!_isOwner || !_locked) return;
+
+            SendData(Event.EventCode.SendDestroy, _id);
         }
 
         /// <summary>
-        /// Destroy this object
-        /// TODO: Implement
+        /// Destroy the object with the corresponding id
         /// </summary>
-        public void ReceiveDestroy()
+        public static void ReceiveDestroy(int id)
         {
-            Destroy();
+            Shapes[id].Destroy();
         }
 
         /// <summary>
         /// Warns the other clients that this object can't be modified
-        /// TODO: Implement 
         /// </summary>
-        public void SendOwnership()
+        private void SendOwnership()
         {
+            if (!_isOwner || !_locked) return;
+
+            object[] data = { _isOwner, _id };
+            SendData(Event.EventCode.SendOwnership, data);
         }
 
         /// <summary>
         /// Update this object so that it can't be modified until told otherwise
-        /// TODO: Implement 
         /// </summary>
-        public void UpdateOwnership()
+        public static void ReceiveOwnership(object[] data)
         {
+            var owned = (bool)data[0];
+            var id = (int)data[1];
+
+            Shapes[id]._locked = owned;
+        }
+
+        private static void SendData(Event.EventCode eventCode, object data = null)
+        {
+            var raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
+
+            PhotonNetwork.RaiseEvent((byte)eventCode, data, raiseEventOptions,
+                SendOptions.SendReliable);
         }
 
         #endregion

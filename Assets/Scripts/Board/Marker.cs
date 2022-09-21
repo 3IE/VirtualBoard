@@ -78,8 +78,8 @@ namespace Board
 
                 _touchPos = new Vector2(_touch.textureCoord.x, _touch.textureCoord.y);
 
-                int x = (int)(_touchPos.x * _board.textureSize.x - (_board!.tools.penSize / 2));
-                int y = (int)(_touchPos.y * _board.textureSize.y - (_board!.tools.penSize / 2));
+                int x = (int)(_touchPos.x * _board.textureSize.x - _board!.tools.penSize / 2);
+                int y = (int)(_touchPos.y * _board.textureSize.y - _board!.tools.penSize / 2);
 
                 // If we are touching the board and in its boundaries, then we draw
                 if (!InBound(x, y))
@@ -139,8 +139,8 @@ namespace Board
 
         private void ModifyTexture(Modification modification)
         {
-            ModifyTexture(modification.x, modification.y, modification.destX, modification.destY, modification.colors,
-                modification.penSize);
+            ModifyTexture(modification.X, modification.Y, modification.DestX, modification.DestY, modification.Colors,
+                modification.PenSize);
         }
 
         public void AddModification(Modification modification)

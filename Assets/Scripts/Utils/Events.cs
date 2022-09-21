@@ -18,9 +18,13 @@ namespace Utils
             Marker = 20,
             Eraser,
 
-            // Objects 3X
+            // Objects 30 - 59
+            SendNewObject = 30,
+            SendDestroy,
+            SendTransform,
+            SendOwnership,
 
-            // Chat 4X
+            // Chat 6X
 
             // Error 100 - 200 (temporaire)
         }

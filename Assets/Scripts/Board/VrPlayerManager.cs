@@ -33,7 +33,8 @@ namespace Board
             PhotonNetwork.RaiseEvent((byte) Event.EventCode.SendNewPosition, content, raiseEventOptions, SendOptions.SendReliable);
         }
         private void Ping(Vector3 position)
-        { // pooling des ping, 2 prefab de ping (un pour l'utilisateur et un pour les autres) 
+        { 
+            // pooling des ping, 2 prefab de ping (un pour l'utilisateur et un pour les autres) 
             // ping physique
             var ping = Instantiate(localPingPrefab,  position, boardTransform.rotation, boardTransform);
             // ping sur le reseaux
@@ -41,17 +42,19 @@ namespace Board
             SendNewPingEvent(new Vector2(localPos.x, localPos.y));
         }
         private void SendNewPingEvent(Vector2 position) {
-            object[] content = { position };
             var raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
-            PhotonNetwork.RaiseEvent((byte) Event.EventCode.SendNewPing, content, raiseEventOptions, SendOptions.SendReliable);
+            
+            PhotonNetwork.RaiseEvent((byte) Event.EventCode.SendNewPing, position, raiseEventOptions, SendOptions.SendReliable);
         }
     
-        //! TO DELETE LATER
+        /// <summary>
+        /// TODO: DELETE!
+        /// </summary>
         public void HahaPinged()
         {
-            object[] content = { new Vector2(1, 1)};
             var raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
-            PhotonNetwork.RaiseEvent((byte) Event.EventCode.SendNewPing, content, raiseEventOptions, SendOptions.SendReliable);
+
+            PhotonNetwork.RaiseEvent((byte) Event.EventCode.SendNewPing, Vector2.one, raiseEventOptions, SendOptions.SendReliable);
         }
     }
 }

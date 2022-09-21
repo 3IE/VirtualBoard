@@ -17,6 +17,10 @@ namespace Board.Shapes
             _defaultPlayerMask = LayerMask.GetMask("Default", "Player");
 
             _hits = new RaycastHit[20];
+
+            ShapeId = ShapeSelector.SphereId;
+            
+            SendNewObject();
         }
 
         /// <summary>

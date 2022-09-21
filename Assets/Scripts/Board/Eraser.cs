@@ -127,7 +127,7 @@ namespace Board
 
         private void ModifyTexture(Modification modification)
         {
-            ModifyTexture(modification.x, modification.y, modification.destX, modification.destY, modification.colors, modification.penSize);
+            ModifyTexture(modification.X, modification.Y, modification.DestX, modification.DestY, modification.Colors, modification.PenSize);
         }
 
         public void AddModification(Modification modification)
