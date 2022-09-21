@@ -1,18 +1,21 @@
 using UnityEngine;
 
-public class Board : MonoBehaviour
+namespace Board
 {
-    public Texture2D texture;
-    public Vector2 textureSize = new Vector2(2048 * 0.6f, 2048 * 1.5f);
-    public Tools tools;
-
-    // Start is called before the first frame update
-    void Start()
+    public class Board : MonoBehaviour
     {
-        Renderer renderer = GetComponent<Renderer>();
+        public Texture2D texture;
+        public Vector2 textureSize = new(2048 * 0.6f, 2048 * 1.5f);
+        public Tools tools;
 
-        texture = new Texture2D((int) textureSize.x, (int) textureSize.y);
-        tools.baseColor = texture.GetPixel(0, 0);
-        renderer.material.mainTexture = texture;
+        // Start is called before the first frame update
+        private void Start()
+        {
+            Renderer r = GetComponent<Renderer>();
+            
+            texture = new Texture2D((int) textureSize.x, (int) textureSize.y);
+            tools.baseColor = texture.GetPixel(0, 0);
+            r.material.mainTexture = texture;
+        }
     }
 }

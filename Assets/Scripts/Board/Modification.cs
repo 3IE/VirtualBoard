@@ -2,34 +2,36 @@ using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
+using Event = Utils.Event;
 
-public class Modification
+namespace Board
 {
-    public int x;
-    public int y;
-    public float destX;
-    public float destY;
-    public Color[] colors;
-    public int penSize;
-
-    public Modification(int x, int y, float destX, float destY, Color[] colors, int penSize)
+    public class Modification
     {
-        this.x = x;
-        this.y = y;
-        this.destX = destX;
-        this.destY = destY;
-        this.colors = colors;
-        this.penSize = penSize;
-    }
+        public readonly int X;
+        public readonly int Y;
+        public readonly float DestX;
+        public readonly float DestY;
+        public readonly Color[] Colors;
+        public readonly int PenSize;
 
-    internal void Send(Event.EventCode code)
-    {
-        object[] content = new object[] { this };
+        public Modification(int x, int y, float destX, float destY, Color[] colors, int penSize)
+        {
+            X = x;
+            Y = y;
+            DestX = destX;
+            DestY = destY;
+            Colors = colors;
+            PenSize = penSize;
+        }
 
-        // We send the data to every other person in the room
-        RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
+        internal void Send(Event.EventCode code)
+        {
+            // We send the data to every other person in the room
+            RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
 
-        // We send the event
-        PhotonNetwork.RaiseEvent((byte) code, content, raiseEventOptions, SendOptions.SendReliable);
+            // We send the event
+            PhotonNetwork.RaiseEvent((byte) code, this, raiseEventOptions, SendOptions.SendReliable);
+        }
     }
 }
