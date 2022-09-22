@@ -1130,6 +1130,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "OnlineInteractions",
+            "id": "e8bd57f3-1de7-4a32-bd1d-44f7853d94bc",
+            "actions": [
+                {
+                    "name": "Ping",
+                    "type": "Button",
+                    "id": "8f3c9346-b205-4482-93c3-413d65f6221c",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "e3ba3814-b118-4c0c-a240-19ddc4afbdcb",
+                    "path": "<XRController>{RightHand}/secondaryButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Generic XR Controller",
+                    "action": "Ping",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [
