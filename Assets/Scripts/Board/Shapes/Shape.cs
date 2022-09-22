@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using ExitGames.Client.Photon;
 using Photon.Pun;
@@ -30,6 +29,7 @@ namespace Board.Shapes
         private bool _resizing;
 
         private Material _mat;
+        private Rigidbody _rigidbody;
 
         private static readonly int Create1 = Shader.PropertyToID("_Creating");
         private static readonly int Modify1 = Shader.PropertyToID("_Modifying");
@@ -42,9 +42,10 @@ namespace Board.Shapes
 
         #region Unity
 
-        private void Start()
+        private void Awake()
         {
             _mat = GetComponent<Renderer>().material;
+            _rigidbody = GetComponent<Rigidbody>();
             _defaultLayer = LayerMask.NameToLayer("Default");
             _shapesLayer = LayerMask.NameToLayer("Shapes");
             Interactors = new List<IXRInteractor>(2);
@@ -52,7 +53,7 @@ namespace Board.Shapes
             
             Shapes.Add(_id, this);            
             
-            Create();
+            Freeze();
         }
 
         private void Update()
@@ -89,10 +90,34 @@ namespace Board.Shapes
             _mat.SetFloat(Destroy1, 0);
         }
 
-        public void CreateAction()
+        public void CreateAction(IXRInteractor interactor)
         {
             StopAction();
-            _locked = true;
+            Create();
+
+            if (!_isOwner)
+            {
+                if (_locked)
+                    return;
+
+                _isOwner = true;
+                _locked = true;
+
+                SendOwnership();
+            }
+
+            Interactors.Add(interactor);
+
+            UpdateAction();
+        }
+
+        public void StopCreateAction(IXRInteractor interactor)
+        {
+            StopAction();
+
+            Interactors.Remove(interactor);
+
+            UpdateActionDeselect();
         }
 
         #endregion
@@ -113,16 +138,55 @@ namespace Board.Shapes
             }
 
             Interactors.Add(args.interactorObject);
-
-            _moving = Interactors.Count == 1;
-            _resizing = Interactors.Count == 2;
-
+            
             Modify();
+
+            UpdateAction();
+        }
+
+        public void OnDeselect(SelectExitEventArgs args)
+        {
+            Interactors.Remove(args.interactorObject);
+
+            UpdateActionDeselect();
+        }
+
+        private void UpdateActionDeselect()
+        {
+            _moving = Interactors.Count == 1;
+            _resizing = false;
 
             if (_moving)
             {
                 InitialDistance = Vector3.Distance(transform.position, Interactors[0].transform.position);
                 gameObject.layer = _shapesLayer;
+                Unfreeze();
+
+                return;
+            }
+            
+            StopAction();
+
+            Freeze();
+
+            gameObject.layer = _defaultLayer;
+
+            _isOwner = false;
+            _locked = false;
+
+            SendOwnership();
+        }
+
+        private void UpdateAction()
+        {
+            _moving = Interactors.Count == 1;
+            _resizing = Interactors.Count == 2;
+
+            if (_moving)
+            {
+                InitialDistance = Vector3.Distance(transform.position, Interactors[0].transform.position);
+                gameObject.layer = _shapesLayer;
+                Unfreeze();
             }
 
             if (!_resizing) return;
@@ -134,27 +198,13 @@ namespace Board.Shapes
             InitialScale = transform.localScale;
         }
 
-        public void OnDeselect(SelectExitEventArgs args)
+        private void Freeze()
         {
-            Interactors.Remove(args.interactorObject);
-
-            _moving = Interactors.Count == 1;
-            _resizing = false;
-
-            if (_moving)
-            {
-                InitialDistance = Vector3.Distance(transform.position, Interactors[0].transform.position);
-                gameObject.layer = _shapesLayer;
-
-                return;
-            }
-
-            gameObject.layer = _defaultLayer;
-
-            _isOwner = false;
-            _locked = false;
-
-            SendOwnership();
+            _rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+        }
+        private void Unfreeze()
+        {
+            _rigidbody.constraints = RigidbodyConstraints.None;
         }
 
         #endregion

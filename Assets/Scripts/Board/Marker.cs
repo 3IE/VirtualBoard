@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Utils;
 using Event = Utils.Event;
 
 namespace Board
@@ -13,7 +12,6 @@ namespace Board
 
         private Renderer _renderer;
         private Color[] _colors;
-        private float _tipHeight;
 
         private Transform _tipTransform;
         private Board _board;
@@ -30,7 +28,6 @@ namespace Board
         {
             _tipTransform = tip.transform;
             _renderer = tip.GetComponent<Renderer>();
-            _tipHeight = _tipTransform.localScale.y;
 
             _touchedLastFrame = false;
             _modifications = new Queue<Modification>();
@@ -40,7 +37,7 @@ namespace Board
         {
             UpdateRotation();
 
-            if (_modifications.TryDequeue(out Modification mod))
+            if (_modifications.TryDequeue(out var mod))
                 ModifyTexture(mod);
 
             if (CanDraw)
@@ -78,8 +75,8 @@ namespace Board
 
                 _touchPos = new Vector2(_touch.textureCoord.x, _touch.textureCoord.y);
 
-                int x = (int)(_touchPos.x * _board.textureSize.x - _board!.tools.penSize / 2);
-                int y = (int)(_touchPos.y * _board.textureSize.y - _board!.tools.penSize / 2);
+                var x = (int)(_touchPos.x * _board.textureSize.x - _board!.tools.penSize / 2);
+                var y = (int)(_touchPos.y * _board.textureSize.y - _board!.tools.penSize / 2);
 
                 // If we are touching the board and in its boundaries, then we draw
                 if (!InBound(x, y))
@@ -93,10 +90,6 @@ namespace Board
                     }
                     catch (ArgumentException)
                     {
-#if UNITY_EDITOR
-                        PrintVar.PrintDebug("Eraser: went out of board");
-#endif
-
                         _board = null;
                         _touchedLastFrame = false;
                     }

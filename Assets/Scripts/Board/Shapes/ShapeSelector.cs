@@ -1,25 +1,32 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit;
 
 namespace Board.Shapes
 {
     public class ShapeSelector : MonoBehaviour
     {
-        public static readonly byte CubeId = 0;
-        public static readonly byte CylinderId = 0;
-        public static readonly byte SphereId = 0;
-        
-        [SerializeField]
-        private List<GameObject> shapes;
+        public const byte CubeId = 0;
+        public const byte CylinderId = 0;
+        public const byte SphereId = 0;
 
-        public static XRInteractionManager InteractionManager;
+        [SerializeField] private XRRayInteractor leftInteractor;
+        [SerializeField] private XRRayInteractor rightInteractor;
+
+        [SerializeField] private InputActionReference createReference;
+        [SerializeField] private XRInteractionManager interactionManager;
+        [SerializeField] private Transform shapesParent;
+        [SerializeField] private List<GameObject> shapes;
 
         private byte _index;
 
+        private Shape _currentShape;
+
         private void Awake()
         {
+            createReference.action.started += CreateObject;
+            createReference.action.canceled += StopCreateObject;
         }
 
         private void Start()
@@ -44,14 +51,28 @@ namespace Board.Shapes
             _index = SphereId;
         }
 
-        public GameObject GetShape()
+        public GameObject GetShape(byte shapeId)
+        {
+            return shapes[shapeId];
+        }
+
+        private GameObject GetShape()
         {
             return shapes[_index];
         }
 
-        public GameObject GetShape(byte shapeId)
+        private void CreateObject(InputAction.CallbackContext ctx)
         {
-            return shapes[shapeId];
+            var prefab = GetShape();
+            var obj = Instantiate(prefab, shapesParent);
+            obj.GetComponent<XRSimpleInteractable>().interactionManager = interactionManager;
+            _currentShape = obj.GetComponent<Shape>();
+            _currentShape.CreateAction(leftInteractor);
+        }
+        
+        private void StopCreateObject(InputAction.CallbackContext ctx)
+        {
+            _currentShape.StopCreateAction(leftInteractor);
         }
     }
 }

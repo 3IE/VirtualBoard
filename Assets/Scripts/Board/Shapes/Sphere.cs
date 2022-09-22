@@ -26,7 +26,7 @@ namespace Board.Shapes
         protected override void Move()
         {
             if (Physics.Raycast(Interactors[0].transform.position, Interactors[0].transform.forward,
-                    out var hit, InitialDistance, _defaultMask))
+                    out var hit, 100f, _defaultMask))
             {
                 Vector3 position = hit.point + hit.normal * _radius;
                 if (!Physics.CheckSphere(position, _radius - 0.01f, _defaultPlayerMask))
@@ -37,7 +37,7 @@ namespace Board.Shapes
             }
 
             var size = Physics.SphereCastNonAlloc(Interactors[0].transform.position, _radius,
-                Interactors[0].transform.forward, _hits, InitialDistance, _defaultMask);
+                Interactors[0].transform.forward, _hits, 100f, _defaultMask);
             var positionFound = false;
 
             for (int i = size - 1; i >= 0 && !positionFound; i--)
