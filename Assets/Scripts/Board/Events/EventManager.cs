@@ -4,12 +4,11 @@ using Board.Shapes;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
-using TMPro;
 using UnityEngine;
+using Users;
 using Utils;
 using DeviceType = Utils.DeviceType;
 using Event = Utils.Event;
-using Object = UnityEngine.Object;
 
 namespace Board.Events
 {

@@ -1115,6 +1115,34 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""customAction"",
+            ""id"": ""5309f06b-bd95-4586-a7fd-c9cb991d7a6b"",
+            ""actions"": [
+                {
+                    ""name"": ""Ping"",
+                    ""type"": ""Button"",
+                    ""id"": ""7cb0d0f6-60ec-4b5a-b81d-40f67b81d4b0"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""99371948-644a-4db9-bc6e-c1287a31707c"",
+                    ""path"": ""<XRController>{RightHand}/primaryButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Generic XR Controller"",
+                    ""action"": ""Ping"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -1229,6 +1257,9 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
         m_XRIRightHandLocomotion_TeleportModeCancel = m_XRIRightHandLocomotion.FindAction("Teleport Mode Cancel", throwIfNotFound: true);
         m_XRIRightHandLocomotion_Turn = m_XRIRightHandLocomotion.FindAction("Turn", throwIfNotFound: true);
         m_XRIRightHandLocomotion_Move = m_XRIRightHandLocomotion.FindAction("Move", throwIfNotFound: true);
+        // customAction
+        m_customAction = asset.FindActionMap("customAction", throwIfNotFound: true);
+        m_customAction_Ping = m_customAction.FindAction("Ping", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -1755,6 +1786,39 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
         }
     }
     public XRIRightHandLocomotionActions @XRIRightHandLocomotion => new XRIRightHandLocomotionActions(this);
+
+    // customAction
+    private readonly InputActionMap m_customAction;
+    private ICustomActionActions m_CustomActionActionsCallbackInterface;
+    private readonly InputAction m_customAction_Ping;
+    public struct CustomActionActions
+    {
+        private @XRIDefaultInputActions m_Wrapper;
+        public CustomActionActions(@XRIDefaultInputActions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Ping => m_Wrapper.m_customAction_Ping;
+        public InputActionMap Get() { return m_Wrapper.m_customAction; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(CustomActionActions set) { return set.Get(); }
+        public void SetCallbacks(ICustomActionActions instance)
+        {
+            if (m_Wrapper.m_CustomActionActionsCallbackInterface != null)
+            {
+                @Ping.started -= m_Wrapper.m_CustomActionActionsCallbackInterface.OnPing;
+                @Ping.performed -= m_Wrapper.m_CustomActionActionsCallbackInterface.OnPing;
+                @Ping.canceled -= m_Wrapper.m_CustomActionActionsCallbackInterface.OnPing;
+            }
+            m_Wrapper.m_CustomActionActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @Ping.started += instance.OnPing;
+                @Ping.performed += instance.OnPing;
+                @Ping.canceled += instance.OnPing;
+            }
+        }
+    }
+    public CustomActionActions @customAction => new CustomActionActions(this);
     private int m_GenericXRControllerSchemeIndex = -1;
     public InputControlScheme GenericXRControllerScheme
     {
@@ -1839,5 +1903,9 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
         void OnTeleportModeCancel(InputAction.CallbackContext context);
         void OnTurn(InputAction.CallbackContext context);
         void OnMove(InputAction.CallbackContext context);
+    }
+    public interface ICustomActionActions
+    {
+        void OnPing(InputAction.CallbackContext context);
     }
 }

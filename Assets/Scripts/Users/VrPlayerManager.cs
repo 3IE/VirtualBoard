@@ -1,11 +1,16 @@
+using System;
+using System.Linq;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
+using UnityEngine.XR.Interaction.Toolkit;
+using Utils;
 using Event = Utils.Event;
 
-namespace Board
+namespace Users
 {
     public class VrPlayerManager : MonoBehaviour
     {
@@ -18,12 +23,46 @@ namespace Board
         [SerializeField]
         private GameObject localPingPrefab;
 
+        private XRIDefaultInputActions _customInputs;
+        #region ressource
+        // https://forum.unity.com/threads/fetch-xr-handed-ness-from-an-inputaction.907139/
+        #endregion
+        
+        [SerializeField] 
+        private Transform rightHandTransform;
+        [SerializeField] 
+        private Transform leftHandTransform;
+
+        private void Awake()
+        {
+            _customInputs = new XRIDefaultInputActions();
+        }
+
         private void OnEnable()
         {
+            _customInputs.Enable();
+            _customInputs.customAction.Ping.started += TryPing;
             _vrCamTransform = Camera.main!.transform;
             InvokeRepeating(nameof(SendNewPositionEvent), refreshRate, refreshRate);
         }
-        private void OnDisable() => CancelInvoke();
+
+        private void TryPing(InputAction.CallbackContext obj)
+        {
+            print($"Trying ping");
+            Ray ray = new (rightHandTransform.position, rightHandTransform.forward);
+            if (!Physics.Raycast(ray, out var hit, 100f)) return;
+            if (hit.collider.CompareTag("Board"))
+                Ping(hit.point);
+            else if (hit.collider.CompareTag("Ping"))
+                Destroy(hit.collider.gameObject.transform.parent.gameObject);
+        }
+
+        private void OnDisable() 
+        {
+            CancelInvoke();
+            _customInputs.customAction.Ping.started -= TryPing;
+            _customInputs.Disable();
+        }
         private void SendNewPositionEvent()
         {
             object[] content = { _vrCamTransform.position - boardTransform.position };

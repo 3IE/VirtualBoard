@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using DeviceType = Utils.DeviceType;
 
-namespace Board
+namespace Users
 {
     public class PlayerEntity : MonoBehaviour
     {
