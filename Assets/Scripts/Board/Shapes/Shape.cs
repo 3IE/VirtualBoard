@@ -27,6 +27,7 @@ namespace Board.Shapes
 
         private bool _moving;
         private bool _resizing;
+        private bool _deleting;
 
         private Material _mat;
         private Rigidbody _rigidbody;
@@ -78,12 +79,17 @@ namespace Board.Shapes
             _mat.SetFloat(Modify1, 1);
         }
 
-        private void Destroy()
+        public void Delete()
         {
             _mat.SetFloat(Destroy1, 1);
         }
 
-        public void StopAction()
+        public void Destroy()
+        {
+            Destroy(gameObject);
+        }
+
+        private void StopAction()
         {
             _mat.SetFloat(Create1, 0);
             _mat.SetFloat(Modify1, 0);
@@ -124,8 +130,23 @@ namespace Board.Shapes
 
         #region Selection
 
+        public void OnHoverEnter(HoverEnterEventArgs args)
+        {
+            if (_deleting && ReferenceEquals(args.interactorObject, Selector.leftInteractor))
+                Delete();
+        }
+        
+        public void OnHoverExit(HoverExitEventArgs args)
+        {
+            if (_deleting && ReferenceEquals(args.interactorObject, Selector.leftInteractor))
+                _mat.SetFloat(Destroy1, 0);
+        }
+        
         public void OnSelect(SelectEnterEventArgs args)
         {
+            if(_deleting)
+                return;
+            
             if (!_isOwner)
             {
                 if (_locked)
@@ -146,34 +167,25 @@ namespace Board.Shapes
 
         public void OnDeselect(SelectExitEventArgs args)
         {
-            Interactors.Remove(args.interactorObject);
+            if(_deleting)
+                return;
+            
+            Interactors.Clear();
 
             UpdateActionDeselect();
         }
 
         private void UpdateActionDeselect()
         {
-            _moving = Interactors.Count == 1;
+            _moving = false;
             _resizing = false;
-
-            if (_moving)
-            {
-                InitialDistance = Vector3.Distance(transform.position, Interactors[0].transform.position);
-                gameObject.layer = _shapesLayer;
-                Unfreeze();
-
-                return;
-            }
-            
-            StopAction();
-
-            Freeze();
-
-            gameObject.layer = _defaultLayer;
-
             _isOwner = false;
             _locked = false;
 
+            gameObject.layer = _defaultLayer;
+            
+            StopAction();
+            Freeze();
             SendOwnership();
         }
 
@@ -205,6 +217,12 @@ namespace Board.Shapes
         private void Unfreeze()
         {
             _rigidbody.constraints = RigidbodyConstraints.None;
+        }
+
+        public static void DeletionMode(bool value)
+        {
+            foreach (var shape in Shapes.Values)
+                shape._deleting = value;
         }
 
         #endregion
@@ -275,7 +293,7 @@ namespace Board.Shapes
         /// </summary>
         public static void ReceiveDestroy(int id)
         {
-            Shapes[id].Destroy();
+            Shapes[id].Delete();
             Shapes.Remove(id);
         }
 
