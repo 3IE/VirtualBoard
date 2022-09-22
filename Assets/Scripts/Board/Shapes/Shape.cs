@@ -89,7 +89,7 @@ namespace Board.Shapes
             Destroy(gameObject);
         }
 
-        public void StopAction()
+        private void StopAction()
         {
             _mat.SetFloat(Create1, 0);
             _mat.SetFloat(Modify1, 0);
@@ -170,34 +170,22 @@ namespace Board.Shapes
             if(_deleting)
                 return;
             
-            Interactors.Remove(args.interactorObject);
+            Interactors.Clear();
 
             UpdateActionDeselect();
         }
 
         private void UpdateActionDeselect()
         {
-            _moving = Interactors.Count == 1;
+            _moving = false;
             _resizing = false;
-
-            if (_moving)
-            {
-                InitialDistance = Vector3.Distance(transform.position, Interactors[0].transform.position);
-                gameObject.layer = _shapesLayer;
-                Unfreeze();
-
-                return;
-            }
-            
-            StopAction();
-
-            Freeze();
-
-            gameObject.layer = _defaultLayer;
-
             _isOwner = false;
             _locked = false;
 
+            gameObject.layer = _defaultLayer;
+            
+            StopAction();
+            Freeze();
             SendOwnership();
         }
 
