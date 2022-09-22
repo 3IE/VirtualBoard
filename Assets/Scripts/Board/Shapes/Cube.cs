@@ -86,7 +86,7 @@ namespace Board.Shapes
 
         protected override void Rotate()
         {
-            _transform.rotation = Interactors[0].transform.rotation * InitialRotation;
+            _transform.rotation = Interactors[0].transform.rotation;
         }
     }
 }
