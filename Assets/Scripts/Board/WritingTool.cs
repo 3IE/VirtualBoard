@@ -13,6 +13,8 @@ namespace Board
         private bool _touchedLast;
         private Quaternion _lastRot;
         private Vector3 _lastPosition;
+        
+        private Transform _transform;
 
         protected bool CanDraw;
 
@@ -26,14 +28,14 @@ namespace Board
                     
                     if (transform.position.z <= _lastPosition.z) return;
                     
-                    _lastPosition.x = transform.position.x;
-                    _lastPosition.y = transform.position.y;
-                    transform.position = _lastPosition;
+                    _lastPosition.x = _transform.position.x;
+                    _lastPosition.y = _transform.position.y;
+                    _transform.position = _lastPosition;
                 }
                 else
                 {
-                    _lastRot = transform.rotation;
-                    _lastPosition = transform.position;
+                    _lastRot = _transform.rotation;
+                    _lastPosition = _transform.position;
                     _touchedLast = true;
                 }
             }

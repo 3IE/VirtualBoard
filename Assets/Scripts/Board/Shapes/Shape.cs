@@ -17,6 +17,7 @@ namespace Board.Shapes
 
         protected float InitialDistance;
         protected Vector3 InitialScale;
+        protected Quaternion InitialRotation;
 
         protected List<IXRInteractor> Interactors;
 
@@ -30,6 +31,7 @@ namespace Board.Shapes
         private bool _resizing;
 
         private Material _mat;
+        private Rigidbody _rigidbody;
 
         private static readonly int Create1 = Shader.PropertyToID("_Creating");
         private static readonly int Modify1 = Shader.PropertyToID("_Modifying");
@@ -42,9 +44,10 @@ namespace Board.Shapes
 
         #region Unity
 
-        private void Start()
+        private void Awake()
         {
             _mat = GetComponent<Renderer>().material;
+            _rigidbody = GetComponent<Rigidbody>();
             _defaultLayer = LayerMask.NameToLayer("Default");
             _shapesLayer = LayerMask.NameToLayer("Shapes");
             Interactors = new List<IXRInteractor>(2);
@@ -101,6 +104,8 @@ namespace Board.Shapes
 
         public void OnSelect(SelectEnterEventArgs args)
         {
+            _rigidbody.isKinematic = false;
+            
             if (!_isOwner)
             {
                 if (_locked)
@@ -122,6 +127,7 @@ namespace Board.Shapes
             if (_moving)
             {
                 InitialDistance = Vector3.Distance(transform.position, Interactors[0].transform.position);
+                InitialRotation = transform.rotation;
                 gameObject.layer = _shapesLayer;
             }
 
@@ -148,6 +154,8 @@ namespace Board.Shapes
 
                 return;
             }
+
+            _rigidbody.isKinematic = true;
 
             gameObject.layer = _defaultLayer;
 
