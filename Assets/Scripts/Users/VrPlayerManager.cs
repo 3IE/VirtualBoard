@@ -1,13 +1,8 @@
-using System;
-using System.Linq;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Serialization;
-using UnityEngine.XR.Interaction.Toolkit;
-using Utils;
 using Event = Utils.Event;
 
 namespace Users
@@ -19,6 +14,7 @@ namespace Users
         [SerializeField] private Transform boardTransform;
         [SerializeField] private float refreshRate = 0.2f;
         [SerializeField] private GameObject localPingPrefab;
+        [SerializeField] private VRMenu VRMenu;
 
         private XRIDefaultInputActions _customInputs;
         #region ressource
@@ -39,13 +35,21 @@ namespace Users
         {
             _customInputs.Enable();
             _customInputs.OnlineInteractions.Ping.started += TryPing;
+            _customInputs.Menu.OpenMenu.started += OpenMenu; 
             _vrCamTransform = Camera.main!.transform;
             InvokeRepeating(nameof(SendNewPositionEvent), refreshRate, refreshRate);
         }
 
+        private void OpenMenu(InputAction.CallbackContext obj)
+        {
+            VRMenu.transform.SetPositionAndRotation(_vrCamTransform.position, _vrCamTransform.rotation);
+            VRMenu.transform.Translate(_vrCamTransform.forward);
+            VRMenu.gameObject.SetActive(true);
+            VRMenu.WakeUp();
+        }
+
         private void TryPing(InputAction.CallbackContext obj)
         {
-            print($"Trying ping");
             Ray ray = new (rightHandTransform.position, rightHandTransform.forward);
             if (!Physics.Raycast(ray, out var hit, 100f)) return;
             if (hit.collider.CompareTag("Board"))
@@ -58,6 +62,7 @@ namespace Users
         {
             CancelInvoke();
             _customInputs.OnlineInteractions.Ping.started -= TryPing;
+            _customInputs.Menu.OpenMenu.started -= OpenMenu; 
             _customInputs.Disable();
         }
         private void SendNewPositionEvent()

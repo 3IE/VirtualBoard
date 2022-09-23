@@ -22,7 +22,7 @@ namespace Utils
         /// </summary>
         /// <param name="n"> Index of the line </param>
         /// <param name="args"> Content to print </param>
-        public static void Print(uint n, params string[] args)
+        public static void print(uint n, params string[] args)
         {
             _text.faceColor = Color.black;
 
@@ -37,7 +37,7 @@ namespace Utils
         /// Prints on the next line available
         /// </summary>
         /// <param name="args"> Content to print </param>
-        public static void Print(params string[] args)
+        public static void print(params string[] args)
         {
             _text.faceColor = Color.black;
 
