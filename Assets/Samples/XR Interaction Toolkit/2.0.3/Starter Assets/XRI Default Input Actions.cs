@@ -1152,6 +1152,62 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""OnlineInteractions"",
+            ""id"": ""e8bd57f3-1de7-4a32-bd1d-44f7853d94bc"",
+            ""actions"": [
+                {
+                    ""name"": ""Ping"",
+                    ""type"": ""Button"",
+                    ""id"": ""8f3c9346-b205-4482-93c3-413d65f6221c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""e3ba3814-b118-4c0c-a240-19ddc4afbdcb"",
+                    ""path"": ""<XRController>{RightHand}/secondaryButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Generic XR Controller"",
+                    ""action"": ""Ping"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
+            ""name"": ""Menu"",
+            ""id"": ""60dcb297-a8a7-47e3-a9b6-8e951bc75eb9"",
+            ""actions"": [
+                {
+                    ""name"": ""OpenMenu"",
+                    ""type"": ""Button"",
+                    ""id"": ""b3661700-2961-4ec9-a1ef-aa2c456cb4c9"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""edcef131-1aac-4ce5-801d-de21091e9f3a"",
+                    ""path"": ""<XRController>{RightHand}/primaryButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Generic XR Controller"",
+                    ""action"": ""OpenMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -1270,6 +1326,12 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
         m__3DObjects = asset.FindActionMap("3D Objects", throwIfNotFound: true);
         m__3DObjects_Createobject = m__3DObjects.FindAction("Create object", throwIfNotFound: true);
         m__3DObjects_Deleteobject = m__3DObjects.FindAction("Delete object", throwIfNotFound: true);
+        // OnlineInteractions
+        m_OnlineInteractions = asset.FindActionMap("OnlineInteractions", throwIfNotFound: true);
+        m_OnlineInteractions_Ping = m_OnlineInteractions.FindAction("Ping", throwIfNotFound: true);
+        // Menu
+        m_Menu = asset.FindActionMap("Menu", throwIfNotFound: true);
+        m_Menu_OpenMenu = m_Menu.FindAction("OpenMenu", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -1837,6 +1899,72 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
         }
     }
     public _3DObjectsActions @_3DObjects => new _3DObjectsActions(this);
+
+    // OnlineInteractions
+    private readonly InputActionMap m_OnlineInteractions;
+    private IOnlineInteractionsActions m_OnlineInteractionsActionsCallbackInterface;
+    private readonly InputAction m_OnlineInteractions_Ping;
+    public struct OnlineInteractionsActions
+    {
+        private @XRIDefaultInputActions m_Wrapper;
+        public OnlineInteractionsActions(@XRIDefaultInputActions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Ping => m_Wrapper.m_OnlineInteractions_Ping;
+        public InputActionMap Get() { return m_Wrapper.m_OnlineInteractions; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(OnlineInteractionsActions set) { return set.Get(); }
+        public void SetCallbacks(IOnlineInteractionsActions instance)
+        {
+            if (m_Wrapper.m_OnlineInteractionsActionsCallbackInterface != null)
+            {
+                @Ping.started -= m_Wrapper.m_OnlineInteractionsActionsCallbackInterface.OnPing;
+                @Ping.performed -= m_Wrapper.m_OnlineInteractionsActionsCallbackInterface.OnPing;
+                @Ping.canceled -= m_Wrapper.m_OnlineInteractionsActionsCallbackInterface.OnPing;
+            }
+            m_Wrapper.m_OnlineInteractionsActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @Ping.started += instance.OnPing;
+                @Ping.performed += instance.OnPing;
+                @Ping.canceled += instance.OnPing;
+            }
+        }
+    }
+    public OnlineInteractionsActions @OnlineInteractions => new OnlineInteractionsActions(this);
+
+    // Menu
+    private readonly InputActionMap m_Menu;
+    private IMenuActions m_MenuActionsCallbackInterface;
+    private readonly InputAction m_Menu_OpenMenu;
+    public struct MenuActions
+    {
+        private @XRIDefaultInputActions m_Wrapper;
+        public MenuActions(@XRIDefaultInputActions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @OpenMenu => m_Wrapper.m_Menu_OpenMenu;
+        public InputActionMap Get() { return m_Wrapper.m_Menu; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(MenuActions set) { return set.Get(); }
+        public void SetCallbacks(IMenuActions instance)
+        {
+            if (m_Wrapper.m_MenuActionsCallbackInterface != null)
+            {
+                @OpenMenu.started -= m_Wrapper.m_MenuActionsCallbackInterface.OnOpenMenu;
+                @OpenMenu.performed -= m_Wrapper.m_MenuActionsCallbackInterface.OnOpenMenu;
+                @OpenMenu.canceled -= m_Wrapper.m_MenuActionsCallbackInterface.OnOpenMenu;
+            }
+            m_Wrapper.m_MenuActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @OpenMenu.started += instance.OnOpenMenu;
+                @OpenMenu.performed += instance.OnOpenMenu;
+                @OpenMenu.canceled += instance.OnOpenMenu;
+            }
+        }
+    }
+    public MenuActions @Menu => new MenuActions(this);
     private int m_GenericXRControllerSchemeIndex = -1;
     public InputControlScheme GenericXRControllerScheme
     {
@@ -1926,5 +2054,13 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
     {
         void OnCreateobject(InputAction.CallbackContext context);
         void OnDeleteobject(InputAction.CallbackContext context);
+    }
+    public interface IOnlineInteractionsActions
+    {
+        void OnPing(InputAction.CallbackContext context);
+    }
+    public interface IMenuActions
+    {
+        void OnOpenMenu(InputAction.CallbackContext context);
     }
 }

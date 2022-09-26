@@ -5,6 +5,7 @@ using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
+using Users;
 using Utils;
 using DeviceType = Utils.DeviceType;
 using Event = Utils.Event;
@@ -109,7 +110,7 @@ namespace Board.Events
         {
             base.OnPlayerLeftRoom(otherPlayer);
 
-            PrintVar.Print(otherPlayer.NickName + "left the room");
+            PrintVar.print(otherPlayer.NickName + "left the room");
 
             var playerEntity = _others.Find(x => x.photonId == otherPlayer.ActorNumber);
             _others.Remove(playerEntity);
