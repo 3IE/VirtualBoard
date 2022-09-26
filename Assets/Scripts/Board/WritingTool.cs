@@ -14,9 +14,13 @@ namespace Board
         private Quaternion _lastRot;
         private Vector3 _lastPosition;
 
+        private Vector3 _initialPosition;
+        private Quaternion _initialRotation;
+        
         private Transform _transform;
 
         protected bool CanDraw;
+        protected bool Reseting;
 
         protected void UpdateRotation()
         {
@@ -53,6 +57,11 @@ namespace Board
         {
             CanDraw = false;
             hover.Hover();
+        }
+        
+        public void ResetPosition()
+        {
+            Reseting = true;
         }
     }
 }
