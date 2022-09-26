@@ -4,12 +4,10 @@ using Board.Shapes;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
-using TMPro;
 using UnityEngine;
 using Utils;
 using DeviceType = Utils.DeviceType;
 using Event = Utils.Event;
-using Object = UnityEngine.Object;
 
 namespace Board.Events
 {
@@ -43,7 +41,7 @@ namespace Board.Events
         public void Start()
         {
             _others = new List<PlayerEntity>();
-            
+
             PlayerEvents.SetupPrefabs(postItPrefab, onlinePingPrefab, boardPrefab);
         }
 
@@ -60,29 +58,33 @@ namespace Board.Events
                 case < 10:
                     OnRoomEvent(code, photonEvent.CustomData);
                     break;
-                
+
                 case < 20:
                     OnPlayerEvent(code, photonEvent.CustomData, photonEvent);
                     break;
-                
+
                 case < 30:
                     OnToolEvent(code, photonEvent.CustomData);
                     break;
-                
+
                 case < 60:
                     OnObjectEvent(code, photonEvent.CustomData);
                     break;
-                
+
                 case < 70:
                     OnChatEvent(code, photonEvent.CustomData);
                     break;
-                
+
                 case >= 100 and < 200:
                     OnErrorEvent(code, photonEvent.CustomData);
                     break;
-                
+
+                case >= 200:
+                    Debug.Log($"Photon Event: {code}");
+                    break;
+
                 default:
-                    throw new ArgumentException("Invalid event code");
+                    throw new ArgumentException($"Invalid event code: {photonEvent.Code}");
             }
         }
 
@@ -93,6 +95,13 @@ namespace Board.Events
             var raiseEventOptions = new RaiseEventOptions { TargetActors = new[] { newPlayer.ActorNumber } };
 
             PhotonNetwork.RaiseEvent((byte)Event.EventCode.SendNewPlayerIn, transform.position, raiseEventOptions,
+                SendOptions.SendReliable);
+
+            if (!PhotonNetwork.IsMasterClient) return;
+
+            var content = boardPrefab.GetComponent<Board>().texture.EncodeToPNG();
+                
+            PhotonNetwork.RaiseEvent((byte)Event.EventCode.Texture, content, raiseEventOptions,
                 SendOptions.SendReliable);
         }
 
@@ -105,6 +114,26 @@ namespace Board.Events
             var playerEntity = _others.Find(x => x.photonId == otherPlayer.ActorNumber);
             _others.Remove(playerEntity);
             Destroy(playerEntity.gameObject);
+        }
+
+        public override void OnJoinedRoom()
+        {
+            PhotonNetwork.NickName =
+                string.Format("{0} {1}",
+                    $"{((DeviceType)PhotonNetwork.LocalPlayer.CustomProperties["Device"] == DeviceType.VR ? "VR" : "AR")}",
+                    $" {PhotonNetwork.LocalPlayer.NickName}");
+
+            var raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
+
+            PhotonNetwork.RaiseEvent((byte)Event.EventCode.SendNewPlayerIn, transform.position, raiseEventOptions,
+                SendOptions.SendReliable);
+        }
+
+        public override void OnDisconnected(DisconnectCause cause)
+        {
+            base.OnDisconnected(cause);
+
+            Debug.LogError($"Disconnected from server: {cause}");
         }
 
         #endregion
@@ -140,7 +169,7 @@ namespace Board.Events
                 case Event.EventCode.SendNewPlayerIn:
                     var newPlayer = PhotonNetwork.CurrentRoom.GetPlayer(photonEvent.Sender);
                     var playerEntity = AddPlayer(newPlayer);
-                    
+
                     playerEntity.UpdateTransform((Vector3)data);
                     _others.Add(playerEntity);
                     break;
@@ -153,14 +182,14 @@ namespace Board.Events
                     throw new ArgumentException("Unknown event code");
             }
         }
-        
+
         private PlayerEntity AddPlayer(Player newPlayer)
         {
             print(newPlayer.NickName + " joined the room.");
 
             var device = (DeviceType)newPlayer.CustomProperties.GetValueOrDefault("Device");
 
-            var entity = Instantiate(device == DeviceType.VR ? vrPrefab : arPrefab, new Vector3(0, 1.05f, 0),
+            var entity = Instantiate(device == DeviceType.VR ? vrPrefab : arPrefab, new Vector3(0, 0, 0),
                 Quaternion.identity);
             var playerEntity = entity.AddComponent<PlayerEntity>();
             playerEntity.SetValues(device, newPlayer.ActorNumber, newPlayer.NickName);
@@ -177,13 +206,17 @@ namespace Board.Events
             switch (eventCode)
             {
                 case Event.EventCode.Marker:
-                    tools.marker.AddModification((Modification)data);
+                    tools.marker.AddModification(new Modification(data));
                     break;
 
                 case Event.EventCode.Eraser:
-                    tools.eraser.AddModification((Modification)data);
+                    tools.eraser.AddModification(new Modification(data));
                     break;
                 
+                case Event.EventCode.Texture:
+                    boardPrefab.GetComponent<Board>().texture.LoadImage(data as byte[]);
+                    break;
+
                 default:
                     throw new ArgumentException("Unknown event code");
             }
@@ -200,15 +233,15 @@ namespace Board.Events
                 case Event.EventCode.SendNewObject:
                     Shape.ReceiveNewObject(data as object[]);
                     break;
-                
+
                 case Event.EventCode.SendDestroy:
                     Shape.ReceiveDestroy((int)data);
                     break;
-                
+
                 case Event.EventCode.SendTransform:
                     Shape.ReceiveTransform(data as object[]);
                     break;
-                
+
                 case Event.EventCode.SendOwnership:
                     Shape.ReceiveOwnership(data as object[]);
                     break;
@@ -217,7 +250,7 @@ namespace Board.Events
                     throw new ArgumentException("Invalid event code");
             }
         }
-        
+
         #endregion
 
         #region CHAT_EVENTS

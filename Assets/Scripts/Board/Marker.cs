@@ -70,9 +70,7 @@ namespace Board
             if (Physics.Raycast(_tipTransform.position, transform.up, out _touch, .5f) &&
                 _touch.transform.CompareTag("Board"))
             {
-                if (_board == null)
-                    _board = _touch.transform.GetComponent<Board>();
-
+                _board ??= _touch.transform.GetComponent<Board>();
                 _touchPos = new Vector2(_touch.textureCoord.x, _touch.textureCoord.y);
 
                 var x = (int)(_touchPos.x * _board.textureSize.x - _board!.tools.penSize / 2);
@@ -95,7 +93,8 @@ namespace Board
                     }
                     finally
                     {
-                        new Modification(x, y, _lastTouchPos.x, _lastTouchPos.y, _colors, _board!.tools.penSize)
+                        new Modification(x, y, _lastTouchPos.x, _lastTouchPos.y, _renderer.material.color,
+                                _board!.tools.penSize)
                             .Send(Event.EventCode.Marker);
                     }
                 }
@@ -115,24 +114,25 @@ namespace Board
 
         private void ModifyTexture(int x, int y, float destX, float destY, Color[] colors, int penSize)
         {
-            _board.texture.SetPixels(x, y, penSize, penSize, colors);
+            boardObject.texture.SetPixels(x, y, penSize, penSize, colors);
 
             // Interpolation
-            for (float f = 0.01f; f < 1.00f; f += _board.tools.coverage)
+            for (var f = 0.01f; f < 1.00f; f += boardObject.tools.coverage)
             {
-                int lerpX = (int)Mathf.Lerp(_lastTouchPos.x, x, f);
-                int lerpY = (int)Mathf.Lerp(_lastTouchPos.y, y, f);
+                var lerpX = (int)Mathf.Lerp(destX, x, f);
+                var lerpY = (int)Mathf.Lerp(destY, y, f);
 
-                _board.texture.SetPixels(lerpX, lerpY, penSize, penSize, colors);
+                boardObject.texture.SetPixels(lerpX, lerpY, penSize, penSize, colors);
             }
 
             // We apply the changes
-            _board.texture.Apply();
+            boardObject.texture.Apply();
         }
 
         private void ModifyTexture(Modification modification)
         {
-            ModifyTexture(modification.X, modification.Y, modification.DestX, modification.DestY, modification.Colors,
+            var colors = Tools.GenerateSquare(modification.Color, boardObject);
+            ModifyTexture(modification.X, modification.Y, modification.DestX, modification.DestY, colors,
                 modification.PenSize);
         }
 

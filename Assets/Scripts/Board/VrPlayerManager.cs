@@ -24,11 +24,9 @@ namespace Board
 
         private void SendNewPositionEvent()
         {
-            object[] content = { _vrCamTransform.position - boardTransform.position };
-
             var raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
 
-            PhotonNetwork.RaiseEvent((byte)Event.EventCode.SendNewPosition, content, raiseEventOptions,
+            PhotonNetwork.RaiseEvent((byte)Event.EventCode.SendNewPosition, _vrCamTransform.position, raiseEventOptions,
                 SendOptions.SendReliable);
         }
 

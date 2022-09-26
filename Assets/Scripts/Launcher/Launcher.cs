@@ -1,3 +1,4 @@
+using System;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
@@ -32,8 +33,13 @@ namespace Launcher
             PhotonNetwork.SetPlayerCustomProperties(new Hashtable { { "Device", DeviceType.VR } });
 
 #if UNITY_EDITOR
-            logView.SetActive(true);
+            //logView.SetActive(true);
 #endif
+        }
+
+        private void Start()
+        {
+            Connect();
         }
 
         /// <summary>

@@ -17,6 +17,7 @@ namespace Utils
             // Tools 2X
             Marker = 20,
             Eraser,
+            Texture = 29,
 
             // Objects 30 - 59
             SendNewObject = 30,

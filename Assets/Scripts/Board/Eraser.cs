@@ -60,15 +60,14 @@ namespace Board
         private void Draw()
         {
             // We check if we are touching the board with the marker
-            if (Physics.Raycast(transform.position, transform.up, out _touch, 0.5f) && _touch.transform.CompareTag("Board"))
+            if (Physics.Raycast(transform.position, transform.up, out _touch, 0.5f) &&
+                _touch.transform.CompareTag("Board"))
             {
-                if (_board == null)
-                    _board = _touch.transform.GetComponent<Board>();
-
+                _board ??= _touch.transform.GetComponent<Board>();
                 _touchPos = new Vector2(_touch.textureCoord.x, _touch.textureCoord.y);
 
-                int x = (int)(_touchPos.x * _board.textureSize.x - _board!.tools.penSize / 2);
-                int y = (int)(_touchPos.y * _board.textureSize.y - _board!.tools.penSize / 2);
+                var x = (int)(_touchPos.x * _board.textureSize.x - _board!.tools.penSize / 2);
+                var y = (int)(_touchPos.y * _board.textureSize.y - _board!.tools.penSize / 2);
 
                 // If we are touching the board and in its boundaries, then we draw
                 if (!InBound(x, y))
@@ -76,7 +75,8 @@ namespace Board
 
                 if (_touchedLastFrame)
                 {
-                    try {
+                    try
+                    {
                         ModifyTexture(x, y, _lastTouchPos.x, _lastTouchPos.y, _colors, _board.tools.penSize);
                     }
                     catch (ArgumentException)
@@ -90,7 +90,8 @@ namespace Board
                     }
                     finally
                     {
-                        new Modification(x, y, _lastTouchPos.x, _lastTouchPos.y, _colors, _board!.tools.penSize)
+                        new Modification(x, y, _lastTouchPos.x, _lastTouchPos.y, _board!.tools.baseColor,
+                                _board!.tools.penSize)
                             .Send(Event.EventCode.Eraser);
                     }
                 }
@@ -113,10 +114,10 @@ namespace Board
             _board.texture.SetPixels(x, y, penSize, penSize, colors);
 
             // Interpolation
-            for (float f = 0.01f; f < 1.00f; f += _board.tools.coverage)
+            for (var f = 0.01f; f < 1.00f; f += _board.tools.coverage)
             {
-                int lerpX = (int)Mathf.Lerp(_lastTouchPos.x, x, f);
-                int lerpY = (int)Mathf.Lerp(_lastTouchPos.y, y, f);
+                var lerpX = (int)Mathf.Lerp(_lastTouchPos.x, x, f);
+                var lerpY = (int)Mathf.Lerp(_lastTouchPos.y, y, f);
 
                 _board.texture.SetPixels(lerpX, lerpY, penSize, penSize, colors);
             }
@@ -127,7 +128,9 @@ namespace Board
 
         private void ModifyTexture(Modification modification)
         {
-            ModifyTexture(modification.X, modification.Y, modification.DestX, modification.DestY, modification.Colors, modification.PenSize);
+            var colors = Tools.GenerateSquare(modification.Color, boardObject);
+            ModifyTexture(modification.X, modification.Y, modification.DestX, modification.DestY, colors,
+                modification.PenSize);
         }
 
         public void AddModification(Modification modification)
