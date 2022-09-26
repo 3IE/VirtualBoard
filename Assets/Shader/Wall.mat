@@ -102,7 +102,7 @@ Material:
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _Radius: 27.18
+    - _Radius: 100
     - _SmoothnessTextureChannel: 0
     - _Softness: 8
     - _SpecularHighlights: 1

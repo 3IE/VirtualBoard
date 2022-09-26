@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using JetBrains.Annotations;
+using UnityEngine;
 using Utils;
 
 namespace Board
@@ -18,9 +19,18 @@ namespace Board
         private Quaternion _initialRotation;
         
         private Transform _transform;
+        private Rigidbody _rigidbody;
 
         protected bool CanDraw;
-        protected bool Resetting;
+
+        private void Awake()
+        {
+            _rigidbody = GetComponent<Rigidbody>();
+            _transform = transform;
+            
+            _initialPosition = _transform.position;
+            _initialRotation = _transform.rotation;
+        }
 
         protected void UpdateRotation()
         {
@@ -32,8 +42,11 @@ namespace Board
 
                     if (transform.position.z <= _lastPosition.z) return;
 
-                    _lastPosition.x = _transform.position.x;
-                    _lastPosition.y = _transform.position.y;
+                    var position = _transform.position;
+                    
+                    _lastPosition.x = position.x;
+                    _lastPosition.y = position.y;
+                    
                     _transform.position = _lastPosition;
                 }
                 else
@@ -46,7 +59,7 @@ namespace Board
             else
                 _touchedLast = false;
         }
-
+        
         public void AuthorizeDraw()
         {
             CanDraw = true;
@@ -58,10 +71,17 @@ namespace Board
             CanDraw = false;
             hover.Hover();
         }
-        
-        public void ResetPosition()
+
+        private void OnCollisionEnter(Collision collision)
         {
-            Resetting = true;
+            if (!collision.gameObject.CompareTag("Ceiling")) return;
+
+            _rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+
+            _transform.position = _initialPosition;
+            _transform.rotation = _initialRotation;
+
+            _rigidbody.constraints = RigidbodyConstraints.None;
         }
     }
 }

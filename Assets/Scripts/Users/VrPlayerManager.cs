@@ -3,6 +3,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 using Event = Utils.Event;
 
 namespace Users
@@ -14,7 +15,7 @@ namespace Users
         [SerializeField] private Transform boardTransform;
         [SerializeField] private float refreshRate = 0.2f;
         [SerializeField] private GameObject localPingPrefab;
-        [SerializeField] private VRMenu VRMenu;
+        [FormerlySerializedAs("VRMenu")] [SerializeField] private VRMenu vrMenu;
 
         private XRIDefaultInputActions _customInputs;
         #region ressource
@@ -42,10 +43,10 @@ namespace Users
 
         private void OpenMenu(InputAction.CallbackContext obj)
         {
-            VRMenu.transform.SetPositionAndRotation(_vrCamTransform.position, _vrCamTransform.rotation);
-            VRMenu.transform.Translate(_vrCamTransform.forward);
-            VRMenu.gameObject.SetActive(true);
-            VRMenu.WakeUp();
+            vrMenu.transform.SetPositionAndRotation(_vrCamTransform.position, _vrCamTransform.rotation);
+            vrMenu.transform.Translate(_vrCamTransform.forward);
+            vrMenu.gameObject.SetActive(true);
+            vrMenu.WakeUp();
         }
 
         private void TryPing(InputAction.CallbackContext obj)
