@@ -36,7 +36,7 @@ namespace Board.Events
 
         public static void ReceivePing(Vector2 position)
         {
-            var ping = Object.Instantiate(_onlinePingPrefab, new Vector3(0, -10, 0), _boardPrefab.transform.rotation,
+            var ping = Object.Instantiate(_onlinePingPrefab, new Vector3(0, 0, 0), _boardPrefab.transform.rotation,
                 _boardPrefab.transform);
             ping.transform.localPosition = new Vector3(position.x, position.y, 0);
 

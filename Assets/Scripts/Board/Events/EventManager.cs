@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Board.Shapes;
 using ExitGames.Client.Photon;
 using Photon.Pun;
@@ -9,6 +10,7 @@ using Users;
 using Utils;
 using DeviceType = Utils.DeviceType;
 using Event = Utils.Event;
+using Random = UnityEngine.Random;
 
 namespace Board.Events
 {
@@ -101,9 +103,15 @@ namespace Board.Events
             if (!PhotonNetwork.IsMasterClient) return;
 
             var content = boardPrefab.GetComponent<Board>().texture.EncodeToPNG();
-                
+
             PhotonNetwork.RaiseEvent((byte)Event.EventCode.Texture, content, raiseEventOptions,
                 SendOptions.SendReliable);
+
+            foreach (var data in from shape in Shape.Shapes
+                     let transform1 = shape.Value.transform
+                     select new object[] { transform1.position, transform1.rotation, shape.Key })
+                PhotonNetwork.RaiseEvent((byte)Event.EventCode.SendNewObject, data, raiseEventOptions,
+                    SendOptions.SendReliable);
         }
 
         public override void OnPlayerLeftRoom(Player otherPlayer)
@@ -213,7 +221,7 @@ namespace Board.Events
                 case Event.EventCode.Eraser:
                     tools.eraser.AddModification(new Modification(data));
                     break;
-                
+
                 case Event.EventCode.Texture:
                     boardPrefab.GetComponent<Board>().texture.LoadImage(data as byte[]);
                     break;

@@ -7,7 +7,7 @@ namespace Board
     public class Board : MonoBehaviourPunCallbacks
     {
         public Texture2D texture;
-        public Vector2 textureSize = new(2048 * 0.6f, 2048 * 1.5f);
+        public Vector2 textureSize = new(2048, 2048);
         public Tools tools;
 
         private void Awake()

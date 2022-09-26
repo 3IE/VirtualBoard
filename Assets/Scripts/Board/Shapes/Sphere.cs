@@ -19,8 +19,6 @@ namespace Board.Shapes
             _hits = new RaycastHit[20];
 
             ShapeId = ShapeSelector.SphereId;
-            
-            SendNewObject();
         }
 
         protected override void Move()

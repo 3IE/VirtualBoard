@@ -67,18 +67,16 @@ namespace Users
         }
         private void SendNewPositionEvent()
         {
-            object[] content = { _vrCamTransform.position - boardTransform.position };
-        
             var raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
 
-            PhotonNetwork.RaiseEvent((byte) Event.EventCode.SendNewPosition, content, raiseEventOptions, SendOptions.SendReliable);
+            PhotonNetwork.RaiseEvent((byte) Event.EventCode.SendNewPosition, _vrCamTransform.position, raiseEventOptions, SendOptions.SendReliable);
         }
         private void Ping(Vector3 position)
         { 
             // pooling des ping, 2 prefab de ping (un pour l'utilisateur et un pour les autres) 
             // ping physique
             var ping = Instantiate(localPingPrefab,  position, boardTransform.rotation, boardTransform);
-            // ping sur le reseaux
+            // ping sur le reseau
             var localPos = ping.transform.localPosition;
             SendNewPingEvent(new Vector2(localPos.x, localPos.y));
         }

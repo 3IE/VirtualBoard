@@ -20,7 +20,7 @@ namespace Board
         private Transform _transform;
 
         protected bool CanDraw;
-        protected bool Reseting;
+        protected bool Resetting;
 
         protected void UpdateRotation()
         {
@@ -61,7 +61,7 @@ namespace Board
         
         public void ResetPosition()
         {
-            Reseting = true;
+            Resetting = true;
         }
     }
 }

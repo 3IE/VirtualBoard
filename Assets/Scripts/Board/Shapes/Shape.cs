@@ -39,7 +39,7 @@ namespace Board.Shapes
         private static int _defaultLayer;
         private static int _shapesLayer;
 
-        private static readonly Dictionary<int, Shape> Shapes = new();
+        public static readonly Dictionary<int, Shape> Shapes = new();
 
         #region Unity
 
@@ -124,6 +124,8 @@ namespace Board.Shapes
             Interactors.Remove(interactor);
 
             UpdateActionDeselect();
+            
+            SendNewObject();
         }
 
         #endregion
@@ -232,7 +234,7 @@ namespace Board.Shapes
         /// <summary>
         /// Sends a signal to create an object with these parameters
         /// </summary>
-        protected void SendNewObject()
+        public void SendNewObject()
         {
             var transform1 = transform;
             var data = new object[] { transform1.position, transform1.rotation, ShapeId };
