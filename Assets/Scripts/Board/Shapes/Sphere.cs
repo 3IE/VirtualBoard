@@ -13,8 +13,8 @@ namespace Board.Shapes
 
         private void Start()
         {
-            _defaultMask = LayerMask.GetMask("Default");
-            _defaultPlayerMask = LayerMask.GetMask("Default", "Player");
+            _defaultMask = LayerMask.GetMask("Default", "Static Shapes");
+            _defaultPlayerMask = LayerMask.GetMask("Default", "Player", "Static Shapes");
 
             _hits = new RaycastHit[20];
 
@@ -73,6 +73,7 @@ namespace Board.Shapes
         /// This object does not need to be rotated as it is a sphere.
         /// </summary>
         protected override void Rotate()
-        {}
+        {
+        }
     }
 }

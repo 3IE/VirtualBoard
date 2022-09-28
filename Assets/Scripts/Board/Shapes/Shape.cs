@@ -47,7 +47,7 @@ namespace Board.Shapes
         {
             _mat = GetComponent<Renderer>().material;
             _rigidbody = GetComponent<Rigidbody>();
-            _defaultLayer = LayerMask.NameToLayer("Default");
+            _defaultLayer = LayerMask.NameToLayer("Static Shapes");
             _shapesLayer = LayerMask.NameToLayer("Shapes");
             Interactors = new List<IXRInteractor>(2);
             _id = _counter++;
@@ -154,6 +154,8 @@ namespace Board.Shapes
                 if (_locked)
                     return;
 
+                Selector.currentShape = this;
+                
                 _isOwner = true;
                 _locked = true;
 
@@ -171,6 +173,8 @@ namespace Board.Shapes
         {
             if(_deleting)
                 return;
+            
+            Selector.currentShape = null;
             
             Interactors.Clear();
 

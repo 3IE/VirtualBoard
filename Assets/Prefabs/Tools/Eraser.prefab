@@ -163,7 +163,7 @@ Transform:
   - {fileID: 7143106208591965682}
   - {fileID: 7143106209212332641}
   m_Father: {fileID: 0}
-  m_RootOrder: -1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &7143106209593597302
 Rigidbody:
@@ -200,7 +200,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   m_InteractionLayers:
-    m_Bits: 1
+    m_Bits: 4294967295
   m_SelectMode: 0
   m_CustomReticle: {fileID: 0}
   m_FirstHoverEntered:
@@ -309,7 +309,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 375fde903808e474db8d2f76225e4c22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hover: {fileID: 0}
+  boardObject: {fileID: 0}
   rotationLocked: 0
+  CanDraw: 0
+  tip: {fileID: 0}
 --- !u!65 &1978687141466471729
 BoxCollider:
   m_ObjectHideFlags: 0

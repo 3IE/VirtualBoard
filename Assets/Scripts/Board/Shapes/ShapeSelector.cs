@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 using UnityEngine.XR.Interaction.Toolkit;
 
 namespace Board.Shapes
@@ -22,7 +23,7 @@ namespace Board.Shapes
 
         private byte _index;
 
-        private Shape _currentShape;
+        [FormerlySerializedAs("_currentShape")] public Shape currentShape;
         private bool _creating;
 
         private void Awake()
@@ -77,19 +78,19 @@ namespace Board.Shapes
             var obj = Instantiate(prefab, shapesParent);
             obj.GetComponent<XRSimpleInteractable>().interactionManager = interactionManager;
 
-            _currentShape = obj.GetComponent<Shape>();
-            _currentShape.CreateAction(leftInteractor);
+            currentShape = obj.GetComponent<Shape>();
+            currentShape.CreateAction(leftInteractor);
         }
 
         private void StopCreateObject(InputAction.CallbackContext ctx)
         {
-            if (_currentShape is null)
+            if (currentShape is null)
                 return;
             
             _creating = false;
             
-            _currentShape.StopCreateAction(leftInteractor);
-            _currentShape = null;
+            currentShape.StopCreateAction(leftInteractor);
+            currentShape = null;
         }
 
         private void DeleteObject(InputAction.CallbackContext ctx)
@@ -100,7 +101,7 @@ namespace Board.Shapes
             Shape.DeletionMode(true);
 
             if (Physics.Raycast(leftInteractor.transform.position, leftInteractor.transform.forward,
-                    out var hit, 100f, LayerMask.GetMask("Default")))
+                    out var hit, 100f, LayerMask.GetMask("Static Shapes")))
                 hit.collider.GetComponent<Shape>().Delete();
         }
 
@@ -112,7 +113,7 @@ namespace Board.Shapes
             Shape.DeletionMode(false);
 
             if (Physics.Raycast(leftInteractor.transform.position, leftInteractor.transform.forward,
-                    out var hit, 100f, LayerMask.GetMask("Default")))
+                    out var hit, 100f, LayerMask.GetMask("Static Shapes")))
                 hit.collider.GetComponent<Shape>().Destroy();
         }
     }
