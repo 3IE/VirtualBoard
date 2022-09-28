@@ -196,11 +196,12 @@ namespace Board.Shapes
             _moving = Interactors.Count == 1;
             _resizing = Interactors.Count == 2;
 
+            Unfreeze(); 
+            
             if (_moving)
             {
                 InitialDistance = Vector3.Distance(transform.position, Interactors[0].transform.position);
                 gameObject.layer = _shapesLayer;
-                Unfreeze();
             }
 
             if (!_resizing) return;
@@ -234,7 +235,7 @@ namespace Board.Shapes
         /// <summary>
         /// Sends a signal to create an object with these parameters
         /// </summary>
-        public void SendNewObject()
+        protected void SendNewObject()
         {
             var transform1 = transform;
             var data = new object[] { transform1.position, transform1.rotation, ShapeId };
@@ -242,6 +243,10 @@ namespace Board.Shapes
             SendData(Event.EventCode.SendNewObject, data);
         }
 
+        /// <summary>
+        /// Receives a signal to create an object with these parameters
+        /// </summary>
+        /// <param name="data"> the transform and id of the object </param>
         public static void ReceiveNewObject(object[] data)
         {
             var position = (Vector3)data[0];

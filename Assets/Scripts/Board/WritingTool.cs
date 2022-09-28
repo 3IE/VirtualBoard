@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using UnityEngine;
+﻿using UnityEngine;
 using Utils;
 
 namespace Board
@@ -21,6 +20,9 @@ namespace Board
         private Transform _transform;
         private Rigidbody _rigidbody;
 
+        #if UNITY_EDITOR
+        [SerializeField]
+        #endif
         protected bool CanDraw;
 
         private void Awake()
@@ -72,9 +74,15 @@ namespace Board
             hover.Hover();
         }
 
-        private void OnCollisionEnter(Collision collision)
+        private void OnTriggerEnter(Collider other)
         {
-            if (!collision.gameObject.CompareTag("Ceiling")) return;
+            if (other.CompareTag("Board"))
+            {
+                rotationLocked = true;
+                return;
+            }
+            
+            if (!other.CompareTag("Ceiling")) return;
 
             _rigidbody.constraints = RigidbodyConstraints.FreezeAll;
 
@@ -82,6 +90,12 @@ namespace Board
             _transform.rotation = _initialRotation;
 
             _rigidbody.constraints = RigidbodyConstraints.None;
+        }
+        
+        private void OnTriggerExit(Collider other)
+        {
+            if (other.CompareTag("Board"))
+                rotationLocked = false;
         }
     }
 }

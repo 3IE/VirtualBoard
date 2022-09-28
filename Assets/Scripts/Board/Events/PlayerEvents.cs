@@ -7,25 +7,25 @@ namespace Board.Events
     {
         private static GameObject _postItPrefab;
         private static GameObject _onlinePingPrefab;
-        private static GameObject _boardPrefab;
+        private static GameObject _boardTransform;
 
-        public static void SetupPrefabs(GameObject postItPrefab, GameObject onlinePingPrefab, GameObject boardPrefab)
+        public static void SetupPrefabs(GameObject postItPrefab, GameObject onlinePingPrefab, GameObject boardTransform)
         {
             _postItPrefab = postItPrefab;
             _onlinePingPrefab = onlinePingPrefab;
-            _boardPrefab = boardPrefab;
+            _boardTransform = boardTransform;
         }
 
         public static void ReceiveNewPostIt(object[] data)
         {
             var postItPos = (Vector2)data[0];
             var text = (string)data[1];
-            var boardPosPostIt = _boardPrefab.transform.position;
+            var boardPosPostIt = _boardTransform.transform.position;
             
             var position = new Vector3(boardPosPostIt.x + postItPos.x,
                 boardPosPostIt.y + postItPos.y, boardPosPostIt.z);
-            var postIt = Object.Instantiate(_postItPrefab, position, _boardPrefab.transform.rotation,
-                _boardPrefab.transform);
+            var postIt = Object.Instantiate(_postItPrefab, position, _boardTransform.transform.rotation,
+                _boardTransform.transform);
 
             postIt.GetComponentInChildren<TMP_Text>().text = text;
             // TODO: change color depending on the player who created the post it
@@ -36,8 +36,8 @@ namespace Board.Events
 
         public static void ReceivePing(Vector2 position)
         {
-            var ping = Object.Instantiate(_onlinePingPrefab, new Vector3(0, 0, 0), _boardPrefab.transform.rotation,
-                _boardPrefab.transform);
+            var ping = Object.Instantiate(_onlinePingPrefab, new Vector3(0, 0, 0), _boardTransform.transform.rotation,
+                _boardTransform.transform);
             ping.transform.localPosition = new Vector3(position.x, position.y, 0);
 
             /*

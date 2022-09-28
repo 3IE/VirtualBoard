@@ -10,7 +10,6 @@ using Users;
 using Utils;
 using DeviceType = Utils.DeviceType;
 using Event = Utils.Event;
-using Random = UnityEngine.Random;
 
 namespace Board.Events
 {
@@ -22,6 +21,7 @@ namespace Board.Events
         [SerializeField] private GameObject postItPrefab;
         [SerializeField] private GameObject onlinePingPrefab;
         [SerializeField] private GameObject boardPrefab;
+        [SerializeField] private GameObject boardTransform;
 
         private List<PlayerEntity> _others;
 
@@ -45,7 +45,7 @@ namespace Board.Events
         {
             _others = new List<PlayerEntity>();
 
-            PlayerEvents.SetupPrefabs(postItPrefab, onlinePingPrefab, boardPrefab);
+            PlayerEvents.SetupPrefabs(postItPrefab, onlinePingPrefab, boardTransform);
         }
 
         #endregion

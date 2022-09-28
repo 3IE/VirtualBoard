@@ -14,23 +14,28 @@ namespace Board
         private Color[] _colors;
 
         private Transform _tipTransform;
-        private Board _board;
-
         private RaycastHit _touch;
         private Vector2 _touchPos;
-        private Vector2 _lastTouchPos;
         private bool _touchedLastFrame;
 
         private Queue<Modification> _modifications;
 
-        // Start is called before the first frame update
-        private void Start()
+        protected Vector2 LastTouchPos;
+        protected Board Board;
+
+        protected virtual void Initialize()
         {
             _tipTransform = tip.transform;
             _renderer = tip.GetComponent<Renderer>();
 
             _touchedLastFrame = false;
-            _modifications = new Queue<Modification>();
+            _modifications = new Queue<Modification>(256);
+        }
+        
+        // Start is called before the first frame update
+        private void Start()
+        {
+            Initialize();
         }
 
         private void Update()
@@ -55,7 +60,7 @@ namespace Board
         /// </returns>
         private bool InBound(int x, int y)
         {
-            return x >= 0 && x <= _board.textureSize.x && y >= 0 && y <= _board.textureSize.y;
+            return x >= 0 && x <= Board.textureSize.x && y >= 0 && y <= Board.textureSize.y;
         }
 
         /// <summary>
@@ -70,11 +75,11 @@ namespace Board
             if (Physics.Raycast(_tipTransform.position, transform.up, out _touch, .5f) &&
                 _touch.transform.CompareTag("Board"))
             {
-                _board ??= _touch.transform.GetComponent<Board>();
+                Board ??= _touch.transform.GetComponent<Board>();
                 _touchPos = new Vector2(_touch.textureCoord.x, _touch.textureCoord.y);
 
-                var x = (int)(_touchPos.x * _board.textureSize.x - _board!.tools.penSize / 2);
-                var y = (int)(_touchPos.y * _board.textureSize.y - _board!.tools.penSize / 2);
+                var x = (int)(_touchPos.x * Board.textureSize.x - Board!.tools.penSize / 2);
+                var y = (int)(_touchPos.y * Board.textureSize.y - Board!.tools.penSize / 2);
 
                 // If we are touching the board and in its boundaries, then we draw
                 if (!InBound(x, y))
@@ -82,34 +87,49 @@ namespace Board
 
                 if (_touchedLastFrame)
                 {
+                    if (Vector2.Distance(new Vector2(x, y), LastTouchPos) < 0.01f)
+                        return;
+
                     try
                     {
-                        ModifyTexture(x, y, _lastTouchPos.x, _lastTouchPos.y, _colors, _board.tools.penSize);
+                        ModifyTexture(x, y, LastTouchPos.x, LastTouchPos.y, _colors, Board.tools.penSize);
                     }
                     catch (ArgumentException)
                     {
-                        _board = null;
                         _touchedLastFrame = false;
                     }
                     finally
                     {
-                        new Modification(x, y, _lastTouchPos.x, _lastTouchPos.y, _renderer.material.color,
-                                _board!.tools.penSize)
-                            .Send(Event.EventCode.Marker);
+                        SendModification(x, y);
+
+                        if (!_touchedLastFrame)
+                            Board = null;
                     }
                 }
                 else
-                    // TODO generate shape depending on selected one
-                    _colors = Tools.GenerateSquare(_renderer.material.color, _board);
+                    _colors = GenerateShape();
 
-                _lastTouchPos = new Vector2(x, y);
+                LastTouchPos = new Vector2(x, y);
                 _touchedLastFrame = true;
 
                 return;
             }
 
-            _board = null;
+            Board = null;
             _touchedLastFrame = false;
+        }
+
+        protected virtual Color[] GenerateShape()
+        {
+            return Tools.GenerateSquare(_renderer.material.color, Board);
+            // TODO generate shape depending on selected one
+        }
+
+        protected virtual void SendModification(int x, int y)
+        {
+            new Modification(x, y, LastTouchPos.x, LastTouchPos.y, _renderer.material.color,
+                    Board!.tools.penSize)
+                .Send(Event.EventCode.Marker);
         }
 
         private void ModifyTexture(int x, int y, float destX, float destY, Color[] colors, int penSize)
@@ -139,11 +159,6 @@ namespace Board
         public void AddModification(Modification modification)
         {
             _modifications.Enqueue(modification);
-        }
-
-        public void ResetColors(Board board)
-        {
-            _colors = Tools.GenerateSquare(_renderer.material.color, board);
         }
 
         // TODO add other shapes ?

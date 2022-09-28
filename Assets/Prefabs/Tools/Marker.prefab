@@ -110,7 +110,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ce3748add7b1014f9b05ecf8b2ce759, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mat: {fileID: 2100000, guid: 85a21e71f30819643ba7afe1f19dd888, type: 2}
 --- !u!1 &441707064651445001
 GameObject:
   m_ObjectHideFlags: 0
@@ -392,7 +391,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hover: {fileID: 6211745579641748902}
+  boardObject: {fileID: 0}
   rotationLocked: 0
+  CanDraw: 0
   tip: {fileID: 441707064651445001}
 --- !u!65 &2229995121750660245
 BoxCollider:
@@ -405,8 +406,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.119620524, y: 0.4665076, z: 0.12201271}
-  m_Center: {x: -0.00000013907751, y: 0.051435746, z: -0.0035883114}
+  m_Size: {x: 0.119620524, y: 0.4674717, z: 0.12201271}
+  m_Center: {x: -0.00000013907751, y: 0.051918563, z: -0.003588313}
 --- !u!1 &441707065742839177
 GameObject:
   m_ObjectHideFlags: 0

@@ -68,6 +68,9 @@ namespace Board.Shapes
 
         private void CreateObject(InputAction.CallbackContext ctx)
         {
+            if (Shape.NumberOfShapes() >= 25)
+                return;
+
             _creating = true;
 
             var prefab = GetShape();
@@ -80,8 +83,11 @@ namespace Board.Shapes
 
         private void StopCreateObject(InputAction.CallbackContext ctx)
         {
+            if (_currentShape is null)
+                return;
+            
             _creating = false;
-
+            
             _currentShape.StopCreateAction(leftInteractor);
             _currentShape = null;
         }

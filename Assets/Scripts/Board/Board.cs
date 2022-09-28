@@ -6,12 +6,15 @@ namespace Board
 {
     public class Board : MonoBehaviourPunCallbacks
     {
+        private const string GameVersion = "1";
+
         public Texture2D texture;
         public Vector2 textureSize = new(2048, 2048);
         public Tools tools;
 
         private void Awake()
         {
+            PhotonNetwork.GameVersion = GameVersion;
             PhotonNetwork.SetPlayerCustomProperties(new Hashtable { { "Device", Utils.DeviceType.VR } });
             PhotonNetwork.ConnectUsingSettings();
         }
@@ -30,7 +33,7 @@ namespace Board
         // Start is called before the first frame update
         private void Start()
         {
-            Renderer r = GetComponent<Renderer>();
+            var r = GetComponent<Renderer>();
 
             texture = new Texture2D((int)textureSize.x, (int)textureSize.y);
             tools.baseColor = texture.GetPixel(0, 0);
