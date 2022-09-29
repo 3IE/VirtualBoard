@@ -74,6 +74,7 @@ namespace Board.Shapes
         /// </summary>
         protected override void Rotate()
         {
+            // Do nothing
         }
     }
 }
