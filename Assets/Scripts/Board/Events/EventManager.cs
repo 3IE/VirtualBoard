@@ -5,6 +5,8 @@ using Board.Shapes;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
+using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using Users;
 using Utils;
@@ -16,12 +18,12 @@ namespace Board.Events
     public class EventManager : MonoBehaviourPunCallbacks
     {
         [SerializeField] private Tools tools;
+
         [SerializeField] private GameObject vrPrefab;
         [SerializeField] private GameObject arPrefab;
         [SerializeField] private GameObject postItPrefab;
         [SerializeField] private GameObject onlinePingPrefab;
-        [SerializeField] private GameObject boardPrefab;
-        [SerializeField] private GameObject boardTransform;
+        [SerializeField] private GameObject board;
 
         private List<PlayerEntity> _others;
 
@@ -45,7 +47,7 @@ namespace Board.Events
         {
             _others = new List<PlayerEntity>();
 
-            PlayerEvents.SetupPrefabs(postItPrefab, onlinePingPrefab, boardTransform);
+            PlayerEvents.SetupPrefabs(postItPrefab, onlinePingPrefab, board);
         }
 
         #endregion
@@ -102,7 +104,7 @@ namespace Board.Events
 
             if (!PhotonNetwork.IsMasterClient) return;
 
-            var content = boardPrefab.GetComponent<Board>().texture.EncodeToPNG();
+            var content = board.GetComponent<Board>().texture.EncodeToPNG();
 
             PhotonNetwork.RaiseEvent((byte)Event.EventCode.Texture, content, raiseEventOptions,
                 SendOptions.SendReliable);
@@ -112,13 +114,29 @@ namespace Board.Events
                      select new object[] { transform1.position, transform1.rotation, shape.Key })
                 PhotonNetwork.RaiseEvent((byte)Event.EventCode.SendNewObject, data, raiseEventOptions,
                     SendOptions.SendReliable);
+
+            foreach (var data in from ping in PlayerEvents.Pings
+                     select ping.transform.localPosition
+                     into pos
+                     let scale = board.transform.localScale.x
+                     select new Vector2(pos.x * scale, pos.z * scale))
+                PhotonNetwork.RaiseEvent((byte)Event.EventCode.SendNewPing, data, raiseEventOptions,
+                    SendOptions.SendReliable);
+
+            foreach (var data in from postIt in PlayerEvents.PostIts
+                     let pos = postIt.transform.localPosition
+                     let text = postIt.GetComponentInChildren<TMP_Text>().text
+                     let scale = board.transform.localScale.x
+                     select new object[] { new Vector2(pos.x * scale, pos.z * scale) })
+                PhotonNetwork.RaiseEvent((byte)Event.EventCode.SendNewPostIt, data, raiseEventOptions,
+                    SendOptions.SendReliable);
         }
 
         public override void OnPlayerLeftRoom(Player otherPlayer)
         {
             base.OnPlayerLeftRoom(otherPlayer);
 
-            PrintVar.print(otherPlayer.NickName + "left the room");
+            Debug.Log(otherPlayer.NickName + "left the room");
 
             var playerEntity = _others.Find(x => x.photonId == otherPlayer.ActorNumber);
             _others.Remove(playerEntity);
@@ -128,9 +146,8 @@ namespace Board.Events
         public override void OnJoinedRoom()
         {
             PhotonNetwork.NickName =
-                string.Format("{0} {1}",
-                    $"{((DeviceType)PhotonNetwork.LocalPlayer.CustomProperties["Device"] == DeviceType.VR ? "VR" : "AR")}",
-                    $" {PhotonNetwork.LocalPlayer.NickName}");
+                $"{((DeviceType)PhotonNetwork.LocalPlayer.CustomProperties["Device"] == DeviceType.VR ? "VR" : "AR")}" +
+                $" {PhotonNetwork.LocalPlayer.NickName}";
 
             var raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
 
@@ -142,6 +159,8 @@ namespace Board.Events
         {
             base.OnDisconnected(cause);
 
+            PlayerEvents.Clear();
+
             Debug.LogError($"Disconnected from server: {cause}");
         }
 
@@ -149,6 +168,12 @@ namespace Board.Events
 
         #region ROOM_EVENTS
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="eventCode"></param>
+        /// <param name="data"> Unused </param>
+        /// <exception cref="ArgumentException"></exception>
         private static void OnRoomEvent(Event.EventCode eventCode, object data)
         {
             switch (eventCode)
@@ -223,7 +248,7 @@ namespace Board.Events
                     break;
 
                 case Event.EventCode.Texture:
-                    boardPrefab.GetComponent<Board>().texture.LoadImage(data as byte[]);
+                    board.GetComponent<Board>().texture.LoadImage(data as byte[]);
                     break;
 
                 default:

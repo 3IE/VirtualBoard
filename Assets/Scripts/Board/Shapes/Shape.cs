@@ -3,6 +3,7 @@ using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.XR.Interaction.Toolkit;
 using Event = Utils.Event;
 
@@ -25,8 +26,9 @@ namespace Board.Shapes
         private bool _locked;
         private bool _isOwner;
 
-        private bool _moving;
-        private bool _resizing;
+        public bool rotating;
+        public bool moving;
+        public bool resizing;
         private bool _deleting;
 
         private Material _mat;
@@ -59,9 +61,11 @@ namespace Board.Shapes
 
         private void Update()
         {
-            if (_moving)
+            if (moving)
                 Move();
-            if (_resizing)
+            else if (rotating)
+                Rotate();
+            else if (resizing)
                 Resize();
         }
 
@@ -146,7 +150,7 @@ namespace Board.Shapes
         
         public void OnSelect(SelectEnterEventArgs args)
         {
-            if(_deleting)
+            if(_deleting || Selector.currentShape is not null)
                 return;
             
             if (!_isOwner)
@@ -183,8 +187,8 @@ namespace Board.Shapes
 
         private void UpdateActionDeselect()
         {
-            _moving = false;
-            _resizing = false;
+            moving = false;
+            resizing = false;
             _isOwner = false;
             _locked = false;
 
@@ -197,18 +201,18 @@ namespace Board.Shapes
 
         private void UpdateAction()
         {
-            _moving = Interactors.Count == 1;
-            _resizing = Interactors.Count == 2;
+            moving = Interactors.Count == 1;
+            resizing = Interactors.Count == 2;
 
             Unfreeze(); 
             
-            if (_moving)
+            if (moving)
             {
                 InitialDistance = Vector3.Distance(transform.position, Interactors[0].transform.position);
                 gameObject.layer = _shapesLayer;
             }
 
-            if (!_resizing) return;
+            if (!resizing) return;
 
             InitialDistance = Vector3.Distance(Interactors[0].transform.position, Interactors[1].transform.position);
             if (InitialDistance == 0)

@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 namespace Board.Events
@@ -7,45 +8,63 @@ namespace Board.Events
     {
         private static GameObject _postItPrefab;
         private static GameObject _onlinePingPrefab;
-        private static GameObject _boardTransform;
+        private static GameObject _board;
 
-        public static void SetupPrefabs(GameObject postItPrefab, GameObject onlinePingPrefab, GameObject boardTransform)
+        public static readonly List<GameObject> Pings = new();
+        public static readonly List<GameObject> PostIts = new();
+
+        public static void SetupPrefabs(GameObject postItPrefab, GameObject onlinePingPrefab, GameObject board)
         {
             _postItPrefab = postItPrefab;
             _onlinePingPrefab = onlinePingPrefab;
-            _boardTransform = boardTransform;
+            _board = board;
         }
 
         public static void ReceiveNewPostIt(object[] data)
         {
-            var postItPos = (Vector2)data[0];
+            var position = (Vector2)data[0];
             var text = (string)data[1];
-            var boardPosPostIt = _boardTransform.transform.position;
+            var postIt = Object.Instantiate(_postItPrefab, _board.transform);
+            var invertScale = 1 / _board.transform.localScale.x;
             
-            var position = new Vector3(boardPosPostIt.x + postItPos.x,
-                boardPosPostIt.y + postItPos.y, boardPosPostIt.z);
-            var postIt = Object.Instantiate(_postItPrefab, position, _boardTransform.transform.rotation,
-                _boardTransform.transform);
+            postIt.transform.localPosition = new Vector3(position.x * invertScale, 0.01f, position.y * invertScale);
+            postIt.transform.rotation = Quaternion.identity;
+            postIt.transform.localScale *= invertScale;
 
             postIt.GetComponentInChildren<TMP_Text>().text = text;
             // TODO: change color depending on the player who created the post it
             postIt.GetComponentInChildren<Renderer>().material.color = Color.cyan;
 
+            PostIts.Add(postIt);
+            
             // print($"Post-it: {text}, at {position}");
         }
 
         public static void ReceivePing(Vector2 position)
         {
-            var ping = Object.Instantiate(_onlinePingPrefab, new Vector3(0, 0, 0), _boardTransform.transform.rotation,
-                _boardTransform.transform);
-            ping.transform.localPosition = new Vector3(position.x, position.y, 0);
+            var ping = Object.Instantiate(_onlinePingPrefab, _board.transform);
+            var invertScale = 1 / _board.transform.localScale.x;
+            ping.transform.localPosition = new Vector3(position.x * invertScale, 0.01f, position.y * invertScale);
+            ping.transform.rotation = Quaternion.identity;
+            ping.transform.localScale *= invertScale;
 
+            Pings.Add(ping);
+            
             /*
              TODO: add PingSearcher
              _currentPing = ping.transform.position;
              _pingSearcher.AssignedPing = ping;
              _pingSearcher.gameObject.SetActive(true);
             */
+        }
+
+        public static void Clear()
+        {
+            Pings.ForEach(Object.Destroy);
+            PostIts.ForEach(Object.Destroy);
+        
+            Pings.Clear();
+            PostIts.Clear();
         }
     }
 }

@@ -102,7 +102,7 @@ Material:
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _Radius: 100
+    - _Radius: 9.3
     - _SmoothnessTextureChannel: 0
     - _Softness: 8
     - _SpecularHighlights: 1
@@ -114,7 +114,7 @@ Material:
     - _Base_color: {r: 0, g: 0.51916164, b: 1, a: 0}
     - _Color: {r: 1, g: 0, b: 0, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _Position: {r: 6.9, g: 1, b: 10.83, a: 0}
+    - _Position: {r: 0, g: 0, b: 0, a: 0}
     - _Secondary_color: {r: 0, g: 1, b: 1, a: 0}
     - _Tile: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []

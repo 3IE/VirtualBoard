@@ -72,6 +72,13 @@ namespace Board.Shapes
             if (Shape.NumberOfShapes() >= 25)
                 return;
 
+            if (currentShape is not null && !currentShape.resizing)
+            {
+                currentShape.rotating = true;
+                currentShape.moving = false;
+                return;
+            }
+
             _creating = true;
 
             var prefab = GetShape();
@@ -86,6 +93,13 @@ namespace Board.Shapes
         {
             if (currentShape is null)
                 return;
+            
+            if (currentShape.rotating)
+            {
+                currentShape.rotating = false;
+                currentShape.moving = true;
+                return;
+            }
             
             _creating = false;
             
