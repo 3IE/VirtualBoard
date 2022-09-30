@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
 
 namespace Board.Shapes
 {
@@ -29,6 +30,9 @@ namespace Board.Shapes
 
         protected override void Move()
         {
+            Rotate();
+            return; //TODO: remove this line to enable movement
+            
             if (Physics.Raycast(Interactors[0].transform.position, Interactors[0].transform.forward,
                     out var hit, InitialDistance, _defaultMask))
             {
@@ -82,7 +86,7 @@ namespace Board.Shapes
 
         protected override void Rotate()
         {
-            throw new NotImplementedException();
+            _transform.rotation = Interactors[0].transform.rotation;
         }
     }
 }

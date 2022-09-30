@@ -1,9 +1,9 @@
-using System;
 using System.Collections.Generic;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.XR.Interaction.Toolkit;
 using Event = Utils.Event;
 
@@ -26,10 +26,13 @@ namespace Board.Shapes
         private bool _locked;
         private bool _isOwner;
 
-        private bool _moving;
-        private bool _resizing;
+        public bool rotating;
+        public bool moving;
+        public bool resizing;
+        private bool _deleting;
 
         private Material _mat;
+        private Rigidbody _rigidbody;
 
         private static readonly int Create1 = Shader.PropertyToID("_Creating");
         private static readonly int Modify1 = Shader.PropertyToID("_Modifying");
@@ -38,28 +41,31 @@ namespace Board.Shapes
         private static int _defaultLayer;
         private static int _shapesLayer;
 
-        private static readonly Dictionary<int, Shape> Shapes = new();
+        public static readonly Dictionary<int, Shape> Shapes = new();
 
         #region Unity
 
-        private void Start()
+        private void Awake()
         {
             _mat = GetComponent<Renderer>().material;
-            _defaultLayer = LayerMask.NameToLayer("Default");
+            _rigidbody = GetComponent<Rigidbody>();
+            _defaultLayer = LayerMask.NameToLayer("Static Shapes");
             _shapesLayer = LayerMask.NameToLayer("Shapes");
             Interactors = new List<IXRInteractor>(2);
             _id = _counter++;
             
             Shapes.Add(_id, this);            
             
-            Create();
+            Freeze();
         }
 
         private void Update()
         {
-            if (_moving)
+            if (moving)
                 Move();
-            if (_resizing)
+            else if (rotating)
+                Rotate();
+            else if (resizing)
                 Resize();
         }
 
@@ -77,30 +83,28 @@ namespace Board.Shapes
             _mat.SetFloat(Modify1, 1);
         }
 
-        private void Destroy()
+        public void Delete()
         {
             _mat.SetFloat(Destroy1, 1);
         }
 
-        public void StopAction()
+        public void Destroy()
+        {
+            Destroy(gameObject);
+        }
+
+        private void StopAction()
         {
             _mat.SetFloat(Create1, 0);
             _mat.SetFloat(Modify1, 0);
             _mat.SetFloat(Destroy1, 0);
         }
 
-        public void CreateAction()
+        public void CreateAction(IXRInteractor interactor)
         {
             StopAction();
-            _locked = true;
-        }
+            Create();
 
-        #endregion
-
-        #region Selection
-
-        public void OnSelect(SelectEnterEventArgs args)
-        {
             if (!_isOwner)
             {
                 if (_locked)
@@ -112,20 +116,103 @@ namespace Board.Shapes
                 SendOwnership();
             }
 
+            Interactors.Add(interactor);
+
+            UpdateAction();
+        }
+
+        public void StopCreateAction(IXRInteractor interactor)
+        {
+            StopAction();
+
+            Interactors.Remove(interactor);
+
+            UpdateActionDeselect();
+            
+            SendNewObject();
+        }
+
+        #endregion
+
+        #region Selection
+
+        public void OnHoverEnter(HoverEnterEventArgs args)
+        {
+            if (_deleting && ReferenceEquals(args.interactorObject, Selector.leftInteractor))
+                Delete();
+        }
+        
+        public void OnHoverExit(HoverExitEventArgs args)
+        {
+            if (_deleting && ReferenceEquals(args.interactorObject, Selector.leftInteractor))
+                _mat.SetFloat(Destroy1, 0);
+        }
+        
+        public void OnSelect(SelectEnterEventArgs args)
+        {
+            if(_deleting || Selector.currentShape is not null)
+                return;
+            
+            if (!_isOwner)
+            {
+                if (_locked)
+                    return;
+
+                Selector.currentShape = this;
+                
+                _isOwner = true;
+                _locked = true;
+
+                SendOwnership();
+            }
+
             Interactors.Add(args.interactorObject);
-
-            _moving = Interactors.Count == 1;
-            _resizing = Interactors.Count == 2;
-
+            
             Modify();
 
-            if (_moving)
+            UpdateAction();
+        }
+
+        public void OnDeselect(SelectExitEventArgs args)
+        {
+            if(_deleting)
+                return;
+            
+            Selector.currentShape = null;
+            
+            Interactors.Clear();
+
+            UpdateActionDeselect();
+        }
+
+        private void UpdateActionDeselect()
+        {
+            moving = false;
+            resizing = false;
+            _isOwner = false;
+            _locked = false;
+
+            gameObject.layer = _defaultLayer;
+            
+            StopAction();
+            Freeze();
+            SendOwnership();
+        }
+
+        private void UpdateAction()
+        {
+            moving = Interactors.Count == 1;
+            resizing = Interactors.Count == 2;
+
+            Unfreeze(); 
+            
+            if (moving)
             {
                 InitialDistance = Vector3.Distance(transform.position, Interactors[0].transform.position);
                 gameObject.layer = _shapesLayer;
             }
 
-            if (!_resizing) return;
+            if (!resizing) return;
 
             InitialDistance = Vector3.Distance(Interactors[0].transform.position, Interactors[1].transform.position);
             if (InitialDistance == 0)
@@ -134,27 +221,19 @@ namespace Board.Shapes
             InitialScale = transform.localScale;
         }
 
-        public void OnDeselect(SelectExitEventArgs args)
+        private void Freeze()
         {
-            Interactors.Remove(args.interactorObject);
+            _rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+        }
+        private void Unfreeze()
+        {
+            _rigidbody.constraints = RigidbodyConstraints.None;
+        }
 
-            _moving = Interactors.Count == 1;
-            _resizing = false;
-
-            if (_moving)
-            {
-                InitialDistance = Vector3.Distance(transform.position, Interactors[0].transform.position);
-                gameObject.layer = _shapesLayer;
-
-                return;
-            }
-
-            gameObject.layer = _defaultLayer;
-
-            _isOwner = false;
-            _locked = false;
-
-            SendOwnership();
+        public static void DeletionMode(bool value)
+        {
+            foreach (var shape in Shapes.Values)
+                shape._deleting = value;
         }
 
         #endregion
@@ -172,6 +251,10 @@ namespace Board.Shapes
             SendData(Event.EventCode.SendNewObject, data);
         }
 
+        /// <summary>
+        /// Receives a signal to create an object with these parameters
+        /// </summary>
+        /// <param name="data"> the transform and id of the object </param>
         public static void ReceiveNewObject(object[] data)
         {
             var position = (Vector3)data[0];
@@ -225,7 +308,7 @@ namespace Board.Shapes
         /// </summary>
         public static void ReceiveDestroy(int id)
         {
-            Shapes[id].Destroy();
+            Shapes[id].Delete();
             Shapes.Remove(id);
         }
 
