@@ -12,36 +12,36 @@ namespace Board.Shapes
     public abstract class Shape : MonoBehaviour
     {
         public static ShapeSelector Selector;
+        public static readonly Dictionary<int, Shape> Shapes = new();
 
-        protected byte ShapeId;
-
-        protected float InitialDistance;
-        protected Vector3 InitialScale;
-
-        protected List<IXRInteractor> Interactors;
-
-        private int _id;
         private static int _counter;
-
-        private bool _locked;
-        private bool _isOwner;
-
-        public bool rotating;
-        public bool moving;
-        public bool resizing;
-        private bool _deleting;
-
-        private Material _mat;
-        private Rigidbody _rigidbody;
+        private static int _defaultLayer;
+        private static int _shapesLayer;
 
         private static readonly int Create1 = Shader.PropertyToID("_Creating");
         private static readonly int Modify1 = Shader.PropertyToID("_Modifying");
         private static readonly int Destroy1 = Shader.PropertyToID("_Destroying");
 
-        private static int _defaultLayer;
-        private static int _shapesLayer;
+        public bool rotating;
+        public bool moving;
+        public bool resizing;
+        
+        protected byte ShapeId;
 
-        public static readonly Dictionary<int, Shape> Shapes = new();
+        protected float InitialDistance;
+        protected Vector3 InitialScale;
+
+        protected readonly List<IXRInteractor> Interactors = new(2);
+
+        private int _id;
+
+        private bool _locked;
+        private bool _isOwner;
+        
+        private bool _deleting;
+
+        private Material _mat;
+        private Rigidbody _rigidbody;
 
         #region Unity
 
@@ -51,7 +51,6 @@ namespace Board.Shapes
             _rigidbody = GetComponent<Rigidbody>();
             _defaultLayer = LayerMask.NameToLayer("Static Shapes");
             _shapesLayer = LayerMask.NameToLayer("Shapes");
-            Interactors = new List<IXRInteractor>(2);
             _id = _counter++;
             
             Shapes.Add(_id, this);            
