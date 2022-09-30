@@ -6,10 +6,8 @@ using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using Users;
-using Utils;
 using DeviceType = Utils.DeviceType;
 using Event = Utils.Event;
 
@@ -18,13 +16,14 @@ namespace Board.Events
     public class EventManager : MonoBehaviourPunCallbacks
     {
         [SerializeField] private Tools tools;
+        [SerializeField] private PhotonView view;
 
         [SerializeField] private GameObject vrPrefab;
         [SerializeField] private GameObject arPrefab;
         [SerializeField] private GameObject postItPrefab;
         [SerializeField] private GameObject onlinePingPrefab;
         [SerializeField] private GameObject board;
-
+        
         private List<PlayerEntity> _others;
 
         #region UNITY
@@ -153,6 +152,9 @@ namespace Board.Events
 
             PhotonNetwork.RaiseEvent((byte)Event.EventCode.SendNewPlayerIn, transform.position, raiseEventOptions,
                 SendOptions.SendReliable);
+            
+            view.ViewID = 0;
+            view.ViewID = PhotonNetwork.LocalPlayer.ActorNumber;
         }
 
         public override void OnDisconnected(DisconnectCause cause)
@@ -222,11 +224,14 @@ namespace Board.Events
             print(newPlayer.NickName + " joined the room.");
 
             var device = (DeviceType)newPlayer.CustomProperties.GetValueOrDefault("Device");
-
             var entity = Instantiate(device == DeviceType.VR ? vrPrefab : arPrefab, new Vector3(0, 0, 0),
                 Quaternion.identity);
             var playerEntity = entity.AddComponent<PlayerEntity>();
+            var playerView = entity.GetComponent<PhotonView>();
+            
             playerEntity.SetValues(device, newPlayer.ActorNumber, newPlayer.NickName);
+            playerView.ViewID = 0;
+            playerView.ViewID = newPlayer.ActorNumber;
 
             return playerEntity;
         }
