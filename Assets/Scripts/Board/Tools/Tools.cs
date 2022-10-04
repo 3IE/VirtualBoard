@@ -1,7 +1,7 @@
 using System.Linq;
 using UnityEngine;
 
-namespace Board
+namespace Board.Tools
 {
     public class Tools : MonoBehaviour
     {
@@ -24,16 +24,16 @@ namespace Board
 
         public static Color[] GenerateCircle(int x, int y, Color color, Board board)
         {
-            Color[] colors = board.texture.GetPixels(x, y, board.tools.penSize, board.tools.penSize);
+            var colors = board.texture.GetPixels(x, y, board.tools.penSize, board.tools.penSize);
 
-            Vector2Int center = new Vector2Int(board.tools.penSize / 2, board.tools.penSize / 2);
+            var center = new Vector2Int(board.tools.penSize / 2, board.tools.penSize / 2);
 
             for (int i = 0; i < board.tools.penSize * board.tools.penSize; i++)
             {
-                Vector2Int pos = new Vector2Int(i % board.tools.penSize, i / board.tools.penSize);
+                var pos = new Vector2Int(i % board.tools.penSize, i / board.tools.penSize);
+                var dist = new Vector2Int(pos.x - center.x, pos.y - center.y);
 
-                Vector2Int dist = new Vector2Int(pos.x - center.x, pos.y - center.y);
-                float distance = Mathf.Sqrt(dist.x * dist.x + dist.y * dist.y);
+                var distance = Mathf.Sqrt(dist.x * dist.x + dist.y * dist.y);
 
                 if (distance <= board!.tools.penSize / 2)
                     colors[i] = color;

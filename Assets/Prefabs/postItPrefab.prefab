@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3468885621327068383}
   - component: {fileID: 1084679234444968804}
   - component: {fileID: 9183137832296864257}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: postIt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -111,7 +111,7 @@ GameObject:
   - component: {fileID: 4505803749218811628}
   - component: {fileID: 3752083260142718576}
   - component: {fileID: 26441128102708969}
-  m_Layer: 5
+  m_Layer: 3
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -212,7 +212,8 @@ GameObject:
   - component: {fileID: 4959623636022955616}
   - component: {fileID: -3634572151193225581}
   - component: {fileID: -6679781853695153663}
-  m_Layer: 0
+  - component: {fileID: 3013477700268487492}
+  m_Layer: 3
   m_Name: postItPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -293,7 +294,19 @@ MonoBehaviour:
       m_Calls: []
   m_SelectEntered:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 3013477700268487492}
+        m_TargetAssemblyTypeName: DestroyOnGrab, Assembly-CSharp
+        m_MethodName: OnGrab
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_SelectExited:
     m_PersistentCalls:
       m_Calls: []
@@ -367,6 +380,18 @@ MonoBehaviour:
   m_ForceGravityOnDetach: 0
   m_RetainTransformParent: 1
   m_AttachPointCompatibilityMode: 0
+--- !u!114 &3013477700268487492
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4838594930129335131}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55bcfea6c2d816f44b32f621acc63fde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4948758774427492233
 GameObject:
   m_ObjectHideFlags: 0
@@ -378,7 +403,7 @@ GameObject:
   - component: {fileID: 6011080037197349752}
   - component: {fileID: 3872277358378251220}
   - component: {fileID: 5702153814804224241}
-  m_Layer: 5
+  m_Layer: 3
   m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}

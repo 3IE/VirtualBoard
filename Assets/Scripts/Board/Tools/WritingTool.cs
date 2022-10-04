@@ -1,17 +1,18 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using UnityEngine.Serialization;
 using Utils;
 
-namespace Board
+namespace Board.Tools
 {
     public class WritingTool : MonoBehaviour
     {
         [SerializeField] private HoverInteractable hover;
         [SerializeField] protected Board boardObject;
 
-        public bool rotationLocked;
+        [FormerlySerializedAs("rotationLocked")] public bool positionLocked;
 
         private bool _touchedLast;
-        private Quaternion _lastRot;
         private Vector3 _lastPosition;
 
         private Vector3 _initialPosition;
@@ -21,9 +22,12 @@ namespace Board
         private Rigidbody _rigidbody;
 
         #if UNITY_EDITOR
-        [SerializeField]
+        [FormerlySerializedAs("CanDraw")] [SerializeField]
         #endif
-        protected bool CanDraw;
+        protected bool canDraw;
+
+        protected Vector3 collisionPoint;
+        protected Vector3 collisionNormal;
 
         private void Awake()
         {
@@ -36,24 +40,19 @@ namespace Board
 
         protected void UpdateRotation()
         {
-            if (rotationLocked)
+            if (positionLocked)
             {
                 if (_touchedLast)
                 {
-                    transform.rotation = _lastRot;
-
                     if (transform.position.z <= _lastPosition.z) return;
 
                     var position = _transform.position;
                     
                     _lastPosition.x = position.x;
                     _lastPosition.y = position.y;
-                    
-                    _transform.position = _lastPosition;
                 }
                 else
                 {
-                    _lastRot = _transform.rotation;
                     _lastPosition = _transform.position;
                     _touchedLast = true;
                 }
@@ -61,16 +60,14 @@ namespace Board
             else
                 _touchedLast = false;
         }
-        
+
         public void AuthorizeDraw()
         {
-            CanDraw = true;
             hover.HoverExit();
         }
 
         public void UnauthorizeDraw()
         {
-            CanDraw = false;
             hover.Hover();
         }
 
@@ -78,7 +75,8 @@ namespace Board
         {
             if (other.CompareTag("Board"))
             {
-                rotationLocked = true;
+                positionLocked = true;
+                canDraw = true;
                 return;
             }
             
@@ -94,8 +92,10 @@ namespace Board
         
         private void OnTriggerExit(Collider other)
         {
-            if (other.CompareTag("Board"))
-                rotationLocked = false;
+            if (!other.CompareTag("Board")) return;
+            
+            positionLocked = false;
+            canDraw = false;
         }
     }
 }

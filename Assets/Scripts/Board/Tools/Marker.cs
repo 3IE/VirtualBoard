@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Event = Utils.Event;
 
-namespace Board
+namespace Board.Tools
 {
     public class Marker : WritingTool
     {
@@ -45,7 +45,7 @@ namespace Board
             if (_modifications.TryDequeue(out var mod))
                 ModifyTexture(mod);
 
-            if (CanDraw)
+            if (canDraw)
                 Draw();
         }
 
@@ -72,7 +72,7 @@ namespace Board
         private void Draw()
         {
             // We check if we are touching the board with the marker
-            if (Physics.Raycast(_tipTransform.position, transform.up, out _touch, .5f) &&
+            if (Physics.Raycast(_tipTransform.position, transform.up, out _touch, .01f) &&
                 _touch.transform.CompareTag("Board"))
             {
                 Board ??= _touch.transform.GetComponent<Board>();

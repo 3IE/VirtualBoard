@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Board.Shapes;
+using Board.Tools;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
@@ -15,7 +16,7 @@ namespace Board.Events
 {
     public class EventManager : MonoBehaviourPunCallbacks
     {
-        [SerializeField] private Tools tools;
+        [SerializeField] private Tools.Tools tools;
         [SerializeField] private PhotonView view;
 
         [SerializeField] private GameObject vrPrefab;

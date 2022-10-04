@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Serialization;
 using UnityEngine.XR.Interaction.Toolkit;
 
 namespace Board.Shapes
@@ -10,19 +8,25 @@ namespace Board.Shapes
     public class ShapeSelector : MonoBehaviour
     {
         public const byte CubeId = 0;
-        public const byte CylinderId = 0;
-        public const byte SphereId = 0;
+        public const byte CylinderId = 1;
+        public const byte SphereId = 2;
 
+        public bool selected;
         public Shape currentShape;
 
         [SerializeField] public XRRayInteractor leftInteractor;
         [SerializeField] private XRRayInteractor rightInteractor;
+        [SerializeField] private XRInteractionManager interactionManager;
 
         [SerializeField] private InputActionReference createReference;
         [SerializeField] private InputActionReference destroyReference;
-        [SerializeField] private XRInteractionManager interactionManager;
+        [SerializeField] private InputActionReference changeDistance;
+        [SerializeField] private ContinuousMoveProviderBase continuousMoveProvider;
+
         [SerializeField] private Transform shapesParent;
         [SerializeField] private List<GameObject> shapes;
+
+        [Range(0.5f, 5f)] [SerializeField] private float velocity = 0.5f;
 
         private byte _index;
 
@@ -35,6 +39,8 @@ namespace Board.Shapes
 
             destroyReference.action.started += DeleteObject;
             destroyReference.action.canceled += StopDeleteObject;
+
+            changeDistance.action.performed += ChangeDistance;
         }
 
         private void Start()
@@ -78,6 +84,8 @@ namespace Board.Shapes
         }
 #endif
 
+        #region SELECTOR
+
         public void SelectCube()
         {
             _index = CubeId;
@@ -100,12 +108,14 @@ namespace Board.Shapes
 
         private GameObject GetShape()
         {
-#if UNITY_EDITOR
-            return CustomShape.Create(Vector3.one, Vector3.one, Quaternion.identity, testMaterial).gameObject;
-#else
+//#if UNITY_EDITOR
+//            return CustomShape.Create(testMaterial);
+//#else
             return shapes[_index];
-#endif
+//#endif
         }
+
+        #endregion
 
         private void CreateObject(InputAction.CallbackContext ctx)
         {
@@ -122,7 +132,13 @@ namespace Board.Shapes
             _creating = true;
 
             var prefab = GetShape();
+
+            //#if UNITY_EDITOR
+            //var obj = prefab ? prefab : throw new ArgumentNullException(nameof(prefab));
+            //obj.transform.SetParent(shapesParent);
+            //#else
             var obj = Instantiate(prefab, shapesParent);
+            //#endif
             obj.GetComponent<XRSimpleInteractable>().interactionManager = interactionManager;
 
             currentShape = obj.GetComponent<Shape>();
@@ -136,8 +152,7 @@ namespace Board.Shapes
 
             if (currentShape.rotating)
             {
-                currentShape.rotating = false;
-                currentShape.moving = true;
+                currentShape.OnDeselect(null);
                 return;
             }
 
@@ -168,7 +183,28 @@ namespace Board.Shapes
 
             if (Physics.Raycast(leftInteractor.transform.position, leftInteractor.transform.forward,
                     out var hit, 100f, LayerMask.GetMask("Static Shapes")))
-                hit.collider.GetComponent<Shape>().Destroy();
+                hit.collider.GetComponent<Shape>().CallDestroy(false);
+        }
+
+        private void ChangeDistance(InputAction.CallbackContext obj)
+        {
+            if (currentShape is null)
+                return;
+
+            var value = obj.ReadValue<Vector2>().y * Time.deltaTime;
+            
+            currentShape.initialDistance =
+                Mathf.Clamp(currentShape.initialDistance + value * velocity, 0.5f, 100f);
+        }
+
+        public void StartChangeDistance()
+        {
+            continuousMoveProvider.enabled = false;
+        }
+
+        public void StopChangeDistance()
+        {
+            continuousMoveProvider.enabled = true;
         }
     }
 }

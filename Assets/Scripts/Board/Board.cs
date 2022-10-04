@@ -10,13 +10,19 @@ namespace Board
 
         public Texture2D texture;
         public Vector2 textureSize = new(2048, 2048);
-        public Tools tools;
+        public Tools.Tools tools;
 
         private void Awake()
         {
             PhotonNetwork.GameVersion = GameVersion;
             PhotonNetwork.SetPlayerCustomProperties(new Hashtable { { "Device", Utils.DeviceType.VR } });
             PhotonNetwork.ConnectUsingSettings();
+            
+            var r = GetComponent<Renderer>();
+
+            texture = new Texture2D((int)textureSize.x, (int)textureSize.y);
+            tools.baseColor = texture.GetPixel(0, 0);
+            r.material.mainTexture = texture;
         }
 
         public override void OnConnectedToMaster()
@@ -28,16 +34,6 @@ namespace Board
         public override void OnJoinedRoom()
         {
             Debug.Log("Joined room");
-        }
-
-        // Start is called before the first frame update
-        private void Start()
-        {
-            var r = GetComponent<Renderer>();
-
-            texture = new Texture2D((int)textureSize.x, (int)textureSize.y);
-            tools.baseColor = texture.GetPixel(0, 0);
-            r.material.mainTexture = texture;
         }
     }
 }

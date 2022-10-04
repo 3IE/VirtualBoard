@@ -4,7 +4,7 @@ using Photon.Realtime;
 using UnityEngine;
 using Event = Utils.Event;
 
-namespace Board
+namespace Board.Tools
 {
     public class Modification
     {

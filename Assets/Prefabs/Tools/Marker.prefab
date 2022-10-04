@@ -122,6 +122,7 @@ GameObject:
   - component: {fileID: 441707064651445005}
   - component: {fileID: 441707064651445002}
   - component: {fileID: 441707064651445003}
+  - component: {fileID: 8222938792672070424}
   m_Layer: 0
   m_Name: Tip
   m_TagString: Untagged
@@ -207,6 +208,23 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &8222938792672070424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 441707064651445001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eba61605954a820469184860028183ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hover: {fileID: 6211745579641748902}
+  boardObject: {fileID: 0}
+  positionLocked: 0
+  canDraw: 0
+  tip: {fileID: 441707064651445001}
 --- !u!1 &441707065337096309
 GameObject:
   m_ObjectHideFlags: 0
@@ -218,7 +236,6 @@ GameObject:
   - component: {fileID: 441707065337096308}
   - component: {fileID: 441707065337096310}
   - component: {fileID: 441707065337096311}
-  - component: {fileID: 441707065337096265}
   - component: {fileID: 2229995121750660245}
   m_Layer: 0
   m_Name: Marker
@@ -281,7 +298,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   m_InteractionLayers:
-    m_Bits: 4294967295
+    m_Bits: 1
   m_SelectMode: 0
   m_CustomReticle: {fileID: 0}
   m_FirstHoverEntered:
@@ -292,10 +309,34 @@ MonoBehaviour:
       m_Calls: []
   m_HoverEntered:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6211745579641748902}
+        m_TargetAssemblyTypeName: Utils.HoverInteractable, Assembly-CSharp
+        m_MethodName: Hover
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_HoverExited:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 6211745579641748902}
+        m_TargetAssemblyTypeName: Utils.HoverInteractable, Assembly-CSharp
+        m_MethodName: HoverExit
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_FirstSelectEntered:
     m_PersistentCalls:
       m_Calls: []
@@ -304,10 +345,34 @@ MonoBehaviour:
       m_Calls: []
   m_SelectEntered:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8222938792672070424}
+        m_TargetAssemblyTypeName: Board.Tools.WritingTool, Assembly-CSharp
+        m_MethodName: AuthorizeDraw
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_SelectExited:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8222938792672070424}
+        m_TargetAssemblyTypeName: Board.Tools.WritingTool, Assembly-CSharp
+        m_MethodName: UnauthorizeDraw
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_Activated:
     m_PersistentCalls:
       m_Calls: []
@@ -378,23 +443,6 @@ MonoBehaviour:
   m_ForceGravityOnDetach: 0
   m_RetainTransformParent: 1
   m_AttachPointCompatibilityMode: 0
---- !u!114 &441707065337096265
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 441707065337096309}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eba61605954a820469184860028183ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hover: {fileID: 6211745579641748902}
-  boardObject: {fileID: 0}
-  rotationLocked: 0
-  CanDraw: 0
-  tip: {fileID: 441707064651445001}
 --- !u!65 &2229995121750660245
 BoxCollider:
   m_ObjectHideFlags: 0

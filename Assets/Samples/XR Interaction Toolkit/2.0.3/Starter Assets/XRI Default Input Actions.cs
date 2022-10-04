@@ -1126,6 +1126,15 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Change distance"",
+                    ""type"": ""Value"",
+                    ""id"": ""36b0b0c1-04a1-4b3a-bf6e-f1ebb741c8ce"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -1148,6 +1157,17 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Delete object"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5226a07e-bb48-4161-80fa-c61f79e2208c"",
+                    ""path"": ""<XRController>{LeftHand}/Primary2DAxis"",
+                    ""interactions"": """",
+                    ""processors"": ""StickDeadzone"",
+                    ""groups"": """",
+                    ""action"": ""Change distance"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1199,7 +1219,7 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
                 {
                     ""name"": """",
                     ""id"": ""edcef131-1aac-4ce5-801d-de21091e9f3a"",
-                    ""path"": ""<XRController>{RightHand}/primaryButton"",
+                    ""path"": ""<XRController>{LeftHand}/menu"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Generic XR Controller"",
@@ -1326,6 +1346,7 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
         m__3DObjects = asset.FindActionMap("3D Objects", throwIfNotFound: true);
         m__3DObjects_Createobject = m__3DObjects.FindAction("Create object", throwIfNotFound: true);
         m__3DObjects_Deleteobject = m__3DObjects.FindAction("Delete object", throwIfNotFound: true);
+        m__3DObjects_Changedistance = m__3DObjects.FindAction("Change distance", throwIfNotFound: true);
         // OnlineInteractions
         m_OnlineInteractions = asset.FindActionMap("OnlineInteractions", throwIfNotFound: true);
         m_OnlineInteractions_Ping = m_OnlineInteractions.FindAction("Ping", throwIfNotFound: true);
@@ -1864,12 +1885,14 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
     private I_3DObjectsActions m__3DObjectsActionsCallbackInterface;
     private readonly InputAction m__3DObjects_Createobject;
     private readonly InputAction m__3DObjects_Deleteobject;
+    private readonly InputAction m__3DObjects_Changedistance;
     public struct _3DObjectsActions
     {
         private @XRIDefaultInputActions m_Wrapper;
         public _3DObjectsActions(@XRIDefaultInputActions wrapper) { m_Wrapper = wrapper; }
         public InputAction @Createobject => m_Wrapper.m__3DObjects_Createobject;
         public InputAction @Deleteobject => m_Wrapper.m__3DObjects_Deleteobject;
+        public InputAction @Changedistance => m_Wrapper.m__3DObjects_Changedistance;
         public InputActionMap Get() { return m_Wrapper.m__3DObjects; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1885,6 +1908,9 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
                 @Deleteobject.started -= m_Wrapper.m__3DObjectsActionsCallbackInterface.OnDeleteobject;
                 @Deleteobject.performed -= m_Wrapper.m__3DObjectsActionsCallbackInterface.OnDeleteobject;
                 @Deleteobject.canceled -= m_Wrapper.m__3DObjectsActionsCallbackInterface.OnDeleteobject;
+                @Changedistance.started -= m_Wrapper.m__3DObjectsActionsCallbackInterface.OnChangedistance;
+                @Changedistance.performed -= m_Wrapper.m__3DObjectsActionsCallbackInterface.OnChangedistance;
+                @Changedistance.canceled -= m_Wrapper.m__3DObjectsActionsCallbackInterface.OnChangedistance;
             }
             m_Wrapper.m__3DObjectsActionsCallbackInterface = instance;
             if (instance != null)
@@ -1895,6 +1921,9 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
                 @Deleteobject.started += instance.OnDeleteobject;
                 @Deleteobject.performed += instance.OnDeleteobject;
                 @Deleteobject.canceled += instance.OnDeleteobject;
+                @Changedistance.started += instance.OnChangedistance;
+                @Changedistance.performed += instance.OnChangedistance;
+                @Changedistance.canceled += instance.OnChangedistance;
             }
         }
     }
@@ -2054,6 +2083,7 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
     {
         void OnCreateobject(InputAction.CallbackContext context);
         void OnDeleteobject(InputAction.CallbackContext context);
+        void OnChangedistance(InputAction.CallbackContext context);
     }
     public interface IOnlineInteractionsActions
     {

@@ -6,6 +6,8 @@
         {
             base.Initialize();
             
+            ShapeId = ShapeSelector.CylinderId;
+
             Size.y *= 2;
         }
 

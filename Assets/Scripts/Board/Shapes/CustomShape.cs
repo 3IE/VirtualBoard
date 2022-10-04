@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using Dummiesman;
+using Unity.XR.CoreUtils;
+using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
 namespace Board.Shapes
@@ -9,63 +11,40 @@ namespace Board.Shapes
         private MeshFilter _meshFilter;
         private MeshRenderer _meshRenderer;
 
-        public static CustomShape Create(Vector3 size, Vector3 position, Quaternion rotation, Material material)
+        public static GameObject Create(Material material)
         {
-            var gameObject = new GameObject("CustomShape", typeof(MeshFilter), typeof(MeshRenderer), typeof(XRSimpleInteractable));
-            var shape = gameObject.AddComponent<CustomShape>();
-            shape._mesh = new Mesh
-            {
-                vertices = new[]
-                {
-                    new Vector3(-0.5f, -0.5f, -0.5f),
-                    new Vector3(-0.5f, -0.5f, 0.5f),
-                    new Vector3(-0.5f, 0.5f, -0.5f),
-                    new Vector3(-0.5f, 0.5f, 0.5f),
-                    new Vector3(0.5f, -0.5f, -0.5f),
-                    new Vector3(0.5f, -0.5f, 0.5f),
-                    new Vector3(0.5f, 0.5f, -0.5f),
-                    new Vector3(0.5f, 0.5f, 0.5f)
-                },
-                triangles = new[]
-                {
-                    0, 1, 2,
-                    1, 3, 2,
-                    4, 6, 5,
-                    5, 6, 7,
-                    0, 2, 4,
-                    4, 2, 6,
-                    1, 5, 3,
-                    5, 7, 3,
-                    0, 4, 1,
-                    4, 5, 1,
-                    2, 3, 6,
-                    6, 3, 7
-                },
-                colors = new[]
-                {
-                    Color.red,
-                    Color.red,
-                    Color.red,
-                    Color.red,
-                    Color.red,
-                    Color.red,
-                    Color.red,
-                    Color.red,
-                },
-            };
+            var obj = new OBJLoader()
+                .Load("C:\\Users\\yvon.morice\\Documents\\VirtualBoard\\Assets\\Models\\CustomShape.obj");
+            var mesh = obj.GetNamedChild("default");
+
+            var collider = mesh.AddComponent<MeshCollider>();
+            var interactable = mesh.AddComponent<XRSimpleInteractable>();
+            var rigidbody = mesh.AddComponent<Rigidbody>();
+
+            rigidbody.useGravity = false;
+
+            collider.convex = true;
             
-            shape._meshFilter = gameObject.GetComponent<MeshFilter>();
-            shape._meshRenderer = gameObject.GetComponent<MeshRenderer>();
+            var shape = mesh.AddComponent<CustomShape>();
             
-            shape._mesh.RecalculateNormals();
-            shape._mesh.RecalculateBounds();
-            shape._mesh.Optimize();
-            shape._meshFilter.mesh = shape._mesh;
+            interactable.hoverEntered.AddListener(shape.OnHoverEnter);
+            interactable.hoverExited.AddListener(shape.OnHoverExit);
+            interactable.selectEntered.AddListener(shape.OnSelect);
+            interactable.selectExited.AddListener(shape.OnDeselect);
+
+            interactable.selectMode = InteractableSelectMode.Multiple;
+
+            shape._meshFilter = mesh.GetComponent<MeshFilter>();
+            shape._meshRenderer = mesh.GetComponent<MeshRenderer>();
+
+            shape._mesh = shape._meshFilter.mesh;
+
             shape._meshRenderer.material = material;
-            shape.transform.position = position;
-            shape.transform.rotation = rotation;
-            shape.transform.localScale = size;
-            return shape;
+
+            mesh.transform.localPosition = Vector3.zero;
+            mesh.transform.localRotation = Quaternion.identity;
+            mesh.transform.localScale /= shape._mesh.bounds.size.magnitude;
+            return mesh;
         }
     }
 }

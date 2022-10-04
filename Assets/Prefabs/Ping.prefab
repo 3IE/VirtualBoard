@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2640432996576307928}
   - component: {fileID: 2337832351700635072}
   - component: {fileID: 2986918407155338813}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Body
   m_TagString: Ping
   m_Icon: {fileID: 0}
@@ -107,7 +107,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6383243021061585825}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Ping
   m_TagString: Ping
   m_Icon: {fileID: 0}
@@ -123,7 +123,7 @@ Transform:
   m_GameObject: {fileID: 8564327067697552582}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 5160895210112243064}

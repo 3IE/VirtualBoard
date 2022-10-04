@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Board
+namespace Board.Tools
 {
     public class ToolWheelController : MonoBehaviour
     {
