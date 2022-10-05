@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using Utils;
 
 namespace Board.Tools
@@ -32,6 +33,8 @@ namespace Board.Tools
             
             _initialPosition = _transform.position;
             _initialRotation = _transform.rotation;
+
+            TouchedLast = false;
         }
 
         protected void UpdateRotation()
@@ -55,7 +58,6 @@ namespace Board.Tools
                 {
                     _lastRot = _transform.rotation;
                     _lastPosition = _transform.position;
-                    TouchedLast = true;
                 }
             }
             else
@@ -74,13 +76,6 @@ namespace Board.Tools
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.CompareTag("Board"))
-            {
-                rotationLocked = true;
-                canDraw = true;
-                return;
-            }
-            
             if (!other.CompareTag("Ceiling")) return;
 
             _rigidbody.constraints = RigidbodyConstraints.FreezeAll;
@@ -91,14 +86,24 @@ namespace Board.Tools
             _rigidbody.constraints = RigidbodyConstraints.None;
         }
         
-        private void OnTriggerExit(Collider other)
+        private void OnCollisionExit(Collision collision)
         {
-            if (!other.CompareTag("Board")) return;
+            if (!collision.collider.CompareTag("Board")) return;
 
             TouchedLast = false;
             
             rotationLocked = false;
             canDraw = false;
+        }
+
+        private void OnCollisionEnter(Collision collision)
+        {
+            if (!collision.collider.CompareTag("Board")) return;
+
+            TouchedLast = false;
+            
+            rotationLocked = true;
+            canDraw = true;
         }
     }
 }

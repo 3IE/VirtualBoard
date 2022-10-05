@@ -71,7 +71,7 @@ namespace Board.Tools
         private void Draw()
         {
             // We check if we are touching the board with the marker
-            if (Physics.Raycast(_tipTransform.position, transform.up, out _touch, .02f) &&
+            if (Physics.Raycast(_tipTransform.position, transform.up, out _touch, .05f) &&
                 _touch.transform.CompareTag("Board"))
             {
                 Board ??= _touch.transform.GetComponent<Board>();
