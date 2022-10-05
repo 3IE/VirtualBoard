@@ -16,7 +16,6 @@ namespace Board.Tools
         private Transform _tipTransform;
         private RaycastHit _touch;
         private Vector2 _touchPos;
-        private bool _touchedLastFrame;
 
         private Queue<Modification> _modifications;
 
@@ -28,7 +27,7 @@ namespace Board.Tools
             _tipTransform = tip.transform;
             _renderer = tip.GetComponent<Renderer>();
 
-            _touchedLastFrame = false;
+            TouchedLast = false;
             _modifications = new Queue<Modification>(256);
         }
         
@@ -72,7 +71,7 @@ namespace Board.Tools
         private void Draw()
         {
             // We check if we are touching the board with the marker
-            if (Physics.Raycast(_tipTransform.position, transform.up, out _touch, .01f) &&
+            if (Physics.Raycast(_tipTransform.position, transform.up, out _touch, .02f) &&
                 _touch.transform.CompareTag("Board"))
             {
                 Board ??= _touch.transform.GetComponent<Board>();
@@ -85,7 +84,7 @@ namespace Board.Tools
                 if (!InBound(x, y))
                     return;
 
-                if (_touchedLastFrame)
+                if (TouchedLast)
                 {
                     if (Vector2.Distance(new Vector2(x, y), LastTouchPos) < 0.01f)
                         return;
@@ -96,13 +95,13 @@ namespace Board.Tools
                     }
                     catch (ArgumentException)
                     {
-                        _touchedLastFrame = false;
+                        TouchedLast = false;
                     }
                     finally
                     {
                         SendModification(x, y);
 
-                        if (!_touchedLastFrame)
+                        if (!TouchedLast)
                             Board = null;
                     }
                 }
@@ -110,13 +109,13 @@ namespace Board.Tools
                     _colors = GenerateShape();
 
                 LastTouchPos = new Vector2(x, y);
-                _touchedLastFrame = true;
+                TouchedLast = true;
 
                 return;
             }
 
             Board = null;
-            _touchedLastFrame = false;
+            TouchedLast = false;
         }
 
         protected virtual Color[] GenerateShape()

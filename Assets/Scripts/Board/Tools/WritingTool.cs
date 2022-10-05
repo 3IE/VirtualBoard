@@ -1,6 +1,4 @@
-﻿using System;
-using UnityEngine;
-using UnityEngine.Serialization;
+﻿using UnityEngine;
 using Utils;
 
 namespace Board.Tools
@@ -10,9 +8,9 @@ namespace Board.Tools
         [SerializeField] private HoverInteractable hover;
         [SerializeField] protected Board boardObject;
 
-        [FormerlySerializedAs("rotationLocked")] public bool positionLocked;
+        public bool rotationLocked;
 
-        private bool _touchedLast;
+        private Quaternion _lastRot;
         private Vector3 _lastPosition;
 
         private Vector3 _initialPosition;
@@ -22,12 +20,10 @@ namespace Board.Tools
         private Rigidbody _rigidbody;
 
         #if UNITY_EDITOR
-        [FormerlySerializedAs("CanDraw")] [SerializeField]
+        [SerializeField]
         #endif
         protected bool canDraw;
-
-        protected Vector3 collisionPoint;
-        protected Vector3 collisionNormal;
+        protected bool TouchedLast;
 
         private void Awake()
         {
@@ -40,25 +36,30 @@ namespace Board.Tools
 
         protected void UpdateRotation()
         {
-            if (positionLocked)
+            if (rotationLocked)
             {
-                if (_touchedLast)
+                if (TouchedLast)
                 {
+                    transform.rotation = _lastRot;
+
                     if (transform.position.z <= _lastPosition.z) return;
 
                     var position = _transform.position;
                     
                     _lastPosition.x = position.x;
                     _lastPosition.y = position.y;
+                    
+                    _transform.position = _lastPosition;
                 }
                 else
                 {
+                    _lastRot = _transform.rotation;
                     _lastPosition = _transform.position;
-                    _touchedLast = true;
+                    TouchedLast = true;
                 }
             }
             else
-                _touchedLast = false;
+                TouchedLast = false;
         }
 
         public void AuthorizeDraw()
@@ -75,7 +76,7 @@ namespace Board.Tools
         {
             if (other.CompareTag("Board"))
             {
-                positionLocked = true;
+                rotationLocked = true;
                 canDraw = true;
                 return;
             }
@@ -93,8 +94,10 @@ namespace Board.Tools
         private void OnTriggerExit(Collider other)
         {
             if (!other.CompareTag("Board")) return;
+
+            TouchedLast = false;
             
-            positionLocked = false;
+            rotationLocked = false;
             canDraw = false;
         }
     }

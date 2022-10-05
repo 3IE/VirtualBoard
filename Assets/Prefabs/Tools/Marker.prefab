@@ -122,7 +122,6 @@ GameObject:
   - component: {fileID: 441707064651445005}
   - component: {fileID: 441707064651445002}
   - component: {fileID: 441707064651445003}
-  - component: {fileID: 8222938792672070424}
   m_Layer: 0
   m_Name: Tip
   m_TagString: Untagged
@@ -208,23 +207,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &8222938792672070424
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 441707064651445001}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eba61605954a820469184860028183ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hover: {fileID: 6211745579641748902}
-  boardObject: {fileID: 0}
-  positionLocked: 0
-  canDraw: 0
-  tip: {fileID: 441707064651445001}
 --- !u!1 &441707065337096309
 GameObject:
   m_ObjectHideFlags: 0
@@ -237,6 +219,7 @@ GameObject:
   - component: {fileID: 441707065337096310}
   - component: {fileID: 441707065337096311}
   - component: {fileID: 2229995121750660245}
+  - component: {fileID: 830207004534932235}
   m_Layer: 0
   m_Name: Marker
   m_TagString: Tool
@@ -346,7 +329,7 @@ MonoBehaviour:
   m_SelectEntered:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8222938792672070424}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Board.Tools.WritingTool, Assembly-CSharp
         m_MethodName: AuthorizeDraw
         m_Mode: 1
@@ -361,7 +344,7 @@ MonoBehaviour:
   m_SelectExited:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8222938792672070424}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Board.Tools.WritingTool, Assembly-CSharp
         m_MethodName: UnauthorizeDraw
         m_Mode: 1
@@ -456,6 +439,23 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.119620524, y: 0.4674717, z: 0.12201271}
   m_Center: {x: -0.00000013907751, y: 0.051918563, z: -0.003588313}
+--- !u!114 &830207004534932235
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 441707065337096309}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eba61605954a820469184860028183ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hover: {fileID: 6211745579641748902}
+  boardObject: {fileID: 0}
+  rotationLocked: 0
+  canDraw: 0
+  tip: {fileID: 441707064651445001}
 --- !u!1 &441707065742839177
 GameObject:
   m_ObjectHideFlags: 0
