@@ -127,7 +127,7 @@ namespace Board.Events
                      let pos = postIt.transform.localPosition
                      let text = postIt.GetComponentInChildren<TMP_Text>().text
                      let scale = board.transform.localScale.x
-                     select new object[] { new Vector2(pos.x * scale, pos.z * scale) })
+                     select new object[] { new Vector2(pos.x * scale, pos.z * scale), text })
                 PhotonNetwork.RaiseEvent((byte)Event.EventCode.SendNewPostIt, data, raiseEventOptions,
                     SendOptions.SendReliable);
         }
