@@ -1,38 +1,40 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.XR;
+using UnityEngine.XR.Interaction.Toolkit;
 using Utils;
 
 namespace Board.Tools
 {
     public class WritingTool : MonoBehaviour
     {
-        [SerializeField] private HoverInteractable hover;
-        [SerializeField] protected Board boardObject;
-
-        public bool rotationLocked;
+        [SerializeField] private List<HoverInteractable> hover;
 
         private Quaternion _lastRot;
         private Vector3 _lastPosition;
 
         private Vector3 _initialPosition;
         private Quaternion _initialRotation;
-        
+
         private Transform _transform;
         private Rigidbody _rigidbody;
 
-        #if UNITY_EDITOR
+        [SerializeField] protected Board boardObject;
+        [SerializeField] protected float penSize;
+#if UNITY_EDITOR
         [SerializeField]
-        #endif
+#endif
         protected bool canDraw;
         protected bool TouchedLast;
+
+        protected XRBaseController Controller;
+
+        public bool rotationLocked;
 
         private void Awake()
         {
             _rigidbody = GetComponent<Rigidbody>();
             _transform = transform;
-            
-            _initialPosition = _transform.position;
-            _initialRotation = _transform.rotation;
 
             TouchedLast = false;
         }
@@ -46,12 +48,12 @@ namespace Board.Tools
                     transform.rotation = _lastRot;
 
                     if (transform.position.z <= _lastPosition.z) return;
-
-                    var position = _transform.position;
                     
+                    var position = _transform.position;
+
                     _lastPosition.x = position.x;
                     _lastPosition.y = position.y;
-                    
+
                     _transform.position = _lastPosition;
                 }
                 else
@@ -66,12 +68,14 @@ namespace Board.Tools
 
         public void AuthorizeDraw()
         {
-            hover.HoverExit();
+            foreach (var h in hover)
+                h.Hover();
         }
 
         public void UnauthorizeDraw()
         {
-            hover.Hover();
+            foreach (var h in hover)
+                h.HoverExit();
         }
 
         private void OnTriggerEnter(Collider other)
@@ -85,13 +89,13 @@ namespace Board.Tools
 
             _rigidbody.constraints = RigidbodyConstraints.None;
         }
-        
+
         private void OnCollisionExit(Collision collision)
         {
             if (!collision.collider.CompareTag("Board")) return;
 
             TouchedLast = false;
-            
+
             rotationLocked = false;
             canDraw = false;
         }
@@ -101,9 +105,20 @@ namespace Board.Tools
             if (!collision.collider.CompareTag("Board")) return;
 
             TouchedLast = false;
-            
+
             rotationLocked = true;
             canDraw = true;
+        }
+
+        public void OnSelected(SelectEnterEventArgs args)
+        {
+            var interactor = args.interactorObject;
+            Controller = interactor.transform.GetComponent<XRBaseController>();
+        }
+        
+        public void OnDeselected()
+        {
+            Controller = null;
         }
     }
 }

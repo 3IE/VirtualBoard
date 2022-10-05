@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 441707064233815558}
   - component: {fileID: 441707064233815579}
   - component: {fileID: 441707064233815576}
-  - component: {fileID: 441707064233815577}
   - component: {fileID: 6211745579641748902}
-  m_Layer: 0
+  - component: {fileID: 2459629570078697035}
+  m_Layer: 3
   m_Name: Handle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -85,19 +85,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &441707064233815577
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 441707064233815559}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &6211745579641748902
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -110,6 +97,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ce3748add7b1014f9b05ecf8b2ce759, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!65 &2459629570078697035
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 441707064233815559}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1.2861211, z: 1.0000002}
+  m_Center: {x: 0, y: 0.14305985, z: -0.0000018998979}
 --- !u!1 &441707064651445001
 GameObject:
   m_ObjectHideFlags: 0
@@ -121,8 +121,7 @@ GameObject:
   - component: {fileID: 441707064651445000}
   - component: {fileID: 441707064651445005}
   - component: {fileID: 441707064651445002}
-  - component: {fileID: 441707064651445003}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Tip
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -194,19 +193,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &441707064651445003
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 441707064651445001}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &441707065337096309
 GameObject:
   m_ObjectHideFlags: 0
@@ -220,7 +206,7 @@ GameObject:
   - component: {fileID: 441707065337096311}
   - component: {fileID: 2229995121750660245}
   - component: {fileID: 830207004534932235}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Marker
   m_TagString: Tool
   m_Icon: {fileID: 0}
@@ -243,7 +229,7 @@ Transform:
   - {fileID: 441707064651445000}
   - {fileID: 441707065742839176}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &441707065337096310
 Rigidbody:
@@ -276,7 +262,8 @@ MonoBehaviour:
   m_InteractionManager: {fileID: 0}
   m_Colliders:
   - {fileID: 0}
-  - {fileID: 441707064233815577}
+  - {fileID: 2229995121750660245}
+  - {fileID: 2459629570078697035}
   m_InteractionLayerMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -293,9 +280,9 @@ MonoBehaviour:
   m_HoverEntered:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 6211745579641748902}
-        m_TargetAssemblyTypeName: Utils.HoverInteractable, Assembly-CSharp
-        m_MethodName: Hover
+      - m_Target: {fileID: 830207004534932235}
+        m_TargetAssemblyTypeName: Board.Tools.WritingTool, Assembly-CSharp
+        m_MethodName: AuthorizeDraw
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -308,9 +295,9 @@ MonoBehaviour:
   m_HoverExited:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 6211745579641748902}
-        m_TargetAssemblyTypeName: Utils.HoverInteractable, Assembly-CSharp
-        m_MethodName: HoverExit
+      - m_Target: {fileID: 830207004534932235}
+        m_TargetAssemblyTypeName: Board.Tools.WritingTool, Assembly-CSharp
+        m_MethodName: UnauthorizeDraw
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -329,10 +316,22 @@ MonoBehaviour:
   m_SelectEntered:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 830207004534932235}
         m_TargetAssemblyTypeName: Board.Tools.WritingTool, Assembly-CSharp
-        m_MethodName: AuthorizeDraw
+        m_MethodName: UnauthorizeDraw
         m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 830207004534932235}
+        m_TargetAssemblyTypeName: Board.Tools.WritingTool, Assembly-CSharp
+        m_MethodName: OnGrab
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -344,9 +343,21 @@ MonoBehaviour:
   m_SelectExited:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 830207004534932235}
         m_TargetAssemblyTypeName: Board.Tools.WritingTool, Assembly-CSharp
-        m_MethodName: UnauthorizeDraw
+        m_MethodName: AuthorizeDraw
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 830207004534932235}
+        m_TargetAssemblyTypeName: Board.Tools.WritingTool, Assembly-CSharp
+        m_MethodName: OnRelease
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -434,11 +445,11 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 441707065337096309}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.119620524, y: 0.4674717, z: 0.12201271}
-  m_Center: {x: -0.00000013907751, y: 0.051918563, z: -0.003588313}
+  m_Size: {x: 0.10072136, y: 0.10167549, z: 0.101645574}
+  m_Center: {x: -0.0010499954, y: 0.22579357, z: -0.00002033636}
 --- !u!114 &830207004534932235
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -451,10 +462,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eba61605954a820469184860028183ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hover: {fileID: 6211745579641748902}
+  hover:
+  - {fileID: 6211745579641748902}
   boardObject: {fileID: 0}
-  rotationLocked: 0
+  penSize: 10
   canDraw: 0
+  rotationLocked: 0
   tip: {fileID: 441707064651445001}
 --- !u!1 &441707065742839177
 GameObject:
@@ -465,7 +478,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 441707065742839176}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Origin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
