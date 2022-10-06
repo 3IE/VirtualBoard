@@ -10,6 +10,7 @@ namespace Board.Shapes
         public const byte CubeId = 0;
         public const byte CylinderId = 1;
         public const byte SphereId = 2;
+        public const byte CustomShapeId = 3; // Find a way to determine id based on obj file
 
         public bool selected;
         public Shape currentShape;
@@ -50,9 +51,9 @@ namespace Board.Shapes
             Shape.Selector = this;
         }
 
+        public Material testMaterial;
 #if UNITY_EDITOR
         public bool test;
-        public Material testMaterial;
 
         private void Update()
         {
@@ -101,6 +102,16 @@ namespace Board.Shapes
             _index = SphereId;
         }
 
+        /// <summary>
+        /// Selects a custom shape.
+        /// </summary>
+        /// TODO: Find a way to select custom shape via UI
+        /// TODO: Find a way to determine id based on obj file (load at start and attributes at that time?)
+        public void SelectCustomShape()
+        {
+            _index = CustomShapeId;
+        }
+
         public GameObject GetShape(byte shapeId)
         {
             return shapes[shapeId];
@@ -108,11 +119,9 @@ namespace Board.Shapes
 
         private GameObject GetShape()
         {
-//#if UNITY_EDITOR
-//            return CustomShape.Create(testMaterial);
-//#else
-            return shapes[_index];
-//#endif
+            return _index >= CustomShapeId
+                ? CustomShape.Create(_index, testMaterial)
+                : shapes[_index];
         }
 
         #endregion
@@ -133,12 +142,17 @@ namespace Board.Shapes
 
             var prefab = GetShape();
 
-            //#if UNITY_EDITOR
-            //var obj = prefab ? prefab : throw new ArgumentNullException(nameof(prefab));
-            //obj.transform.SetParent(shapesParent);
-            //#else
-            var obj = Instantiate(prefab, shapesParent);
-            //#endif
+            GameObject obj;
+            if (_index >= CustomShapeId)
+            {
+                obj = prefab 
+                    ? prefab
+                    : throw new System.ArgumentNullException(nameof(prefab));
+                obj.transform.SetParent(shapesParent);
+            }
+            else
+                obj = Instantiate(prefab, shapesParent);
+
             obj.GetComponent<XRSimpleInteractable>().interactionManager = interactionManager;
 
             currentShape = obj.GetComponent<Shape>();
@@ -192,7 +206,7 @@ namespace Board.Shapes
                 return;
 
             var value = obj.ReadValue<Vector2>().y * Time.deltaTime;
-            
+
             currentShape.initialDistance =
                 Mathf.Clamp(currentShape.initialDistance + value * velocity, 0.5f, 100f);
         }

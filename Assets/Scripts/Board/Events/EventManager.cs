@@ -43,6 +43,11 @@ namespace Board.Events
             PhotonNetwork.NetworkingClient.EventReceived -= OnEvent;
         }
 
+        public void Awake()
+        {
+            CustomShape.Init();
+        }
+
         public void Start()
         {
             _others = new List<PlayerEntity>();

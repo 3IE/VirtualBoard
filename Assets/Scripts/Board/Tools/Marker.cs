@@ -90,7 +90,8 @@ namespace Board.Tools
                     if (Vector2.Distance(new Vector2(x, y), LastTouchPos) < 0.01f)
                         return;
 
-                    Controller?.SendHapticImpulse(0.3f, 0.1f);
+                    // ReSharper disable once Unity.NoNullPropagation
+                    Controller?.SendHapticImpulse(0.1f, 0.1f);
 
                     try
                     {

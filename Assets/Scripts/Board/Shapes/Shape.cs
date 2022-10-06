@@ -24,12 +24,12 @@ namespace Board.Shapes
         private bool _isOwner;
         private bool _deleting;
 
-        private Material _mat;
         private Rigidbody _rigidbody;
 
         protected readonly List<IXRInteractor> Interactors = new(2);
+        protected internal byte ShapeId;
         
-        protected byte ShapeId;
+        protected Material Mat;
 
         protected Vector3 InitialScale;
         
@@ -46,7 +46,7 @@ namespace Board.Shapes
 
         private void Awake()
         {
-            _mat = GetComponent<Renderer>().material;
+            Mat = GetComponent<Renderer>().material;
             _rigidbody = GetComponent<Rigidbody>();
             _defaultLayer = LayerMask.NameToLayer("Static Shapes");
             _shapesLayer = LayerMask.NameToLayer("Shapes");
@@ -73,17 +73,17 @@ namespace Board.Shapes
 
         private void Create()
         {
-            _mat.SetFloat(Create1, 1);
+            Mat.SetFloat(Create1, 1);
         }
 
         private void Modify()
         {
-            _mat.SetFloat(Modify1, 1);
+            Mat.SetFloat(Modify1, 1);
         }
 
         public void Delete()
         {
-            _mat.SetFloat(Destroy1, 1);
+            Mat.SetFloat(Destroy1, 1);
         }
 
         public void CallDestroy(bool creation)
@@ -98,9 +98,9 @@ namespace Board.Shapes
 
         private void StopAction()
         {
-            _mat.SetFloat(Create1, 0);
-            _mat.SetFloat(Modify1, 0);
-            _mat.SetFloat(Destroy1, 0);
+            Mat.SetFloat(Create1, 0);
+            Mat.SetFloat(Modify1, 0);
+            Mat.SetFloat(Destroy1, 0);
         }
 
         public void CreateAction(IXRInteractor interactor)
@@ -154,7 +154,7 @@ namespace Board.Shapes
         public void OnHoverExit(HoverExitEventArgs args)
         {
             if (_deleting && ReferenceEquals(args.interactorObject, Selector.leftInteractor))
-                _mat.SetFloat(Destroy1, 0);
+                Mat.SetFloat(Destroy1, 0);
         }
 
         public void OnSelect(SelectEnterEventArgs args)
