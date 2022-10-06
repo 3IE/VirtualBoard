@@ -51,7 +51,7 @@ namespace Board.Shapes
             _paths = new Dictionary<byte, string>
             {
                 //string[] files = Directory.GetFiles(Application.streamingAssetsPath, "*.obj");
-                { 3, Path.GetFullPath("Assets/Models/CustomShape.obj") }
+                { 3, /*Path.GetFullPath*/("Assets/Models/CustomShape.obj") }
             };
         }
 

@@ -1191,6 +1191,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "CaptureBoard",
+                    "type": "Button",
+                    "id": "ace2fe31-edd1-4730-bfb6-dd2baff4f1ee",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -1202,6 +1211,17 @@
                     "processors": "",
                     "groups": "Generic XR Controller",
                     "action": "OpenMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4cdf65bd-a9cf-4993-ad37-c1d97f910eaa",
+                    "path": "<XRController>{RightHand}/primaryButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "CaptureBoard",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

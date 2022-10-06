@@ -1213,6 +1213,15 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CaptureBoard"",
+                    ""type"": ""Button"",
+                    ""id"": ""ace2fe31-edd1-4730-bfb6-dd2baff4f1ee"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -1224,6 +1233,17 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
                     ""processors"": """",
                     ""groups"": ""Generic XR Controller"",
                     ""action"": ""OpenMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4cdf65bd-a9cf-4993-ad37-c1d97f910eaa"",
+                    ""path"": ""<XRController>{RightHand}/primaryButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CaptureBoard"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1353,6 +1373,7 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
         // Menu
         m_Menu = asset.FindActionMap("Menu", throwIfNotFound: true);
         m_Menu_OpenMenu = m_Menu.FindAction("OpenMenu", throwIfNotFound: true);
+        m_Menu_CaptureBoard = m_Menu.FindAction("CaptureBoard", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -1966,11 +1987,13 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
     private readonly InputActionMap m_Menu;
     private IMenuActions m_MenuActionsCallbackInterface;
     private readonly InputAction m_Menu_OpenMenu;
+    private readonly InputAction m_Menu_CaptureBoard;
     public struct MenuActions
     {
         private @XRIDefaultInputActions m_Wrapper;
         public MenuActions(@XRIDefaultInputActions wrapper) { m_Wrapper = wrapper; }
         public InputAction @OpenMenu => m_Wrapper.m_Menu_OpenMenu;
+        public InputAction @CaptureBoard => m_Wrapper.m_Menu_CaptureBoard;
         public InputActionMap Get() { return m_Wrapper.m_Menu; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1983,6 +2006,9 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
                 @OpenMenu.started -= m_Wrapper.m_MenuActionsCallbackInterface.OnOpenMenu;
                 @OpenMenu.performed -= m_Wrapper.m_MenuActionsCallbackInterface.OnOpenMenu;
                 @OpenMenu.canceled -= m_Wrapper.m_MenuActionsCallbackInterface.OnOpenMenu;
+                @CaptureBoard.started -= m_Wrapper.m_MenuActionsCallbackInterface.OnCaptureBoard;
+                @CaptureBoard.performed -= m_Wrapper.m_MenuActionsCallbackInterface.OnCaptureBoard;
+                @CaptureBoard.canceled -= m_Wrapper.m_MenuActionsCallbackInterface.OnCaptureBoard;
             }
             m_Wrapper.m_MenuActionsCallbackInterface = instance;
             if (instance != null)
@@ -1990,6 +2016,9 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
                 @OpenMenu.started += instance.OnOpenMenu;
                 @OpenMenu.performed += instance.OnOpenMenu;
                 @OpenMenu.canceled += instance.OnOpenMenu;
+                @CaptureBoard.started += instance.OnCaptureBoard;
+                @CaptureBoard.performed += instance.OnCaptureBoard;
+                @CaptureBoard.canceled += instance.OnCaptureBoard;
             }
         }
     }
@@ -2092,5 +2121,6 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
     public interface IMenuActions
     {
         void OnOpenMenu(InputAction.CallbackContext context);
+        void OnCaptureBoard(InputAction.CallbackContext context);
     }
 }
