@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Board.Shapes;
+using Board.Tools;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
@@ -15,7 +16,7 @@ namespace Board.Events
 {
     public class EventManager : MonoBehaviourPunCallbacks
     {
-        [SerializeField] private Tools tools;
+        [SerializeField] private Tools.Tools tools;
         [SerializeField] private PhotonView view;
 
         [SerializeField] private GameObject vrPrefab;
@@ -40,6 +41,11 @@ namespace Board.Events
             base.OnDisable();
 
             PhotonNetwork.NetworkingClient.EventReceived -= OnEvent;
+        }
+
+        public void Awake()
+        {
+            CustomShape.Init();
         }
 
         public void Start()
@@ -126,7 +132,7 @@ namespace Board.Events
                      let pos = postIt.transform.localPosition
                      let text = postIt.GetComponentInChildren<TMP_Text>().text
                      let scale = board.transform.localScale.x
-                     select new object[] { new Vector2(pos.x * scale, pos.z * scale) })
+                     select new object[] { new Vector2(pos.x * scale, pos.z * scale), text })
                 PhotonNetwork.RaiseEvent((byte)Event.EventCode.SendNewPostIt, data, raiseEventOptions,
                     SendOptions.SendReliable);
         }

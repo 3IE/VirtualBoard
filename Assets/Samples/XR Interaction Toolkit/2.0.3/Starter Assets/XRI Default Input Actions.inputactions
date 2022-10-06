@@ -1104,6 +1104,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Change distance",
+                    "type": "Value",
+                    "id": "36b0b0c1-04a1-4b3a-bf6e-f1ebb741c8ce",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -1126,6 +1135,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Delete object",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5226a07e-bb48-4161-80fa-c61f79e2208c",
+                    "path": "<XRController>{LeftHand}/Primary2DAxis",
+                    "interactions": "",
+                    "processors": "StickDeadzone",
+                    "groups": "",
+                    "action": "Change distance",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
@@ -1177,7 +1197,7 @@
                 {
                     "name": "",
                     "id": "edcef131-1aac-4ce5-801d-de21091e9f3a",
-                    "path": "<XRController>{RightHand}/primaryButton",
+                    "path": "<XRController>{LeftHand}/menu",
                     "interactions": "",
                     "processors": "",
                     "groups": "Generic XR Controller",

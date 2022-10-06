@@ -4,7 +4,7 @@ using Photon.Realtime;
 using UnityEngine;
 using Event = Utils.Event;
 
-namespace Board
+namespace Board.Tools
 {
     public class Modification
     {
@@ -13,9 +13,9 @@ namespace Board
         public readonly float DestX;
         public readonly float DestY;
         public readonly Color Color;
-        public readonly int PenSize;
+        public readonly float PenSize;
 
-        public Modification(int x, int y, float destX, float destY, Color color, int penSize)
+        public Modification(int x, int y, float destX, float destY, Color color, float penSize)
         {
             X = x;
             Y = y;
@@ -35,7 +35,7 @@ namespace Board
             DestX = (float)dataArray[2];
             DestY = (float)dataArray[3];
             Color = new Color(colors[0], colors[1], colors[2]);
-            PenSize = (int)dataArray[5];
+            PenSize = (float)dataArray[5];
         }
 
         internal void Send(Event.EventCode code)
@@ -45,7 +45,7 @@ namespace Board
             object[] content = { X, Y, DestX, DestY, colors, PenSize };
 
             // We send the data to every other person in the room
-            RaiseEventOptions raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
+            var raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
 
             // We send the event
             PhotonNetwork.RaiseEvent((byte)code, content, raiseEventOptions, SendOptions.SendReliable);

@@ -1,87 +1,85 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.XR;
+using UnityEngine.XR.Interaction.Toolkit;
 using Utils;
 
-namespace Board
+namespace Board.Tools
 {
     public class WritingTool : MonoBehaviour
     {
-        [SerializeField] private HoverInteractable hover;
-        [SerializeField] protected Board boardObject;
+        [SerializeField] private List<HoverInteractable> hover;
 
-        public bool rotationLocked;
-
-        private bool _touchedLast;
         private Quaternion _lastRot;
         private Vector3 _lastPosition;
 
         private Vector3 _initialPosition;
         private Quaternion _initialRotation;
-        
+
         private Transform _transform;
         private Rigidbody _rigidbody;
 
-        #if UNITY_EDITOR
+        [SerializeField] protected Board boardObject;
+        [SerializeField] protected float penSize;
+#if UNITY_EDITOR
         [SerializeField]
-        #endif
-        protected bool CanDraw;
+#endif
+        protected bool canDraw;
+        protected bool TouchedLast;
+
+        protected XRBaseController Controller;
+
+        public bool rotationLocked;
 
         private void Awake()
         {
             _rigidbody = GetComponent<Rigidbody>();
             _transform = transform;
-            
-            _initialPosition = _transform.position;
-            _initialRotation = _transform.rotation;
+
+            TouchedLast = false;
         }
 
         protected void UpdateRotation()
         {
             if (rotationLocked)
             {
-                if (_touchedLast)
+                if (TouchedLast)
                 {
                     transform.rotation = _lastRot;
 
                     if (transform.position.z <= _lastPosition.z) return;
-
-                    var position = _transform.position;
                     
+                    var position = _transform.position;
+
                     _lastPosition.x = position.x;
                     _lastPosition.y = position.y;
-                    
+
                     _transform.position = _lastPosition;
                 }
                 else
                 {
                     _lastRot = _transform.rotation;
                     _lastPosition = _transform.position;
-                    _touchedLast = true;
                 }
             }
             else
-                _touchedLast = false;
+                TouchedLast = false;
         }
-        
+
         public void AuthorizeDraw()
         {
-            CanDraw = true;
-            hover.HoverExit();
+            foreach (var h in hover)
+                h.Hover();
         }
 
         public void UnauthorizeDraw()
         {
-            CanDraw = false;
-            hover.Hover();
+            foreach (var h in hover)
+                h.HoverExit();
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.CompareTag("Board"))
-            {
-                rotationLocked = true;
-                return;
-            }
-            
             if (!other.CompareTag("Ceiling")) return;
 
             _rigidbody.constraints = RigidbodyConstraints.FreezeAll;
@@ -91,11 +89,36 @@ namespace Board
 
             _rigidbody.constraints = RigidbodyConstraints.None;
         }
-        
-        private void OnTriggerExit(Collider other)
+
+        private void OnCollisionExit(Collision collision)
         {
-            if (other.CompareTag("Board"))
-                rotationLocked = false;
+            if (!collision.collider.CompareTag("Board")) return;
+
+            TouchedLast = false;
+
+            rotationLocked = false;
+            canDraw = false;
+        }
+
+        private void OnCollisionEnter(Collision collision)
+        {
+            if (!collision.collider.CompareTag("Board")) return;
+
+            TouchedLast = false;
+
+            rotationLocked = true;
+            canDraw = true;
+        }
+
+        public void OnSelected(SelectEnterEventArgs args)
+        {
+            var interactor = args.interactorObject;
+            Controller = interactor.transform.GetComponent<XRBaseController>();
+        }
+        
+        public void OnDeselected()
+        {
+            Controller = null;
         }
     }
 }

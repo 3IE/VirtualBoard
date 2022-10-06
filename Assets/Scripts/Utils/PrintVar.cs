@@ -9,10 +9,10 @@ namespace Utils
     public class PrintVar : MonoBehaviour
     {
         private static TMP_Text _text;
-        private static Dictionary<uint, string> _lines = new();
-        private static StringBuilder _textToPrint = new();
+        private static readonly Dictionary<uint, string> Lines = new();
+        private static readonly StringBuilder TextToPrint = new();
     
-        private static uint _lineId = 0;
+        private static uint _lineId;
 
         private void Awake() 
             => _text = GetComponent<TMP_Text>();
@@ -22,28 +22,28 @@ namespace Utils
         /// </summary>
         /// <param name="n"> Index of the line </param>
         /// <param name="args"> Content to print </param>
-        public static void print(uint n, params string[] args)
+        public static void Print(uint n, params string[] args)
         {
             _text.faceColor = Color.black;
 
             _lineId = Math.Max(_lineId, n);
-            _lines[n] = string.Join("\n", args);
-            _textToPrint.Clear();
-            _textToPrint.AppendJoin("\n\n", _lines.Values);
-            _text.text = _textToPrint.ToString();
+            Lines[n] = string.Join("\n", args);
+            TextToPrint.Clear();
+            TextToPrint.AppendJoin("\n\n", Lines.Values);
+            _text.text = TextToPrint.ToString();
         }
 
         /// <summary>
         /// Prints on the next line available
         /// </summary>
         /// <param name="args"> Content to print </param>
-        public static void print(params string[] args)
+        public static void Print(params string[] args)
         {
             _text.faceColor = Color.black;
 
-            _lines[++_lineId] = string.Join("\n", args);
-            _textToPrint.AppendJoin("\n\n", _lines.Values);
-            _text.text = _textToPrint.ToString();
+            Lines[++_lineId] = string.Join("\n", args);
+            TextToPrint.AppendJoin("\n\n", Lines.Values);
+            _text.text = TextToPrint.ToString();
         }
 
 #if UNITY_EDITOR
@@ -58,10 +58,10 @@ namespace Utils
             _text.faceColor = Color.red;
 
             _lineId = Math.Max(_lineId, n);
-            _lines[n] = string.Join("\n", args);
-            _textToPrint.Clear();
-            _textToPrint.AppendJoin("\n\n", _lines.Values);
-            _text.text = _textToPrint.ToString();
+            Lines[n] = string.Join("\n", args);
+            TextToPrint.Clear();
+            TextToPrint.AppendJoin("\n\n", Lines.Values);
+            _text.text = TextToPrint.ToString();
         }
 
         /// <summary>
@@ -72,9 +72,9 @@ namespace Utils
         {
             _text.faceColor = Color.red;
 
-            _lines[++_lineId] = string.Join("\n", args);
-            _textToPrint.AppendJoin("\n\n", _lines.Values);
-            _text.text = _textToPrint.ToString();
+            Lines[++_lineId] = string.Join("\n", args);
+            TextToPrint.AppendJoin("\n\n", Lines.Values);
+            _text.text = TextToPrint.ToString();
         }
 
 #endif
@@ -83,8 +83,8 @@ namespace Utils
         /// Resets the displayed content
         /// </summary>
         public static void Clear() {
-            _lines.Clear();
-            _textToPrint.Clear();
+            Lines.Clear();
+            TextToPrint.Clear();
             _text.text = "";
         }
     }

@@ -996,7 +996,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2049272682334408768}
   - component: {fileID: 2049272682334408799}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2172,7 +2172,7 @@ GameObject:
   - component: {fileID: 2049272683377395146}
   - component: {fileID: 2049272683377395145}
   - component: {fileID: 2049272683377395149}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: VRMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2193,8 +2193,9 @@ Transform:
   m_Children:
   - {fileID: 2049272682334408768}
   - {fileID: 2049272681748391265}
+  - {fileID: 1998956206186982798}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2049272683377395147
 MonoBehaviour:
@@ -2218,6 +2219,7 @@ MonoBehaviour:
   - {fileID: 2049272683055071014}
   throwThreshold: 1
   timeToFade: 2
+  grabInteractable: {fileID: 2049272683377395145}
 --- !u!54 &2049272683377395146
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2325,7 +2327,7 @@ MonoBehaviour:
   m_OnDeactivate:
     m_PersistentCalls:
       m_Calls: []
-  m_AttachTransform: {fileID: 0}
+  m_AttachTransform: {fileID: 1998956206186982798}
   m_AttachEaseInTime: 0.15
   m_MovementType: 0
   m_VelocityDamping: 1
@@ -4344,3 +4346,34 @@ MonoBehaviour:
   m_ForceGravityOnDetach: 0
   m_RetainTransformParent: 1
   m_AttachPointCompatibilityMode: 0
+--- !u!1 &5148961422293056100
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1998956206186982798}
+  m_Layer: 5
+  m_Name: GrabTransform
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1998956206186982798
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5148961422293056100}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2049272683377395148}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

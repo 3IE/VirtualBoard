@@ -1,62 +1,86 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.XR.Interaction.Toolkit;
 using Utils;
 
-public class VRMenu : MonoBehaviour
+namespace UI
 {
-    // List of MenuPanels with their respective buttons
-    [SerializeField] private List<GameObject> panels;
-    [SerializeField] private List<GameObject> panelsButtons;
-    private PanelIndex activePanelIndex = PanelIndex.PlayerList;
-
-    private Rigidbody _rigidbody;
-    private CanvasGroup _canvasGroup;
-    [SerializeField] private float throwThreshold;
-    [SerializeField] private float timeToFade;
-    private void Awake()
+    public class VRMenu : MonoBehaviour
     {
-        _rigidbody = GetComponent<Rigidbody>();
-        _canvasGroup = GetComponent<CanvasGroup>();
-    }
+        // List of MenuPanels with their respective buttons
+        [SerializeField] private List<GameObject> panels;
+        [SerializeField] private List<GameObject> panelsButtons;
+       
+        [SerializeField] private float throwThreshold;
+        [SerializeField] private float timeToFade;
+        
+        [SerializeField] private XRGrabInteractable grabInteractable;
+        
+        private PanelIndex _activePanelIndex = PanelIndex.PlayerList;
 
-    public void ThrowAway() => StartCoroutine(ThrowAwayRoutine());
-    private IEnumerator ThrowAwayRoutine()
-    {
-        PrintVar.print(1, "Destroying");
-        if (_rigidbody.velocity.magnitude < throwThreshold) yield break;
-        float i = 0.0f;
-        while (i < timeToFade)
+        private Rigidbody _rigidbody;
+        private CanvasGroup _canvasGroup;
+
+        private void Awake()
         {
-            _canvasGroup.alpha = Mathf.Lerp(1f, 0f, i / timeToFade);
-            i += Time.fixedDeltaTime;
-            yield return null;
+            _rigidbody = GetComponent<Rigidbody>();
+            _canvasGroup = GetComponent<CanvasGroup>();
         }
-        gameObject.SetActive(false);
-    }
-    public void WakeUp()
-    {
-        _rigidbody.velocity = Vector3.zero;
-        _canvasGroup.alpha = 1;
-    }
 
-    public void SwitchPanel(int index) => SwitchPanel((PanelIndex) index);
-    public void SwitchPanel(PanelIndex index)
-    {
-        panels[(int)activePanelIndex].SetActive(false);
-        panelsButtons[(int)activePanelIndex].SetActive(true);
-        activePanelIndex = index;
-        panels[(int)activePanelIndex].SetActive(true);
-        panelsButtons[(int)activePanelIndex].SetActive(false);
-    }
-    public enum PanelIndex
-    {
-        PlayerList = 0,
-        PropsList,
-        ToolList
-    }
+        public void ThrowAway() => StartCoroutine(ThrowAwayRoutine());
 
+        private IEnumerator ThrowAwayRoutine()
+        {
+            grabInteractable.enabled = false;
+            
+            PrintVar.Print(1, "Destroying");
+
+            if (_rigidbody.velocity.magnitude < throwThreshold) yield break;
+
+            var i = 0.0f;
+
+            while (i < timeToFade)
+            {
+                _canvasGroup.alpha = Mathf.Lerp(1f, 0f, i / timeToFade);
+                i += Time.fixedDeltaTime;
+
+                yield return null;
+            }
+            
+            gameObject.SetActive(false);
+        }
+
+        public void WakeUp()
+        {
+            StopAllCoroutines();
+            
+            grabInteractable.enabled = true;
+
+            _rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+            _rigidbody.constraints = RigidbodyConstraints.None;
+            
+            _canvasGroup.alpha = 1;
+        }
+
+        public void SwitchPanel(int index) => SwitchPanel((PanelIndex)index);
+
+        private void SwitchPanel(PanelIndex index)
+        {
+            panels[(int)_activePanelIndex].SetActive(false);
+            panelsButtons[(int)_activePanelIndex].SetActive(true);
+          
+            _activePanelIndex = index;
+            
+            panels[(int)_activePanelIndex].SetActive(true);
+            panelsButtons[(int)_activePanelIndex].SetActive(false);
+        }
+
+        private enum PanelIndex
+        {
+            PlayerList = 0,
+            PropsList,
+            ToolList
+        }
+    }
 }

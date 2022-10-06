@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Serialization;
 using UnityEngine.XR.Interaction.Toolkit;
 
 namespace Board.Shapes
@@ -9,21 +8,29 @@ namespace Board.Shapes
     public class ShapeSelector : MonoBehaviour
     {
         public const byte CubeId = 0;
-        public const byte CylinderId = 0;
-        public const byte SphereId = 0;
+        public const byte CylinderId = 1;
+        public const byte SphereId = 2;
+        public const byte CustomShapeId = 3; // Find a way to determine id based on obj file
+
+        public bool selected;
+        public Shape currentShape;
 
         [SerializeField] public XRRayInteractor leftInteractor;
         [SerializeField] private XRRayInteractor rightInteractor;
+        [SerializeField] private XRInteractionManager interactionManager;
 
         [SerializeField] private InputActionReference createReference;
         [SerializeField] private InputActionReference destroyReference;
-        [SerializeField] private XRInteractionManager interactionManager;
+        [SerializeField] private InputActionReference changeDistance;
+        [SerializeField] private ContinuousMoveProviderBase continuousMoveProvider;
+
         [SerializeField] private Transform shapesParent;
         [SerializeField] private List<GameObject> shapes;
 
+        [Range(0.5f, 5f)] [SerializeField] private float velocity = 0.5f;
+
         private byte _index;
 
-        [FormerlySerializedAs("_currentShape")] public Shape currentShape;
         private bool _creating;
 
         private void Awake()
@@ -33,6 +40,8 @@ namespace Board.Shapes
 
             destroyReference.action.started += DeleteObject;
             destroyReference.action.canceled += StopDeleteObject;
+
+            changeDistance.action.performed += ChangeDistance;
         }
 
         private void Start()
@@ -42,32 +51,18 @@ namespace Board.Shapes
             Shape.Selector = this;
         }
 
-        public void SelectCube()
+        public Material testMaterial;
+#if UNITY_EDITOR
+        public bool test;
+
+        private void Update()
         {
-            _index = CubeId;
+            if (test)
+                CreateObject();
+            test = false;
         }
 
-        public void SelectCylinder()
-        {
-            _index = CylinderId;
-        }
-
-        public void SelectSphere()
-        {
-            _index = SphereId;
-        }
-
-        public GameObject GetShape(byte shapeId)
-        {
-            return shapes[shapeId];
-        }
-
-        private GameObject GetShape()
-        {
-            return shapes[_index];
-        }
-
-        private void CreateObject(InputAction.CallbackContext ctx)
+        private void CreateObject()
         {
             if (Shape.NumberOfShapes() >= 25)
                 return;
@@ -88,21 +83,95 @@ namespace Board.Shapes
             currentShape = obj.GetComponent<Shape>();
             currentShape.CreateAction(leftInteractor);
         }
+#endif
+
+        #region SELECTOR
+
+        public void SelectCube()
+        {
+            _index = CubeId;
+        }
+
+        public void SelectCylinder()
+        {
+            _index = CylinderId;
+        }
+
+        public void SelectSphere()
+        {
+            _index = SphereId;
+        }
+
+        /// <summary>
+        /// Selects a custom shape.
+        /// </summary>
+        /// TODO: Find a way to select custom shape via UI
+        /// TODO: Find a way to determine id based on obj file (load at start and attributes at that time?)
+        public void SelectCustomShape()
+        {
+            _index = CustomShapeId;
+        }
+
+        public GameObject GetShape(byte shapeId)
+        {
+            return shapes[shapeId];
+        }
+
+        private GameObject GetShape()
+        {
+            return _index >= CustomShapeId
+                ? CustomShape.Create(_index, testMaterial)
+                : shapes[_index];
+        }
+
+        #endregion
+
+        private void CreateObject(InputAction.CallbackContext ctx)
+        {
+            if (Shape.NumberOfShapes() >= 25)
+                return;
+
+            if (currentShape is not null && !currentShape.resizing)
+            {
+                currentShape.rotating = true;
+                currentShape.moving = false;
+                return;
+            }
+
+            _creating = true;
+
+            var prefab = GetShape();
+
+            GameObject obj;
+            if (_index >= CustomShapeId)
+            {
+                obj = prefab 
+                    ? prefab
+                    : throw new System.ArgumentNullException(nameof(prefab));
+                obj.transform.SetParent(shapesParent);
+            }
+            else
+                obj = Instantiate(prefab, shapesParent);
+
+            obj.GetComponent<XRSimpleInteractable>().interactionManager = interactionManager;
+
+            currentShape = obj.GetComponent<Shape>();
+            currentShape.CreateAction(leftInteractor);
+        }
 
         private void StopCreateObject(InputAction.CallbackContext ctx)
         {
             if (currentShape is null)
                 return;
-            
+
             if (currentShape.rotating)
             {
-                currentShape.rotating = false;
-                currentShape.moving = true;
+                currentShape.OnDeselect(null);
                 return;
             }
-            
+
             _creating = false;
-            
+
             currentShape.StopCreateAction(leftInteractor);
             currentShape = null;
         }
@@ -128,7 +197,28 @@ namespace Board.Shapes
 
             if (Physics.Raycast(leftInteractor.transform.position, leftInteractor.transform.forward,
                     out var hit, 100f, LayerMask.GetMask("Static Shapes")))
-                hit.collider.GetComponent<Shape>().Destroy();
+                hit.collider.GetComponent<Shape>().CallDestroy(false);
+        }
+
+        private void ChangeDistance(InputAction.CallbackContext obj)
+        {
+            if (currentShape is null)
+                return;
+
+            var value = obj.ReadValue<Vector2>().y * Time.deltaTime;
+
+            currentShape.initialDistance =
+                Mathf.Clamp(currentShape.initialDistance + value * velocity, 0.5f, 100f);
+        }
+
+        public void StartChangeDistance()
+        {
+            continuousMoveProvider.enabled = false;
+        }
+
+        public void StopChangeDistance()
+        {
+            continuousMoveProvider.enabled = true;
         }
     }
 }

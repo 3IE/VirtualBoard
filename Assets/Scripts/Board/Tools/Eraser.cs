@@ -1,7 +1,7 @@
 using UnityEngine;
 using Event = Utils.Event;
 
-namespace Board
+namespace Board.Tools
 {
     public class Eraser : Marker
     {
@@ -17,13 +17,13 @@ namespace Board
         protected override void SendModification(int x, int y)
         {
             new Modification(x, y, LastTouchPos.x, LastTouchPos.y, _color,
-                    Board!.tools.penSize)
+                    penSize)
                 .Send(Event.EventCode.Marker);
         }
 
         protected override Color[] GenerateShape()
         {
-            return Tools.GenerateSquare(_color, Board);
+            return Tools.GenerateSquare(_color, penSize);
             // TODO generate shape depending on selected one
         }
     }
