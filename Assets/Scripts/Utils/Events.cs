@@ -1,6 +1,6 @@
 namespace Utils
 {
-    public class Event
+    public static class Event
     {
         public enum EventCode : byte
         {
@@ -26,8 +26,12 @@ namespace Utils
             SendOwnership,
 
             // Chat 6X
+            
+            // Others 7X
+            PingSend = 70,
+            PingReceive,
 
-            // Error 100 - 200 (temporaire)
+            // Error 100 - 200 (temporary)
         }
     }
 }

@@ -5,6 +5,8 @@ using UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
+using Utils;
+using DeviceType = Utils.DeviceType;
 using Event = Utils.Event;
 
 // https://forum.unity.com/threads/fetch-xr-handed-ness-from-an-inputaction.907139/
@@ -13,8 +15,8 @@ namespace Users
 {
     public class VrPlayerManager : MonoBehaviour
     {
-        // a attacher au XR Origin/Camera Offset
-        [SerializeField] private float refreshRate = 0.2f;
+        // to attach to XR Origin/Camera Offset
+        [SerializeField] [Range(0.01f, 1.0f)] private float refreshRate = 0.1f;
         [SerializeField] private Transform boardTransform;
         [SerializeField] private GameObject localPingPrefab;
 
@@ -30,6 +32,8 @@ namespace Users
         private void Awake()
         {
             _customInputs = new XRIDefaultInputActions();
+            
+            DebugPanel.Instance.AddPlayer(DeviceType.VR);
         }
 
         private void OnEnable()
@@ -79,15 +83,18 @@ namespace Users
 
             PhotonNetwork.RaiseEvent((byte)Event.EventCode.SendNewPosition, _vrCamTransform.position, raiseEventOptions,
                 SendOptions.SendReliable);
+            
+#if DEBUG
+            DebugPanel.Instance.AddPlayerSent();
+#endif
         }
 
         private void Ping(Vector3 position)
         {
-            // pooling des ping, 2 prefab de ping (un pour l'utilisateur et un pour les autres) 
-            // ping physique
+            // instantiate ping
             var ping = Instantiate(localPingPrefab, position, boardTransform.rotation, boardTransform);
 
-            // ping sur le reseau
+            // send ping to other players
             var localPos = ping.transform.localPosition;
 
             SendNewPingEvent(new Vector2(localPos.x, localPos.y));
@@ -99,6 +106,10 @@ namespace Users
 
             PhotonNetwork.RaiseEvent((byte)Event.EventCode.SendNewPing, position, raiseEventOptions,
                 SendOptions.SendReliable);
+
+#if DEBUG
+            DebugPanel.Instance.AddPlayerSent();
+#endif
         }
     }
 }

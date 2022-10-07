@@ -7,6 +7,7 @@ using Unity.VisualScripting;
 using Unity.XR.CoreUtils;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
+using Utils;
 
 namespace Board.Shapes
 {
@@ -31,6 +32,11 @@ namespace Board.Shapes
 
         private void OnDestroy()
         {
+            #if DEBUG
+            DebugPanel.Instance.RemoveCustom();
+            DebugPanel.Instance.RemoveObject();
+            #endif
+            
             for (var i = 0; i < Cache.Count; i++)
             {
                 if (Cache[i].Key != ShapeId) continue;

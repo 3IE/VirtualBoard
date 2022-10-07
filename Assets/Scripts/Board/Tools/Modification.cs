@@ -2,6 +2,7 @@ using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
+using Utils;
 using Event = Utils.Event;
 
 namespace Board.Tools
@@ -49,6 +50,10 @@ namespace Board.Tools
 
             // We send the event
             PhotonNetwork.RaiseEvent((byte)code, content, raiseEventOptions, SendOptions.SendReliable);
+            
+            #if DEBUG
+            DebugPanel.Instance.AddBoardSent();
+            #endif
         }
     }
 }

@@ -4,5 +4,6 @@ namespace Utils
 	{
 		VR,
 		AR,
+		Hololens,
 	}
 }

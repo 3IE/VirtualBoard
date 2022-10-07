@@ -1,12 +1,15 @@
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit;
 
 namespace Board.Tools
 {
+    /// <summary>
+    /// Singleton class, holds a list of parameters for the tools
+    /// </summary>
     public class Tools : MonoBehaviour
     {
+        public static Tools Instance { get; private set; }
+        
         [Tooltip(
             "How much we want to interpolate the draw between two frames (lower values means more data is covered)")]
         [Range(0.01f, 1.00f)]
@@ -16,6 +19,11 @@ namespace Board.Tools
         public Eraser eraser;
 
         public Color baseColor;
+
+        private void Awake()
+        {
+            Instance = this;
+        }
 
         public static Color[] GenerateSquare(Color color, float penSize)
         {

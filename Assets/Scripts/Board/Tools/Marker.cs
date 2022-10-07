@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Utils;
 using Event = Utils.Event;
 
 namespace Board.Tools
@@ -42,7 +43,13 @@ namespace Board.Tools
             UpdateRotation();
 
             if (_modifications.TryDequeue(out var mod))
+            {
                 ModifyTexture(mod);
+
+#if DEBUG
+                DebugPanel.Instance.RemoveBoardQueue();
+#endif
+            }
 
             if (canDraw)
                 Draw();
@@ -165,6 +172,10 @@ namespace Board.Tools
         public void AddModification(Modification modification)
         {
             _modifications.Enqueue(modification);
+            
+            #if DEBUG
+            DebugPanel.Instance.AddBoardQueue();
+            #endif
         }
 
         // TODO add other shapes ?
