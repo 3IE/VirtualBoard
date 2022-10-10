@@ -54,15 +54,28 @@ namespace Users
             InvokeRepeating(nameof(SendNewPositionEvent), refreshRate, refreshRate);
         }
 
+        /// <summary>
+        /// Opens the menu in front of the player, or closes it if it's already open
+        /// </summary>
+        /// <param name="obj"></param>
         private void OpenMenu(InputAction.CallbackContext obj)
         {
-            vrMenu.transform.SetPositionAndRotation(_vrCamTransform.position, _vrCamTransform.rotation);
-            vrMenu.transform.Translate(_vrCamTransform.forward * 1.5f);
-            vrMenu.gameObject.SetActive(true);
-            
-            vrMenu.WakeUp();
+            if (vrMenu.gameObject.activeSelf)
+                vrMenu.Close();
+            else
+            {
+                vrMenu.transform.SetPositionAndRotation(_vrCamTransform.position, _vrCamTransform.rotation);
+                vrMenu.transform.Translate(_vrCamTransform.forward * 1.5f);
+                vrMenu.gameObject.SetActive(true);
+                
+                vrMenu.Open();
+            }
         }
 
+        /// <summary>
+        /// Tries to place a ping on the board from the player's hand,
+        /// if the player pings a ping, it'll delete this ping
+        /// </summary>
         private void TryPing(InputAction.CallbackContext obj)
         {
             Ray ray = new(rightHandTransform.position, rightHandTransform.forward);
@@ -96,6 +109,10 @@ namespace Users
 #endif
         }
 
+        /// <summary>
+        /// Places a ping on the board and declare its position to the other players
+        /// </summary>
+        /// <param name="position">Position of the ping</param>
         private void Ping(Vector3 position)
         {
             // instantiate ping

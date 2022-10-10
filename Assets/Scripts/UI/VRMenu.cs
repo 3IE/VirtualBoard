@@ -28,14 +28,16 @@ namespace UI
             _canvasGroup = GetComponent<CanvasGroup>();
         }
 
+        /// <summary>
+        /// If the menu is thrown with at sufficient speed (>throwThreshold)
+        /// it will fade out and disable itself
+        /// </summary>
         public void ThrowAway() => StartCoroutine(ThrowAwayRoutine());
 
         private IEnumerator ThrowAwayRoutine()
         {
             grabInteractable.enabled = false;
             
-            PrintVar.Print(1, "Destroying");
-
             if (_rigidbody.velocity.magnitude < throwThreshold) yield break;
 
             var i = 0.0f;
@@ -51,7 +53,10 @@ namespace UI
             gameObject.SetActive(false);
         }
 
-        public void WakeUp()
+        /// <summary>
+        /// Opens the menu, reset its inertia
+        /// </summary>
+        public void Open()
         {
             StopAllCoroutines();
             
@@ -63,6 +68,20 @@ namespace UI
             _canvasGroup.alpha = 1;
         }
 
+        /// <summary>
+        /// Close the menu
+        /// </summary>
+        public void Close()
+        {
+            StopAllCoroutines();
+            grabInteractable.enabled = false;
+            gameObject.SetActive(false);
+        }
+        
+        /// <summary>
+        /// Switches the active panel to the one specified by the index
+        /// </summary>
+        /// <param name="index"></param>
         public void SwitchPanel(int index) => SwitchPanel((PanelIndex)index);
 
         private void SwitchPanel(PanelIndex index)
