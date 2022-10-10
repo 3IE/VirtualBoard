@@ -9,17 +9,16 @@ namespace Users
         public int photonId;
         public DeviceType device;
 
-        public void SetValues(DeviceType device, int photonId, string username)
+        public void SetValues(DeviceType deviceType, int id, string user)
         {
-            this.device = device;
-            this.photonId = photonId;
-            this.username = username;
+            device = deviceType;
+            photonId = id;
+            username = user;
         }
 
         public void UpdateTransform(Vector3 position)
         {
             transform.position = position;
-            //this.transform.rotation = transform.rotation;
         }
     }
 }

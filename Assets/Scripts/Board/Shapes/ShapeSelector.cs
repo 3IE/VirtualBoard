@@ -2,15 +2,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit;
+using Utils;
 
 namespace Board.Shapes
 {
+    /// <summary>
+    /// Singleton class, handles the input for the shapes.
+    /// </summary>
     public class ShapeSelector : MonoBehaviour
     {
+        public static ShapeSelector Instance { get; private set; }
+        
         public const byte CubeId = 0;
         public const byte CylinderId = 1;
         public const byte SphereId = 2;
-        public const byte CustomShapeId = 3; // Find a way to determine id based on obj file
+        private const byte CustomShapeId = 3; // Find a way to determine id based on obj file
 
         public bool selected;
         public Shape currentShape;
@@ -42,13 +48,13 @@ namespace Board.Shapes
             destroyReference.action.canceled += StopDeleteObject;
 
             changeDistance.action.performed += ChangeDistance;
+            
+            Instance = this;
         }
 
         private void Start()
         {
             _index = CubeId;
-
-            Shape.Selector = this;
         }
 
         public Material testMaterial;
@@ -119,9 +125,13 @@ namespace Board.Shapes
 
         private GameObject GetShape()
         {
-            return _index >= CustomShapeId
-                ? CustomShape.Create(_index, testMaterial)
-                : shapes[_index];
+            if (_index < CustomShapeId) return shapes[_index];
+
+#if DEBUG
+            DebugPanel.Instance.AddCustom();
+#endif
+
+            return CustomShape.Create(_index, testMaterial);
         }
 
         #endregion
@@ -145,7 +155,7 @@ namespace Board.Shapes
             GameObject obj;
             if (_index >= CustomShapeId)
             {
-                obj = prefab 
+                obj = prefab
                     ? prefab
                     : throw new System.ArgumentNullException(nameof(prefab));
                 obj.transform.SetParent(shapesParent);

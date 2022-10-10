@@ -9,6 +9,7 @@ using Photon.Realtime;
 using TMPro;
 using UnityEngine;
 using Users;
+using Utils;
 using DeviceType = Utils.DeviceType;
 using Event = Utils.Event;
 
@@ -24,7 +25,7 @@ namespace Board.Events
         [SerializeField] private GameObject postItPrefab;
         [SerializeField] private GameObject onlinePingPrefab;
         [SerializeField] private GameObject board;
-        
+
         private List<PlayerEntity> _others;
 
         #region UNITY
@@ -85,6 +86,12 @@ namespace Board.Events
                     OnChatEvent(code, photonEvent.CustomData);
                     break;
 
+#if DEBUG
+                case < 80:
+                    OnPingEvent(code, photonEvent.CustomData, photonEvent);
+                    break;
+#endif
+
                 case >= 100 and < 200:
                     OnErrorEvent(code, photonEvent.CustomData);
                     break;
@@ -98,6 +105,26 @@ namespace Board.Events
             }
         }
 
+#if DEBUG
+        private static void OnPingEvent(Event.EventCode code, object photonEventCustomData, EventData photonEvent)
+        {
+            switch (code)
+            {
+                case Event.EventCode.PingSend:
+                    DebugPanel.AnswerPing(photonEventCustomData, photonEvent);
+                    break;
+
+                case Event.EventCode.PingReceive:
+                    DebugPanel.Instance.OnPingReceive(photonEventCustomData);
+                    break;
+
+
+                default:
+                    throw new ArgumentException($"Invalid event code: {code}");
+            }
+        }
+#endif
+
         public override void OnPlayerEnteredRoom(Player newPlayer)
         {
             base.OnPlayerEnteredRoom(newPlayer);
@@ -107,6 +134,10 @@ namespace Board.Events
             PhotonNetwork.RaiseEvent((byte)Event.EventCode.SendNewPlayerIn, transform.position, raiseEventOptions,
                 SendOptions.SendReliable);
 
+#if DEBUG
+            DebugPanel.Instance.AddPlayerSent();
+#endif
+
             if (!PhotonNetwork.IsMasterClient) return;
 
             var content = board.GetComponent<Board>().texture.EncodeToPNG();
@@ -114,27 +145,49 @@ namespace Board.Events
             PhotonNetwork.RaiseEvent((byte)Event.EventCode.Texture, content, raiseEventOptions,
                 SendOptions.SendReliable);
 
+#if DEBUG
+            DebugPanel.Instance.AddBoardSent();
+#endif
+
             foreach (var data in from shape in Shape.Shapes
                      let transform1 = shape.Value.transform
                      select new object[] { transform1.position, transform1.rotation, shape.Key })
+            {
                 PhotonNetwork.RaiseEvent((byte)Event.EventCode.SendNewObject, data, raiseEventOptions,
                     SendOptions.SendReliable);
+
+#if DEBUG
+                DebugPanel.Instance.AddObjectSent();
+#endif
+            }
 
             foreach (var data in from ping in PlayerEvents.Pings
                      select ping.transform.localPosition
                      into pos
                      let scale = board.transform.localScale.x
                      select new Vector2(pos.x * scale, pos.z * scale))
+            {
                 PhotonNetwork.RaiseEvent((byte)Event.EventCode.SendNewPing, data, raiseEventOptions,
                     SendOptions.SendReliable);
+
+#if DEBUG
+                DebugPanel.Instance.AddBoardSent();
+#endif
+            }
 
             foreach (var data in from postIt in PlayerEvents.PostIts
                      let pos = postIt.transform.localPosition
                      let text = postIt.GetComponentInChildren<TMP_Text>().text
                      let scale = board.transform.localScale.x
                      select new object[] { new Vector2(pos.x * scale, pos.z * scale), text })
+            {
                 PhotonNetwork.RaiseEvent((byte)Event.EventCode.SendNewPostIt, data, raiseEventOptions,
                     SendOptions.SendReliable);
+
+#if DEBUG
+                DebugPanel.Instance.AddPlayerSent();
+#endif
+            }
         }
 
         public override void OnPlayerLeftRoom(Player otherPlayer)
@@ -146,6 +199,14 @@ namespace Board.Events
             var playerEntity = _others.Find(x => x.photonId == otherPlayer.ActorNumber);
             _others.Remove(playerEntity);
             Destroy(playerEntity.gameObject);
+
+#if DEBUG
+            var deviceType = otherPlayer.CustomProperties.ContainsKey("Device")
+                ? (DeviceType)otherPlayer.CustomProperties["Device"]
+                : DeviceType.VR;
+
+            DebugPanel.Instance.RemovePlayer(deviceType);
+#endif
         }
 
         public override void OnJoinedRoom()
@@ -158,7 +219,12 @@ namespace Board.Events
 
             PhotonNetwork.RaiseEvent((byte)Event.EventCode.SendNewPlayerIn, transform.position, raiseEventOptions,
                 SendOptions.SendReliable);
-            
+
+#if DEBUG
+            DebugPanel.Instance.AddPlayerSent();
+            DebugPanel.Instance.SetConnected(true);
+#endif
+
             view.ViewID = 0;
             view.ViewID = PhotonNetwork.LocalPlayer.ActorNumber;
         }
@@ -223,6 +289,10 @@ namespace Board.Events
                 default:
                     throw new ArgumentException("Unknown event code");
             }
+
+#if DEBUG
+            DebugPanel.Instance.AddPlayerReceived();
+#endif
         }
 
         private PlayerEntity AddPlayer(Player newPlayer)
@@ -234,10 +304,14 @@ namespace Board.Events
                 Quaternion.identity);
             var playerEntity = entity.AddComponent<PlayerEntity>();
             var playerView = entity.GetComponent<PhotonView>();
-            
+
             playerEntity.SetValues(device, newPlayer.ActorNumber, newPlayer.NickName);
             playerView.ViewID = 0;
             playerView.ViewID = newPlayer.ActorNumber;
+
+#if DEBUG
+            DebugPanel.Instance.AddPlayer(device);
+#endif
 
             return playerEntity;
         }
@@ -259,19 +333,23 @@ namespace Board.Events
                     break;
 
                 case Event.EventCode.Texture:
-                    board.GetComponent<Board>().texture.LoadImage(data as byte[]);
+                    Board.Instance.texture.LoadImage(data as byte[]);
                     break;
 
                 default:
                     throw new ArgumentException("Unknown event code");
             }
+
+#if DEBUG
+            DebugPanel.Instance.AddBoardReceived();
+#endif
         }
 
         #endregion
 
         #region OBJECT_EVENTS
 
-        private void OnObjectEvent(Event.EventCode eventCode, object data)
+        private static void OnObjectEvent(Event.EventCode eventCode, object data)
         {
             switch (eventCode)
             {
@@ -294,13 +372,17 @@ namespace Board.Events
                 default:
                     throw new ArgumentException("Invalid event code");
             }
+
+#if DEBUG
+            DebugPanel.Instance.AddObjectReceived();
+#endif
         }
 
         #endregion
 
         #region CHAT_EVENTS
 
-        private void OnChatEvent(Event.EventCode eventCode, object data)
+        private static void OnChatEvent(Event.EventCode eventCode, object data)
         {
             switch (eventCode)
             {

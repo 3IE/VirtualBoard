@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
+using Utils;
 using Event = Utils.Event;
 
 namespace Board.Shapes
@@ -22,27 +24,34 @@ namespace Board.Shapes
 
         private bool _locked;
         private bool _isOwner;
+        private bool _created;
         private bool _deleting;
 
         private Rigidbody _rigidbody;
 
         protected readonly List<IXRInteractor> Interactors = new(2);
         protected internal byte ShapeId;
-        
+
         protected Material Mat;
 
         protected Vector3 InitialScale;
-        
+
         public float initialDistance;
 
         public bool rotating;
         public bool moving;
         public bool resizing;
 
-        public static ShapeSelector Selector;
         public static readonly Dictionary<int, Shape> Shapes = new();
 
         #region Unity
+
+#if DEBUG
+        private void OnDestroy()
+        {
+            DebugPanel.Instance.RemoveObject();
+        }
+#endif
 
         private void Awake()
         {
@@ -55,6 +64,12 @@ namespace Board.Shapes
             Shapes.Add(_id, this);
 
             Freeze();
+
+            _created = true;
+            
+            #if DEBUG
+            DebugPanel.Instance.AddObject();
+            #endif
         }
 
         private void Update()
@@ -89,10 +104,10 @@ namespace Board.Shapes
         public void CallDestroy(bool creation)
         {
             Shapes.Remove(_id);
-            
+
             if (!creation)
                 SendDestroy();
-            
+
             Destroy(gameObject);
         }
 
@@ -105,6 +120,8 @@ namespace Board.Shapes
 
         public void CreateAction(IXRInteractor interactor)
         {
+            _created = false;
+            
             StopAction();
             Create();
 
@@ -115,8 +132,6 @@ namespace Board.Shapes
 
                 _isOwner = true;
                 _locked = true;
-
-                SendOwnership();
             }
 
             Interactors.Add(interactor);
@@ -127,8 +142,8 @@ namespace Board.Shapes
         public void StopCreateAction(IXRInteractor interactor)
         {
             StopAction();
-            
-            if (transform.position.y < -1)
+
+            if (transform.position.y < -1.5f)
             {
                 CallDestroy(true);
                 return;
@@ -139,6 +154,8 @@ namespace Board.Shapes
             UpdateActionDeselect();
 
             SendNewObject();
+
+            _created = true;
         }
 
         #endregion
@@ -147,13 +164,13 @@ namespace Board.Shapes
 
         public void OnHoverEnter(HoverEnterEventArgs args)
         {
-            if (_deleting && ReferenceEquals(args.interactorObject, Selector.leftInteractor))
+            if (_deleting && ReferenceEquals(args.interactorObject, ShapeSelector.Instance.leftInteractor))
                 Delete();
         }
 
         public void OnHoverExit(HoverExitEventArgs args)
         {
-            if (_deleting && ReferenceEquals(args.interactorObject, Selector.leftInteractor))
+            if (_deleting && ReferenceEquals(args.interactorObject, ShapeSelector.Instance.leftInteractor))
                 Mat.SetFloat(Destroy1, 0);
         }
 
@@ -162,7 +179,7 @@ namespace Board.Shapes
             if (_deleting)
                 return;
 
-            if (Selector.currentShape is not null && !ReferenceEquals(Selector.currentShape, this))
+            if (ShapeSelector.Instance.currentShape is not null && !ReferenceEquals(ShapeSelector.Instance.currentShape, this))
                 return;
 
             if (!_isOwner)
@@ -170,7 +187,7 @@ namespace Board.Shapes
                 if (_locked)
                     return;
 
-                Selector.currentShape = this;
+                ShapeSelector.Instance.currentShape = this;
 
                 _isOwner = true;
                 _locked = true;
@@ -190,7 +207,7 @@ namespace Board.Shapes
             if (_deleting)
                 return;
 
-            Selector.currentShape = null;
+            ShapeSelector.Instance.currentShape = null;
 
             Interactors.Clear();
 
@@ -207,7 +224,7 @@ namespace Board.Shapes
 
             gameObject.layer = _defaultLayer;
 
-            Selector.StopChangeDistance();
+            ShapeSelector.Instance.StopChangeDistance();
 
             StopAction();
             Freeze();
@@ -225,13 +242,13 @@ namespace Board.Shapes
             {
                 initialDistance = Vector3.Distance(transform.position, Interactors[0].transform.position);
                 gameObject.layer = _shapesLayer;
-                
-                Selector.StartChangeDistance();
+
+                ShapeSelector.Instance.StartChangeDistance();
             }
 
             if (!resizing) return;
-            
-            Selector.StopChangeDistance();
+
+            ShapeSelector.Instance.StopChangeDistance();
 
             initialDistance = Vector3.Distance(Interactors[0].transform.position, Interactors[1].transform.position);
             if (initialDistance == 0)
@@ -266,7 +283,7 @@ namespace Board.Shapes
         private void SendNewObject()
         {
             Debug.Log("Sending created object");
-            
+
             var transform1 = transform;
             var data = new object[] { transform1.position, transform1.rotation, ShapeId };
 
@@ -285,7 +302,7 @@ namespace Board.Shapes
             var rotation = (Quaternion)data[1];
             var shapeId = (byte)data[2];
 
-            Instantiate(Selector.GetShape(shapeId), position, rotation);
+            Instantiate(ShapeSelector.Instance.GetShape(shapeId), position, rotation);
         }
 
         /// <summary>
@@ -293,7 +310,7 @@ namespace Board.Shapes
         /// </summary>
         protected void SendTransform()
         {
-            if (!_isOwner || !_locked) return;
+            if (!_isOwner || !_locked || !_created) return;
 
             var transform1 = transform;
             object[] data = { transform1.position, transform1.rotation, transform1.localScale, _id };
@@ -323,7 +340,7 @@ namespace Board.Shapes
         private void SendDestroy()
         {
             Debug.Log("Sending destroy");
-            
+
             SendData(Event.EventCode.SendDestroy, _id);
         }
 
@@ -364,6 +381,10 @@ namespace Board.Shapes
 
             PhotonNetwork.RaiseEvent((byte)eventCode, data, raiseEventOptions,
                 SendOptions.SendReliable);
+
+#if DEBUG
+            DebugPanel.Instance.AddObjectSent();
+#endif
         }
 
         #endregion
