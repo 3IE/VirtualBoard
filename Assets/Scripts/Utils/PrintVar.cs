@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace Utils
 {
+    /// <summary>
+    /// Class used to display a console in game
+    /// </summary>
     public class PrintVar : MonoBehaviour
     {
         private static TMP_Text _text;

@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace Board.Chat
 {
+    /// <inheritdoc cref="Photon.Chat.IChatClientListener" />
     public class Chat : MonoBehaviour, IChatClientListener
     {
         [SerializeField] private string chatAppId;
@@ -15,7 +16,7 @@ namespace Board.Chat
         private AuthenticationValues _id;
 
         private List<string> _msgList;
-        
+
         private string _userId;
         private bool _connected;
 
@@ -34,7 +35,7 @@ namespace Board.Chat
             };
             _msgList = new List<string>(4);
             _id = new AuthenticationValues(PhotonNetwork.LocalPlayer.UserId);
-            
+
             _chatClient.Connect(chatAppId, chatAppVersion, _id);
         }
 
@@ -51,6 +52,7 @@ namespace Board.Chat
 
         #region IChatClientListener
 
+        /// <inheritdoc />
         public void DebugReturn(DebugLevel level, string message)
         {
             switch (level)
@@ -70,6 +72,7 @@ namespace Board.Chat
             }
         }
 
+        /// <inheritDoc/>
         public void OnDisconnected()
         {
             _connected = false;
@@ -78,6 +81,7 @@ namespace Board.Chat
             Debug.Log("Disconnected from chat server");
         }
 
+        /// <inheritDoc/>
         public void OnConnected()
         {
             _connected = true;
@@ -87,11 +91,13 @@ namespace Board.Chat
             Debug.Log("Connected to chat server");
         }
 
+        /// <inheritDoc/>
         public void OnChatStateChange(ChatState state)
         {
             // Do nothing
         }
 
+        /// <inheritDoc/>
         public void OnGetMessages(string channelName, string[] senders, object[] messages)
         {
             for (var i = 0; i < senders.Length; i++)
@@ -99,36 +105,42 @@ namespace Board.Chat
                     _msgList.Add($"{senders[i]}={messages[i]}");
 
             if (_msgList.Count == 0) return;
-            
+
             Debug.Log($"OnGetMessages: {channelName} ({senders.Length}) > {string.Join(", ", _msgList)}");
             _msgList.Clear();
         }
 
+        /// <inheritDoc/>
         public void OnPrivateMessage(string sender, object message, string channelName)
         {
             Debug.LogFormat("OnPrivateMessage: {0} ({1}) > {2}", channelName, sender, message);
         }
 
+        /// <inheritDoc/>
         public void OnSubscribed(string[] channels, bool[] results)
         {
             Debug.Log($"OnSubscribed: {string.Join(", ", channels)}");
         }
 
+        /// <inheritDoc/>
         public void OnUnsubscribed(string[] channels)
         {
             Debug.Log($"OnUnsubscribed: {string.Join(", ", channels)}");
         }
 
+        /// <inheritDoc/>
         public void OnStatusUpdate(string user, int status, bool gotMessage, object message)
         {
             // Do nothing
         }
 
+        /// <inheritDoc/>
         public void OnUserSubscribed(string channel, string user)
         {
             Debug.LogFormat("OnUserSubscribed: channel=\"{0}\" userId=\"{1}\"", channel, user);
         }
 
+        /// <inheritDoc/>
         public void OnUserUnsubscribed(string channel, string user)
         {
             Debug.LogFormat("OnUserUnsubscribed: channel=\"{0}\" userId=\"{1}\"", channel, user);

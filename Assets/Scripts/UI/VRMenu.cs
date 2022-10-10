@@ -6,6 +6,9 @@ using Utils;
 
 namespace UI
 {
+    /// <summary>
+    /// Menu used to display information for the user
+    /// </summary>
     public class VRMenu : MonoBehaviour
     {
         // List of MenuPanels with their respective buttons

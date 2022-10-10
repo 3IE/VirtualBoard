@@ -1,11 +1,10 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using Utils;
-using Event = Utils.Event;
 
 namespace Board.Tools
 {
+    /// <inheritdoc />
     public class Marker : WritingTool
     {
         [Tooltip("The tip of the marker")] [SerializeField]
@@ -18,21 +17,24 @@ namespace Board.Tools
         private RaycastHit _touch;
         private Vector2 _touchPos;
 
-        //private Queue<Modification> _modifications;
-
+        /// <summary>
+        /// Position on the board touched last
+        /// </summary>
         protected Vector2 LastTouchPos;
         private Board _board;
 
-        private bool _modified = false;
+        private bool _modified;
         [SerializeField] private float gpuRefreshRate = 0.1f;
 
+        /// <summary>
+        /// Method called during start used to initialize the component
+        /// </summary>
         protected virtual void Initialize()
         {
             _tipTransform = tip.transform;
             _renderer = tip.GetComponent<Renderer>();
 
             TouchedLast = false;
-            //_modifications = new Queue<Modification>(256);
         }
 
         // Start is called before the first frame update
@@ -43,29 +45,23 @@ namespace Board.Tools
             InvokeRepeating(nameof(UpdateGPU), 0.5f, gpuRefreshRate);
         }
 
+        /// <summary>
+        /// Updates the GPU rendering of the board's rendering every <see cref="gpuRefreshRate"/>
+        /// The update is done only if the value of <see cref="_modified"/> has been changed
+        /// </summary>
         private void UpdateGPU()
         {
             if (!_modified) return;
             
-            boardObject.texture.Apply();
+            Board.Instance.texture.Apply();
             _modified = false;
         }
         
         private void Update()
         {
             UpdateRotation();
-            
-            //if (_modifications.TryDequeue(out var mod))
-            //{
-            //    ModifyTexture(mod);
-            //    _modified = true;
 
-#if DEBUG
-                //DebugPanel.Instance.RemoveBoardQueue();
-#endif
-            //}
-
-            if (canDraw)
+            if (CanDraw)
                 _modified = Draw() || _modified;
         }
 
@@ -75,8 +71,8 @@ namespace Board.Tools
         /// <param name="x"> The x coordinate of the point where the marker touches the board </param>
         /// <param name="y"> The y coordinate of the point where the marker touches the board </param>
         /// <returns>
-        /// True if we are in the boundaries of the board
-        /// False otherwise
+        /// <see langword="true"/> if we are in the boundaries of the board
+        /// <see langword="false"/> otherwise
         /// </returns>
         private bool InBound(int x, int y)
         {
@@ -85,9 +81,9 @@ namespace Board.Tools
 
         /// <summary>
         /// Check if we are touching the board
-        /// if we are not, return
-        /// otherwise draw while touching (interpolation used to avoid drawing only dots)
-        /// when stop touching, send new texture to ar clients
+        /// if we are not, return <see langword="false"/>
+        /// otherwise draw while touching (interpolation used to avoid drawing only dots) and return <see langword="true"/>
+        /// we send the modifications at each frame
         /// </summary>
         private bool Draw()
         {
@@ -145,36 +141,58 @@ namespace Board.Tools
             return false;
         }
 
+        /// <summary>
+        /// Generates a color array
+        /// </summary>
+        /// <returns> color array </returns>
         protected virtual Color[] GenerateShape()
         {
             return Tools.GenerateSquare(_renderer.material.color, penSize);
             // TODO generate shape depending on selected one
         }
 
+        /// <summary>
+        /// Sends a modification to the other players
+        /// </summary>
+        /// <param name="x"> x coordinate of the starting point of the modification </param>
+        /// <param name="y"> y coordinate of the starting point of the modification </param>
         protected virtual void SendModification(int x, int y)
         {
             new Modification(x, y, LastTouchPos.x, LastTouchPos.y, _renderer.material.color,
                     penSize)
-                .Send(Event.EventCode.Marker);
+                .Send(EventCode.Marker);
         }
 
-        private void ModifyTexture(int x, int y, float destX, float destY, Color[] colors, float size)
+        /// <summary>
+        /// Applies a modification between two points on the texture of the board
+        /// </summary>
+        /// <param name="x"> x coordinate of the starting point </param>
+        /// <param name="y"> y coordinate of the starting point </param>
+        /// <param name="destX"> x coordinate of the ending point </param>
+        /// <param name="destY"> y coordinate of the ending point </param>
+        /// <param name="colors"> color array to apply at each step between the two points </param>
+        /// <param name="size"> size of the array </param>
+        private static void ModifyTexture(int x, int y, float destX, float destY, Color[] colors, float size)
         {
             var castSize = (int)size;
 
-            boardObject.texture.SetPixels(x, y, castSize, castSize, colors);
-            boardObject.texture.SetPixels((int)destX, (int)destY, castSize, castSize, colors);
+            Board.Instance.texture.SetPixels(x, y, castSize, castSize, colors);
+            Board.Instance.texture.SetPixels((int)destX, (int)destY, castSize, castSize, colors);
 
             // Interpolation
-            for (var f = 0.01f; f < 1.00f; f += boardObject.tools.coverage)
+            for (var f = 0.01f; f < 1.00f; f += Tools.Instance.coverage)
             {
                 var lerpX = (int)Mathf.Lerp(destX, x, f);
                 var lerpY = (int)Mathf.Lerp(destY, y, f);
             
-                boardObject.texture.SetPixels(lerpX, lerpY, castSize, castSize, colors);
+                Board.Instance.texture.SetPixels(lerpX, lerpY, castSize, castSize, colors);
             }
         }
 
+        /// <summary>
+        /// Applies a modification
+        /// </summary>
+        /// <param name="modification"> Modification to apply </param>
         private void ModifyTexture(Modification modification)
         {
             var colors = Tools.GenerateSquare(modification.Color, penSize);
@@ -183,16 +201,14 @@ namespace Board.Tools
                 modification.PenSize);
         }
 
+        /// <summary>
+        /// Modifies the board's texture and notifies the GPU to update its rendering
+        /// </summary>
+        /// <param name="modification"> modification to apply </param>
         public void AddModification(Modification modification)
         {
-            //_modifications.Enqueue(modification);
             ModifyTexture(modification);            
             _modified = true;
-
-
-#if DEBUG
-            //DebugPanel.Instance.AddBoardQueue();
-#endif
         }
 
         // TODO add other shapes ?

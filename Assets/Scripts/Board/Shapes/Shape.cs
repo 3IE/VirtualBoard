@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using ExitGames.Client.Photon;
 using Photon.Pun;
@@ -6,10 +5,13 @@ using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using Utils;
-using Event = Utils.Event;
+using EventCode = Utils.EventCode;
 
 namespace Board.Shapes
 {
+    /// <summary>
+    /// 3D Object which can be spawned in the scene
+    /// </summary>
     public abstract class Shape : MonoBehaviour
     {
         private static int _counter;
@@ -29,19 +31,30 @@ namespace Board.Shapes
 
         private Rigidbody _rigidbody;
 
+        /// <summary>
+        /// List of interactors currently holding this shape
+        /// </summary>
         protected readonly List<IXRInteractor> Interactors = new(2);
+        /// <summary>
+        /// Id corresponding to the type of this shape
+        /// </summary>
         protected internal byte ShapeId;
 
+        /// <summary>
+        /// Material of the object
+        /// </summary>
         protected Material Mat;
 
-        protected Vector3 InitialScale;
+        internal Vector3 InitialScale;
+        internal float InitialDistance;
 
-        public float initialDistance;
+        internal bool Rotating;
+        internal bool Moving;
+        internal bool Resizing;
 
-        public bool rotating;
-        public bool moving;
-        public bool resizing;
-
+        /// <summary>
+        /// Holds a list of the existing shapes with their <see cref="_id"/> as a key
+        /// </summary>
         public static readonly Dictionary<int, Shape> Shapes = new();
 
         #region Unity
@@ -74,11 +87,11 @@ namespace Board.Shapes
 
         private void Update()
         {
-            if (moving)
+            if (Moving)
                 Move();
-            else if (rotating)
+            else if (Rotating)
                 Rotate();
-            else if (resizing)
+            else if (Resizing)
                 Resize();
         }
 
@@ -96,12 +109,12 @@ namespace Board.Shapes
             Mat.SetFloat(Modify1, 1);
         }
 
-        public void Delete()
+        internal void Delete()
         {
             Mat.SetFloat(Destroy1, 1);
         }
 
-        public void CallDestroy(bool creation)
+        internal void CallDestroy(bool creation)
         {
             Shapes.Remove(_id);
 
@@ -118,7 +131,7 @@ namespace Board.Shapes
             Mat.SetFloat(Destroy1, 0);
         }
 
-        public void CreateAction(IXRInteractor interactor)
+        internal void CreateAction(IXRInteractor interactor)
         {
             _created = false;
             
@@ -139,7 +152,7 @@ namespace Board.Shapes
             UpdateAction();
         }
 
-        public void StopCreateAction(IXRInteractor interactor)
+        internal void StopCreateAction(IXRInteractor interactor)
         {
             StopAction();
 
@@ -162,18 +175,30 @@ namespace Board.Shapes
 
         #region Selection
 
+        /// <summary>
+        /// Is called when an interactor hovers over this shape
+        /// </summary>
+        /// <param name="args"> Properties tied to the event </param>
         public void OnHoverEnter(HoverEnterEventArgs args)
         {
             if (_deleting && ReferenceEquals(args.interactorObject, ShapeSelector.Instance.leftInteractor))
                 Delete();
         }
 
+        /// <summary>
+        /// Is called when an interactor stops hovering over this shape
+        /// </summary>
+        /// <param name="args"> Properties tied to the event </param>
         public void OnHoverExit(HoverExitEventArgs args)
         {
             if (_deleting && ReferenceEquals(args.interactorObject, ShapeSelector.Instance.leftInteractor))
                 Mat.SetFloat(Destroy1, 0);
         }
 
+        /// <summary>
+        /// Is called when an interactor selects this shape
+        /// </summary>
+        /// <param name="args"> Properties tied to the event </param>
         public void OnSelect(SelectEnterEventArgs args)
         {
             if (_deleting)
@@ -202,6 +227,10 @@ namespace Board.Shapes
             UpdateAction();
         }
 
+        /// <summary>
+        /// Is called when an interactor lets go of this shape
+        /// </summary>
+        /// <param name="args"> Properties tied to the event </param>
         public void OnDeselect(SelectExitEventArgs args)
         {
             if (_deleting)
@@ -216,9 +245,9 @@ namespace Board.Shapes
 
         private void UpdateActionDeselect()
         {
-            moving = false;
-            rotating = false;
-            resizing = false;
+            Moving = false;
+            Rotating = false;
+            Resizing = false;
             _isOwner = false;
             _locked = false;
 
@@ -233,26 +262,26 @@ namespace Board.Shapes
 
         private void UpdateAction()
         {
-            moving = Interactors.Count == 1;
-            resizing = Interactors.Count == 2;
+            Moving = Interactors.Count == 1;
+            Resizing = Interactors.Count == 2;
 
             Unfreeze();
 
-            if (moving)
+            if (Moving)
             {
-                initialDistance = Vector3.Distance(transform.position, Interactors[0].transform.position);
+                InitialDistance = Vector3.Distance(transform.position, Interactors[0].transform.position);
                 gameObject.layer = _shapesLayer;
 
                 ShapeSelector.Instance.StartChangeDistance();
             }
 
-            if (!resizing) return;
+            if (!Resizing) return;
 
             ShapeSelector.Instance.StopChangeDistance();
 
-            initialDistance = Vector3.Distance(Interactors[0].transform.position, Interactors[1].transform.position);
-            if (initialDistance == 0)
-                initialDistance = 1;
+            InitialDistance = Vector3.Distance(Interactors[0].transform.position, Interactors[1].transform.position);
+            if (InitialDistance == 0)
+                InitialDistance = 1;
 
             InitialScale = transform.localScale;
         }
@@ -267,7 +296,7 @@ namespace Board.Shapes
             _rigidbody.constraints = RigidbodyConstraints.None;
         }
 
-        public static void DeletionMode(bool value)
+        internal static void DeletionMode(bool value)
         {
             foreach (var shape in Shapes.Values)
                 shape._deleting = value;
@@ -287,7 +316,7 @@ namespace Board.Shapes
             var transform1 = transform;
             var data = new object[] { transform1.position, transform1.rotation, ShapeId };
 
-            SendData(Event.EventCode.SendNewObject, data);
+            SendData(EventCode.SendNewObject, data);
         }
 
         /// <summary>
@@ -314,7 +343,7 @@ namespace Board.Shapes
 
             var transform1 = transform;
             object[] data = { transform1.position, transform1.rotation, transform1.localScale, _id };
-            SendData(Event.EventCode.SendTransform, data);
+            SendData(EventCode.SendTransform, data);
         }
 
         /// <summary>
@@ -341,7 +370,7 @@ namespace Board.Shapes
         {
             Debug.Log("Sending destroy");
 
-            SendData(Event.EventCode.SendDestroy, _id);
+            SendData(EventCode.SendDestroy, _id);
         }
 
         /// <summary>
@@ -361,7 +390,7 @@ namespace Board.Shapes
             if (!_isOwner || !_locked) return;
 
             object[] data = { _isOwner, _id };
-            SendData(Event.EventCode.SendOwnership, data);
+            SendData(EventCode.SendOwnership, data);
         }
 
         /// <summary>
@@ -375,7 +404,7 @@ namespace Board.Shapes
             Shapes[id]._locked = owned;
         }
 
-        private static void SendData(Event.EventCode eventCode, object data = null)
+        private static void SendData(EventCode eventCode, object data = null)
         {
             var raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
 
@@ -408,6 +437,10 @@ namespace Board.Shapes
 
         #endregion
 
+        /// <summary>
+        /// Returns the number of shapes currently existing
+        /// </summary>
+        /// <returns> number of shapes </returns>
         public static int NumberOfShapes()
         {
             return Shapes.Count;

@@ -4,6 +4,10 @@ using UnityEngine.UI;
 
 namespace Board.Tools
 {
+    /// <summary>
+    /// Utility class used to select a tool
+    /// </summary>
+    /// <remarks> DO NOT USE </remarks>
     public class ToolWheelController : MonoBehaviour
     {
         [SerializeField]
@@ -22,7 +26,7 @@ namespace Board.Tools
         [SerializeField]
         private Sprite icon;
 
-        public bool hovered;
+        private bool _hovered;
         private static readonly int Hover = Animator.StringToHash("Hover");
 
         // Start is called before the first frame update
@@ -35,10 +39,10 @@ namespace Board.Tools
         {
             if (selected)
             {
-                if (!hovered)
+                if (!_hovered)
                     HoverEnter();
             }
-            else if (hovered)
+            else if (_hovered)
                 HoverExit();
 
         }
@@ -48,13 +52,13 @@ namespace Board.Tools
             anim.SetBool(Hover, true);
             selectedItem.sprite = icon;
             itemText.text = item;
-            hovered = true;
+            _hovered = true;
         }
 
         private void HoverExit()
         {
             anim.SetBool(Hover, false);
-            hovered = false;
+            _hovered = false;
         }
     }
 }

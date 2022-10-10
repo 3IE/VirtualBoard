@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Dummiesman;
@@ -11,6 +10,7 @@ using Utils;
 
 namespace Board.Shapes
 {
+    /// <inheritdoc />
     public class CustomShape : Cube
     {
         private const int CacheSize = 4;
@@ -23,6 +23,7 @@ namespace Board.Shapes
 
         private static byte _id;
 
+        /// <inheritdoc />
         protected override void Initialize()
         {
             base.Initialize();
@@ -52,6 +53,10 @@ namespace Board.Shapes
             }
         }
 
+        /// <summary>
+        /// Loads the custom shapes into a dictionary
+        /// </summary>
+        /// TODO: change the method to load from server instead of local path
         public static void Init()
         {
             _paths = new Dictionary<byte, string>
@@ -61,6 +66,12 @@ namespace Board.Shapes
             };
         }
 
+        /// <summary>
+        /// Creates a new custom shape
+        /// </summary>
+        /// <param name="id"> id of the type of shape </param>
+        /// <param name="material"> material to give to the object </param>
+        /// <returns> the newly created object </returns>
         public static GameObject Create(byte id, Material material)
         {
             _id = id;

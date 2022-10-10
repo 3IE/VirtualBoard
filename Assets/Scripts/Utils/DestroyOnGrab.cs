@@ -1,9 +1,18 @@
 using UnityEngine;
 
-public class DestroyOnGrab : MonoBehaviour
+namespace Utils
 {
-    public void OnGrab()
+    /// <summary>
+    /// Utility class used to destroy an object when grabbed
+    /// </summary>
+    public class DestroyOnGrab : MonoBehaviour
     {
-        Destroy(gameObject);
+        /// <summary>
+        /// Called when the object is grabbed
+        /// </summary>
+        public void OnGrab()
+        {
+            Destroy(gameObject);
+        }
     }
 }

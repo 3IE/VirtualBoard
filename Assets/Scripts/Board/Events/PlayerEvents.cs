@@ -4,15 +4,30 @@ using UnityEngine;
 
 namespace Board.Events
 {
+    /// <summary>
+    /// Utility class used to delegate the events concerning players <seealso cref="EventManager"/>
+    /// </summary>
     public static class PlayerEvents
     {
         private static GameObject _postItPrefab;
         private static GameObject _onlinePingPrefab;
         private static GameObject _board;
 
+        /// <summary>
+        /// List of currently existing pings
+        /// </summary>
         public static readonly List<GameObject> Pings = new();
+        /// <summary>
+        /// List of currently existing post-its
+        /// </summary>
         public static readonly List<GameObject> PostIts = new();
 
+        /// <summary>
+        /// Method used to initialize some properties
+        /// </summary>
+        /// <param name="postItPrefab"> prefab used to instantiate post-its </param>
+        /// <param name="onlinePingPrefab"> prefab used to instantiate pings </param>
+        /// <param name="board"> game object holding the <see cref="Board"/> script </param>
         public static void SetupPrefabs(GameObject postItPrefab, GameObject onlinePingPrefab, GameObject board)
         {
             _postItPrefab = postItPrefab;
@@ -20,6 +35,10 @@ namespace Board.Events
             _board = board;
         }
 
+        /// <summary>
+        /// Called when a new post-it is received
+        /// </summary>
+        /// <param name="data"> array holding the position and the text of the post-it </param>
         public static void ReceiveNewPostIt(object[] data)
         {
             var position = (Vector2)data[0];
@@ -36,10 +55,12 @@ namespace Board.Events
             postIt.GetComponentInChildren<Renderer>().material.color = Color.cyan;
 
             PostIts.Add(postIt);
-            
-            // print($"Post-it: {text}, at {position}");
         }
 
+        /// <summary>
+        /// Called when a new ping is received
+        /// </summary>
+        /// <param name="position"> position of the ping </param>
         public static void ReceivePing(Vector2 position)
         {
             var ping = Object.Instantiate(_onlinePingPrefab, _board.transform);
@@ -58,6 +79,9 @@ namespace Board.Events
             */
         }
 
+        /// <summary>
+        /// Removes all pings and post-its from the board
+        /// </summary>
         public static void Clear()
         {
             Pings.ForEach(Object.Destroy);

@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 949022340340794721}
   - component: {fileID: 8139195500364482163}
   - component: {fileID: 9044060273755840890}
-  - component: {fileID: 1840870641151759876}
   - component: {fileID: 4797399087333854787}
   m_Layer: 11
   m_Name: Tip
@@ -85,19 +84,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &1840870641151759876
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2549191286467546551}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1.0971842}
-  m_Center: {x: 0, y: 0, z: 0.048592284}
 --- !u!114 &4797399087333854787
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -398,11 +384,9 @@ MonoBehaviour:
   hover:
   - {fileID: 923803429068249896}
   - {fileID: 4797399087333854787}
-  boardObject: {fileID: 0}
   penSize: 37.6
-  canDraw: 0
-  rotationLocked: 0
   tip: {fileID: 2549191286467546551}
+  gpuRefreshRate: 0.1
 --- !u!65 &1978687141466471729
 BoxCollider:
   m_ObjectHideFlags: 0
