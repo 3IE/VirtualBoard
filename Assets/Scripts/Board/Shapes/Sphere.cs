@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace Board.Shapes
 {
+    /// <inheritdoc />
     public class Sphere : Shape
     {
         private float _radius = 0.5f;
@@ -21,23 +22,24 @@ namespace Board.Shapes
             ShapeId = ShapeSelector.SphereId;
         }
 
+        /// <inheritdoc />
         protected override void Move()
         {
             if (Physics.Raycast(Interactors[0].transform.position, Interactors[0].transform.forward,
-                    out var hit, initialDistance, _defaultMask))
+                    out var hit, InitialDistance, _defaultMask))
             {
                 Vector3 position = hit.point + hit.normal * _radius;
                 
                 if (!Physics.CheckSphere(position, _radius - 0.01f, _defaultPlayerMask))
                 {
                     transform.position = position;
-                    initialDistance = hit.distance;
+                    InitialDistance = hit.distance;
                     return;
                 }
             }
             
             var size = Physics.SphereCastNonAlloc(Interactors[0].transform.position, _radius,
-                Interactors[0].transform.forward, _hits, initialDistance, _defaultMask);
+                Interactors[0].transform.forward, _hits, InitialDistance, _defaultMask);
             var positionFound = false;
 
             for (int i = size - 1; i >= 0 && !positionFound; i--)
@@ -54,18 +56,19 @@ namespace Board.Shapes
 
             if (!positionFound)
                 transform.position = Interactors[0].transform.position +
-                                     Interactors[0].transform.forward * initialDistance;
+                                     Interactors[0].transform.forward * InitialDistance;
 
             SendTransform();
         }
 
+        /// <inheritdoc />
         protected override void Resize()
         {
             if (Interactors[0].transform.position == Interactors[1].transform.position)
                 return;
 
             transform.localScale =
-                InitialScale / initialDistance
+                InitialScale / InitialDistance
                 * Vector3.Distance(Interactors[0].transform.position, Interactors[1].transform.position);
             _radius = transform.localScale.x / 2;
 
@@ -75,6 +78,7 @@ namespace Board.Shapes
         /// <summary>
         /// This object does not need to be rotated as it is a sphere.
         /// </summary>
+        /// <remarks> Does nothing </remarks>
         protected override void Rotate()
         {
             // Do nothing

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -6,6 +7,9 @@ using Utils;
 
 namespace Board.Tools
 {
+    /// <summary>
+    /// Base class for the tools writing on the board
+    /// </summary>
     public class WritingTool : MonoBehaviour
     {
         [SerializeField] private List<HoverInteractable> hover;
@@ -19,17 +23,26 @@ namespace Board.Tools
         private Transform _transform;
         private Rigidbody _rigidbody;
 
-        [SerializeField] protected Board boardObject;
+        /// <summary>
+        /// Size used to know the number of pixels we should modify 
+        /// </summary>
         [SerializeField] protected float penSize;
-#if UNITY_EDITOR
-        [SerializeField]
-#endif
-        protected bool canDraw;
+
+        /// <summary>
+        ///  Boolean used to know if the tool is touching the board
+        /// </summary>
+        protected bool CanDraw;
+        /// <summary>
+        /// Boolean used to know if the tool touched the board last frame
+        /// </summary>
         protected bool TouchedLast;
 
+        /// <summary>
+        /// Controller holding the tool
+        /// </summary>
         protected XRBaseController Controller;
 
-        public bool rotationLocked;
+        private bool _rotationLocked;
 
         private void Awake()
         {
@@ -39,9 +52,12 @@ namespace Board.Tools
             TouchedLast = false;
         }
 
+        /// <summary>
+        /// Locks the rotation of the tool if it's touching the board
+        /// </summary>
         protected void UpdateRotation()
         {
-            if (rotationLocked)
+            if (_rotationLocked)
             {
                 if (TouchedLast)
                 {
@@ -66,13 +82,19 @@ namespace Board.Tools
                 TouchedLast = false;
         }
 
-        public void AuthorizeDraw()
+        /// <summary>
+        /// highlights the item
+        /// </summary>
+        public void HoverTool()
         {
             foreach (var h in hover)
                 h.Hover();
         }
 
-        public void UnauthorizeDraw()
+        /// <summary>
+        /// Stops highlighting the item
+        /// </summary>
+        public void HoverExitTool()
         {
             foreach (var h in hover)
                 h.HoverExit();
@@ -96,8 +118,8 @@ namespace Board.Tools
 
             TouchedLast = false;
 
-            rotationLocked = false;
-            canDraw = false;
+            _rotationLocked = false;
+            CanDraw = false;
         }
 
         private void OnCollisionEnter(Collision collision)
@@ -106,16 +128,23 @@ namespace Board.Tools
 
             TouchedLast = false;
 
-            rotationLocked = true;
-            canDraw = true;
+            _rotationLocked = true;
+            CanDraw = true;
         }
 
+        /// <summary>
+        /// Called when this tool is selected by a controller
+        /// </summary>
+        /// <param name="args"> properties tied to this event </param>
         public void OnSelected(SelectEnterEventArgs args)
         {
             var interactor = args.interactorObject;
             Controller = interactor.transform.GetComponent<XRBaseController>();
         }
         
+        /// <summary>
+        /// Called when the controller lets go of this tool
+        /// </summary>
         public void OnDeselected()
         {
             Controller = null;

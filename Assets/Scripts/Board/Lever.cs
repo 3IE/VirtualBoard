@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace Board
 {
+    /// <summary>
+    /// Utility class tied to an object used to adjust the height of the board 
+    /// </summary>
     public class Lever : MonoBehaviour
     {
         [SerializeField]

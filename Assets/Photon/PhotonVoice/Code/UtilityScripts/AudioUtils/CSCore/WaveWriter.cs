@@ -104,7 +104,7 @@ namespace CSCore.Codecs.WAV
         /// </summary>
         /// <param name="filename">The filename.</param>
         /// <param name="source">The source to write down to the file.</param>
-        /// <param name="deleteFileIfAlreadyExists">if set to <c>true</c> the file will be overritten if it already exists.</param>
+        /// <param name="deleteFileIfAlreadyExists">if set to <see langword="true"/> the file will be overritten if it already exists.</param>
         /// <param name="maxlength">The maximum number of bytes to write. Use -1 to write an infinte number of bytes.</param>
         /// <remarks>
         /// This method is obsolete. Use the <see cref="Extensions.WriteToWaveStream" /> extension instead.

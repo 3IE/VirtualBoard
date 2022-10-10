@@ -1,7 +1,10 @@
 using UnityEngine;
 
-namespace Board
+namespace Board.Walls
 {
+    /// <summary>
+    /// Utility class used to update the wall's shader
+    /// </summary>
     public class WallMask : MonoBehaviour
     {
         [SerializeField]
@@ -19,7 +22,7 @@ namespace Board
 
         private void Start()
         {
-            foreach (Renderer r in renderers)
+            foreach (var r in renderers)
             {
                 r.material.SetFloat(Radius, radius);
                 r.material.SetFloat(Softness, softness);
@@ -30,7 +33,7 @@ namespace Board
         // Update is called once per frame
         private void Update()
         {
-            foreach (Renderer r in renderers)
+            foreach (var r in renderers)
                 r.material.SetVector(Position, transform.position);
         }
     }

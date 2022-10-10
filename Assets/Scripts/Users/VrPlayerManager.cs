@@ -4,17 +4,21 @@ using Photon.Realtime;
 using UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Serialization;
-using Event = Utils.Event;
+using Utils;
+using DeviceType = Utils.DeviceType;
+using EventCode = Utils.EventCode;
 
 // https://forum.unity.com/threads/fetch-xr-handed-ness-from-an-inputaction.907139/
 
 namespace Users
 {
+    /// <summary>
+    /// Utility class used to handle the inputs of the player
+    /// </summary>
     public class VrPlayerManager : MonoBehaviour
     {
-        // a attacher au XR Origin/Camera Offset
-        [SerializeField] private float refreshRate = 0.2f;
+        // to attach to XR Origin/Camera Offset
+        [SerializeField] [Range(0.01f, 1.0f)] private float refreshRate = 0.1f;
         [SerializeField] private Transform boardTransform;
         [SerializeField] private GameObject localPingPrefab;
 
@@ -29,7 +33,15 @@ namespace Users
 
         private void Awake()
         {
+            if (Unity.XR.Oculus.Performance.TrySetDisplayRefreshRate(90f))
+                Debug.Log("Could not set display refresh rate to 90Hz !");
+            
             _customInputs = new XRIDefaultInputActions();
+        }
+
+        private void Start()
+        {
+            DebugPanel.Instance.AddPlayer(DeviceType.VR);
         }
 
         private void OnEnable()
@@ -43,15 +55,28 @@ namespace Users
             InvokeRepeating(nameof(SendNewPositionEvent), refreshRate, refreshRate);
         }
 
+        /// <summary>
+        /// Opens the menu in front of the player, or closes it if it's already open
+        /// </summary>
+        /// <param name="obj"></param>
         private void OpenMenu(InputAction.CallbackContext obj)
         {
-            vrMenu.transform.SetPositionAndRotation(_vrCamTransform.position, _vrCamTransform.rotation);
-            vrMenu.transform.Translate(_vrCamTransform.forward * 1.5f);
-            vrMenu.gameObject.SetActive(true);
-            
-            vrMenu.WakeUp();
+            if (vrMenu.gameObject.activeSelf)
+                vrMenu.Close();
+            else
+            {
+                vrMenu.transform.SetPositionAndRotation(_vrCamTransform.position, _vrCamTransform.rotation);
+                vrMenu.transform.Translate(_vrCamTransform.forward * 1.5f);
+                vrMenu.gameObject.SetActive(true);
+                
+                vrMenu.Open();
+            }
         }
 
+        /// <summary>
+        /// Tries to place a ping on the board from the player's hand,
+        /// if the player pings a ping, it'll delete this ping
+        /// </summary>
         private void TryPing(InputAction.CallbackContext obj)
         {
             Ray ray = new(rightHandTransform.position, rightHandTransform.forward);
@@ -77,17 +102,24 @@ namespace Users
         {
             var raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
 
-            PhotonNetwork.RaiseEvent((byte)Event.EventCode.SendNewPosition, _vrCamTransform.position, raiseEventOptions,
+            PhotonNetwork.RaiseEvent((byte)EventCode.SendNewPosition, _vrCamTransform.position, raiseEventOptions,
                 SendOptions.SendReliable);
+            
+#if DEBUG
+            DebugPanel.Instance.AddPlayerSent();
+#endif
         }
 
+        /// <summary>
+        /// Places a ping on the board and declare its position to the other players
+        /// </summary>
+        /// <param name="position">Position of the ping</param>
         private void Ping(Vector3 position)
         {
-            // pooling des ping, 2 prefab de ping (un pour l'utilisateur et un pour les autres) 
-            // ping physique
+            // instantiate ping
             var ping = Instantiate(localPingPrefab, position, boardTransform.rotation, boardTransform);
 
-            // ping sur le reseau
+            // send ping to other players
             var localPos = ping.transform.localPosition;
 
             SendNewPingEvent(new Vector2(localPos.x, localPos.y));
@@ -97,8 +129,12 @@ namespace Users
         {
             var raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
 
-            PhotonNetwork.RaiseEvent((byte)Event.EventCode.SendNewPing, position, raiseEventOptions,
+            PhotonNetwork.RaiseEvent((byte)EventCode.SendNewPing, position, raiseEventOptions,
                 SendOptions.SendReliable);
+
+#if DEBUG
+            DebugPanel.Instance.AddPlayerSent();
+#endif
         }
     }
 }
