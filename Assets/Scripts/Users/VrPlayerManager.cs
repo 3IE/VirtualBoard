@@ -1,3 +1,4 @@
+using System;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
@@ -32,7 +33,10 @@ namespace Users
         private void Awake()
         {
             _customInputs = new XRIDefaultInputActions();
-            
+        }
+
+        private void Start()
+        {
             DebugPanel.Instance.AddPlayer(DeviceType.VR);
         }
 

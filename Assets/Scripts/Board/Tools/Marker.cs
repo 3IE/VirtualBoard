@@ -18,10 +18,13 @@ namespace Board.Tools
         private RaycastHit _touch;
         private Vector2 _touchPos;
 
-        private Queue<Modification> _modifications;
+        //private Queue<Modification> _modifications;
 
         protected Vector2 LastTouchPos;
         private Board _board;
+
+        private bool _modified = false;
+        [SerializeField] private float gpuRefreshRate = 0.1f;
 
         protected virtual void Initialize()
         {
@@ -29,30 +32,41 @@ namespace Board.Tools
             _renderer = tip.GetComponent<Renderer>();
 
             TouchedLast = false;
-            _modifications = new Queue<Modification>(256);
+            //_modifications = new Queue<Modification>(256);
         }
-        
+
         // Start is called before the first frame update
         private void Start()
         {
             Initialize();
+            
+            InvokeRepeating(nameof(UpdateGPU), 0.5f, gpuRefreshRate);
         }
 
+        private void UpdateGPU()
+        {
+            if (!_modified) return;
+            
+            boardObject.texture.Apply();
+            _modified = false;
+        }
+        
         private void Update()
         {
             UpdateRotation();
-
-            if (_modifications.TryDequeue(out var mod))
-            {
-                ModifyTexture(mod);
+            
+            //if (_modifications.TryDequeue(out var mod))
+            //{
+            //    ModifyTexture(mod);
+            //    _modified = true;
 
 #if DEBUG
-                DebugPanel.Instance.RemoveBoardQueue();
+                //DebugPanel.Instance.RemoveBoardQueue();
 #endif
-            }
+            //}
 
             if (canDraw)
-                Draw();
+                _modified = Draw() || _modified;
         }
 
         /// <summary>
@@ -75,7 +89,7 @@ namespace Board.Tools
         /// otherwise draw while touching (interpolation used to avoid drawing only dots)
         /// when stop touching, send new texture to ar clients
         /// </summary>
-        private void Draw()
+        private bool Draw()
         {
             // We check if we are touching the board with the marker
             if (Physics.Raycast(_tipTransform.position, _tipTransform.forward, out _touch,
@@ -90,12 +104,12 @@ namespace Board.Tools
 
                 // If we are touching the board and in its boundaries, then we draw
                 if (!InBound(x, y))
-                    return;
+                    return false;
 
                 if (TouchedLast)
                 {
                     if (Vector2.Distance(new Vector2(x, y), LastTouchPos) < 0.01f)
-                        return;
+                        return false;
 
                     // ReSharper disable once Unity.NoNullPropagation
                     Controller?.SendHapticImpulse(0.1f, 0.1f);
@@ -122,11 +136,13 @@ namespace Board.Tools
                 LastTouchPos = new Vector2(x, y);
                 TouchedLast = true;
 
-                return;
+                return true;
             }
 
             _board = null;
             TouchedLast = false;
+
+            return false;
         }
 
         protected virtual Color[] GenerateShape()
@@ -144,38 +160,39 @@ namespace Board.Tools
 
         private void ModifyTexture(int x, int y, float destX, float destY, Color[] colors, float size)
         {
-            var castSize = (int)size; 
-            
+            var castSize = (int)size;
+
             boardObject.texture.SetPixels(x, y, castSize, castSize, colors);
+            boardObject.texture.SetPixels((int)destX, (int)destY, castSize, castSize, colors);
 
             // Interpolation
             for (var f = 0.01f; f < 1.00f; f += boardObject.tools.coverage)
             {
                 var lerpX = (int)Mathf.Lerp(destX, x, f);
                 var lerpY = (int)Mathf.Lerp(destY, y, f);
-
+            
                 boardObject.texture.SetPixels(lerpX, lerpY, castSize, castSize, colors);
             }
-
-            // We apply the changes
-            boardObject.texture.Apply();
         }
 
         private void ModifyTexture(Modification modification)
         {
             var colors = Tools.GenerateSquare(modification.Color, penSize);
-            
+
             ModifyTexture(modification.X, modification.Y, modification.DestX, modification.DestY, colors,
                 modification.PenSize);
         }
 
         public void AddModification(Modification modification)
         {
-            _modifications.Enqueue(modification);
-            
-            #if DEBUG
-            DebugPanel.Instance.AddBoardQueue();
-            #endif
+            //_modifications.Enqueue(modification);
+            ModifyTexture(modification);            
+            _modified = true;
+
+
+#if DEBUG
+            //DebugPanel.Instance.AddBoardQueue();
+#endif
         }
 
         // TODO add other shapes ?

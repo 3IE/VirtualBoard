@@ -86,13 +86,14 @@ namespace Utils
         private void Start()
         {
             SetConnected(false);
-            InvokeRepeating(nameof(SendPing), .2f, .2f);
+            //InvokeRepeating(nameof(SendPing), .2f, .2f);
         }
 
         // Update is called once per frame
         private void Update()
         {
             _deltaTime += (Time.deltaTime - _deltaTime) * 0.1f;
+            _pingTime = PhotonNetwork.NetworkingClient.LoadBalancingPeer.RoundTripTime;
 
             var fps = 1.0f / _deltaTime;
 
@@ -100,6 +101,8 @@ namespace Utils
             time.text = $"{Time.unscaledTime:0.000}";
             if (!_connected)
                 connectionTime.text = $"{Time.unscaledTime - _startConnectionTime:0.000}";
+            
+            ping.text = $"{_pingTime:0.000}";
         }
 
         #endregion
