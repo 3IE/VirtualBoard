@@ -32,6 +32,9 @@ namespace Users
 
         private void Awake()
         {
+            if (Unity.XR.Oculus.Performance.TrySetDisplayRefreshRate(90f))
+                Debug.Log("Could not set display refresh rate to 90Hz !");
+            
             _customInputs = new XRIDefaultInputActions();
         }
 
