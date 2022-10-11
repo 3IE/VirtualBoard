@@ -35,9 +35,26 @@ namespace Board.Tools
         /// </summary>
         public Color baseColor;
 
+        internal bool Modified;
+        [SerializeField] private float gpuRefreshRate = 0.1f;
+
         private void Awake()
         {
             Instance = this;
+            
+            InvokeRepeating(nameof(UpdateGPU), 0.5f, gpuRefreshRate);
+        }
+
+        /// <summary>
+        /// Updates the GPU rendering of the board's rendering every <see cref="gpuRefreshRate"/>
+        /// The update is done only if the value of <see cref="Modified"/> has been changed
+        /// </summary>
+        private void UpdateGPU()
+        {
+            if (!Modified) return;
+            
+            Board.Instance.texture.Apply();
+            Modified = false;
         }
 
         /// <summary>
@@ -50,5 +67,7 @@ namespace Board.Tools
         {
             return Enumerable.Repeat(color, (int)(penSize * penSize)).ToArray();
         }
+        
+        
     }
 }

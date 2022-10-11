@@ -23,9 +23,6 @@ namespace Board.Tools
         protected Vector2 LastTouchPos;
         private Board _board;
 
-        private bool _modified;
-        [SerializeField] private float gpuRefreshRate = 0.1f;
-
         /// <summary>
         /// Method called during start used to initialize the component
         /// </summary>
@@ -41,20 +38,6 @@ namespace Board.Tools
         private void Start()
         {
             Initialize();
-            
-            InvokeRepeating(nameof(UpdateGPU), 0.5f, gpuRefreshRate);
-        }
-
-        /// <summary>
-        /// Updates the GPU rendering of the board's rendering every <see cref="gpuRefreshRate"/>
-        /// The update is done only if the value of <see cref="_modified"/> has been changed
-        /// </summary>
-        private void UpdateGPU()
-        {
-            if (!_modified) return;
-            
-            Board.Instance.texture.Apply();
-            _modified = false;
         }
         
         private void Update()
@@ -62,7 +45,7 @@ namespace Board.Tools
             UpdateRotation();
 
             if (CanDraw)
-                _modified = Draw() || _modified;
+                Tools.Instance.Modified = Draw() || Tools.Instance.Modified;
         }
 
         /// <summary>
@@ -208,7 +191,7 @@ namespace Board.Tools
         public void AddModification(Modification modification)
         {
             ModifyTexture(modification);            
-            _modified = true;
+            Tools.Instance.Modified = true;
         }
 
         // TODO add other shapes ?
