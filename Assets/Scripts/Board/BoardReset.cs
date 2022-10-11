@@ -1,17 +1,29 @@
 using System.Linq;
+using Board.Events;
 using UnityEngine;
 
-public class BoardReset : MonoBehaviour
+namespace Board
 {
-    [SerializeField] private Board.Board board;
-
-    public void OnPush()
+    /// <summary>
+    /// Utility class to reset the texture of the board
+    /// </summary>
+    public class BoardReset : MonoBehaviour
     {
-        var c = board.tools.baseColor;
-        var arr = board.texture.GetPixels();
+        [SerializeField] private Board board;
+
+        /// <summary>
+        /// Used to clean the board
+        /// </summary>
+        public void OnPush()
+        {
+            var c = Tools.Tools.Instance.baseColor;
+            var arr = board.texture.GetPixels();
         
-        arr = Enumerable.Repeat(c, arr.Length).ToArray();
+            arr = Enumerable.Repeat(c, arr.Length).ToArray();
         
-        board.texture.SetPixels(arr);
+            board.texture.SetPixels(arr);
+            
+            PlayerEvents.Clear();
+        }
     }
 }

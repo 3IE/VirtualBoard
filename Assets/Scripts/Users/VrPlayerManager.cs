@@ -1,19 +1,20 @@
-using System;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Serialization;
 using Utils;
 using DeviceType = Utils.DeviceType;
-using Event = Utils.Event;
+using EventCode = Utils.EventCode;
 
 // https://forum.unity.com/threads/fetch-xr-handed-ness-from-an-inputaction.907139/
 
 namespace Users
 {
+    /// <summary>
+    /// Utility class used to handle the inputs of the player
+    /// </summary>
     public class VrPlayerManager : MonoBehaviour
     {
         // to attach to XR Origin/Camera Offset
@@ -101,7 +102,7 @@ namespace Users
         {
             var raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
 
-            PhotonNetwork.RaiseEvent((byte)Event.EventCode.SendNewPosition, _vrCamTransform.position, raiseEventOptions,
+            PhotonNetwork.RaiseEvent((byte)EventCode.SendNewPosition, _vrCamTransform.position, raiseEventOptions,
                 SendOptions.SendReliable);
             
 #if DEBUG
@@ -128,7 +129,7 @@ namespace Users
         {
             var raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
 
-            PhotonNetwork.RaiseEvent((byte)Event.EventCode.SendNewPing, position, raiseEventOptions,
+            PhotonNetwork.RaiseEvent((byte)EventCode.SendNewPing, position, raiseEventOptions,
                 SendOptions.SendReliable);
 
 #if DEBUG

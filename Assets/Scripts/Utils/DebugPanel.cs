@@ -1,8 +1,6 @@
 using System;
 using System.Globalization;
-using ExitGames.Client.Photon;
 using Photon.Pun;
-using Photon.Realtime;
 using TMPro;
 using UnityEngine;
 
@@ -15,8 +13,10 @@ namespace Utils
     /// TODO: Remove the DEBUG preprocessor directive to remove this object from the build.
     public class DebugPanel : MonoBehaviour
     {
-
 #if DEBUG
+        /// <summary>
+        /// Instance of the class
+        /// </summary>
         public static DebugPanel Instance { get; private set; }
 
         #region GUI
@@ -41,8 +41,6 @@ namespace Utils
 
         [SerializeField] private TextMeshProUGUI boardSent;
         [SerializeField] private TextMeshProUGUI boardReceived;
-
-        [SerializeField] private TextMeshProUGUI boardQueue;
 
         #endregion
 
@@ -101,49 +99,18 @@ namespace Utils
             time.text = $"{Time.unscaledTime:0.000}";
             if (!_connected)
                 connectionTime.text = $"{Time.unscaledTime - _startConnectionTime:0.000}";
-            
+
             ping.text = $"{_pingTime:0.000}";
-        }
-
-        #endregion
-
-        #region PING
-
-        private void SendPing()
-        {
-            var pingTime = Time.unscaledTime;
-            var raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
-
-            PhotonNetwork.RaiseEvent((byte)Event.EventCode.PingSend, pingTime, raiseEventOptions,
-                SendOptions.SendReliable);
-        }
-
-        public static void AnswerPing(object data, EventData photonEvent)
-        {
-            var raiseEventOptions = new RaiseEventOptions { TargetActors = new[] { photonEvent.Sender } };
-
-            PhotonNetwork.RaiseEvent((byte)Event.EventCode.PingSend, data, raiseEventOptions,
-                SendOptions.SendReliable);
-        }
-
-        public void OnPingReceive(object data)
-        {
-            var sendTime = (float)data;
-            var receiveTime = Time.unscaledTime;
-
-            var pingTime = (receiveTime - sendTime) * 1000;
-
-            _pingTime *= _nbPing++;
-            _pingTime += pingTime;
-            _pingTime /= _nbPing;
-
-            UpdatePingTime();
         }
 
         #endregion
 
         #region SETTERS
 
+        /// <summary>
+        /// Sets <see cref="_connected"/> to the value of <c>connected</c>
+        /// </summary>
+        /// <param name="connected"> value to assign</param>
         public void SetConnected(bool connected)
         {
             if (!connected)
@@ -152,6 +119,11 @@ namespace Utils
             _connected = connected;
         }
 
+        /// <summary>
+        /// Updates the debug panel to add a player
+        /// </summary>
+        /// <param name="deviceType"> type of player to add </param>
+        /// <exception cref="ArgumentOutOfRangeException"> Occurs when the given argument is an unknown value </exception>
         public void AddPlayer(DeviceType deviceType)
         {
             switch (deviceType)
@@ -170,6 +142,11 @@ namespace Utils
             }
         }
 
+        /// <summary>
+        /// Updates the debug panel to remove a player
+        /// </summary>
+        /// <param name="deviceType"> type of player to add </param>
+        /// <exception cref="ArgumentOutOfRangeException"> Occurs when the given argument is an unknown value </exception>
         public void RemovePlayer(DeviceType deviceType)
         {
             switch (deviceType)
@@ -224,76 +201,94 @@ namespace Utils
             UpdateHoloNb();
         }
 
+        /// <summary>
+        /// Used to update the debug panel to add a message about a player being sent 
+        /// </summary>
         public void AddPlayerSent()
         {
             _playerSentValue++;
             UpdatePlayerSent();
         }
 
+        /// <summary>
+        /// Used to update the debug panel to add a message about a player being received 
+        /// </summary>
         public void AddPlayerReceived()
         {
             _playerReceivedValue++;
             UpdatePlayerReceived();
         }
 
+        /// <summary>
+        /// Used to update the debug panel to add a message about an object being sent 
+        /// </summary>
         public void AddObjectSent()
         {
             _objectSentValue++;
             UpdateObjectSent();
         }
 
+        /// <summary>
+        /// Used to update the debug panel to add a message about an object being received 
+        /// </summary>
         public void AddObjectReceived()
         {
             _objectReceivedValue++;
             UpdateObjectReceived();
         }
 
+        /// <summary>
+        /// Used to update the debug panel to add an object
+        /// </summary>
         public void AddObject()
         {
             _objectNbValue++;
             UpdateObjectNb();
         }
 
+        /// <summary>
+        /// Used to update the debug panel to remove an object
+        /// </summary>
         public void RemoveObject()
         {
             _objectNbValue--;
             UpdateObjectNb();
         }
 
+        /// <summary>
+        /// Used to update the debug panel to add a custom object
+        /// </summary>
         public void AddCustom()
         {
             _customNbValue++;
             UpdateCustomNb();
         }
 
+        /// <summary>
+        /// Used to update the debug panel to remove a custom object
+        /// </summary>
         public void RemoveCustom()
         {
             _customNbValue--;
             UpdateCustomNb();
         }
 
+        /// <summary>
+        /// Used to update the debug panel to add a message about the board being sent 
+        /// </summary>
         public void AddBoardSent()
         {
             _boardSentValue++;
             UpdateBoardSent();
         }
 
+        /// <summary>
+        /// Used to update the debug panel to add a message about the board being received 
+        /// </summary>
         public void AddBoardReceived()
         {
             _boardReceivedValue++;
             UpdateBoardReceived();
-        }
-
-        public void AddBoardQueue()
-        {
-            _boardQueueValue++;
-            UpdateBoardQueue();
-        }
-
-        public void RemoveBoardQueue()
-        {
-            _boardQueueValue--;
-            UpdateBoardQueue();
         }
 
         #endregion
@@ -360,20 +355,14 @@ namespace Utils
             boardReceived.text = _boardReceivedValue.ToString();
         }
 
-        private void UpdateBoardQueue()
-        {
-            boardQueue.text = _boardQueueValue.ToString();
-        }
-
         #endregion
 
 #else
-    
     private void Awake()
     {
         Destroy(gameObject);
     }
-    
+
 #endif
     }
 }

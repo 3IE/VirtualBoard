@@ -1,37 +1,48 @@
 ﻿using UnityEngine;
 
-public class CutoutObject : MonoBehaviour
+namespace Board.Walls
 {
-    [SerializeField]
-    private Transform targetObject;
-
-    [SerializeField]
-    private LayerMask wallMask;
-
-    private Camera mainCamera;
-
-    private void Awake()
+    /// <summary>
+    /// Utility class used to update the wall's shader
+    /// </summary>
+    public class CutoutObject : MonoBehaviour
     {
-        mainCamera = GetComponent<Camera>();
-    }
+        [SerializeField]
+        private Transform targetObject;
 
-    private void Update()
-    {
-        Vector2 cutoutPos = mainCamera.WorldToViewportPoint(targetObject.position);
-        cutoutPos.y /= (Screen.width / Screen.height);
+        [SerializeField]
+        private LayerMask wallMask;
 
-        Vector3 offset = targetObject.position - transform.position;
-        RaycastHit[] hitObjects = Physics.RaycastAll(transform.position, offset, offset.magnitude, wallMask);
+        private Camera _mainCamera;
+        private static readonly int CutoutPos = Shader.PropertyToID("_CutoutPos");
+        private static readonly int CutoutSize = Shader.PropertyToID("_CutoutSize");
+        private static readonly int FalloffSize = Shader.PropertyToID("_FalloffSize");
 
-        for (int i = 0; i < hitObjects.Length; ++i)
+        private void Awake()
         {
-            Material[] materials = hitObjects[i].transform.GetComponent<Renderer>().materials;
+            _mainCamera = GetComponent<Camera>();
+        }
 
-            for (int m = 0; m < materials.Length; ++m)
+        private void Update()
+        {
+            Vector2 cutoutPos = _mainCamera.WorldToViewportPoint(targetObject.position);
+            var offset = targetObject.position - transform.position;
+            var hitObjects = new RaycastHit[5];
+            
+            cutoutPos.y /= Screen.width / Screen.height;
+
+            var size = Physics.RaycastNonAlloc(transform.position, offset, hitObjects, offset.magnitude, wallMask);
+
+            for (var i = 0; i < size; ++i)
             {
-                materials[m].SetVector("_CutoutPos", cutoutPos);
-                materials[m].SetFloat("_CutoutSize", 0.1f);
-                materials[m].SetFloat("_FalloffSize", 0.05f);
+                var materials = hitObjects[i].transform.GetComponent<Renderer>().materials;
+
+                foreach (var m in materials)
+                {
+                    m.SetVector(CutoutPos, cutoutPos);
+                    m.SetFloat(CutoutSize, 0.1f);
+                    m.SetFloat(FalloffSize, 0.05f);
+                }
             }
         }
     }

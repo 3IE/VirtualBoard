@@ -11,18 +11,25 @@ namespace Board.Shapes
     /// </summary>
     public class ShapeSelector : MonoBehaviour
     {
+        /// <summary>
+        /// Instance of the class
+        /// </summary>
         public static ShapeSelector Instance { get; private set; }
-        
-        public const byte CubeId = 0;
-        public const byte CylinderId = 1;
-        public const byte SphereId = 2;
+
+        internal const byte CubeId = 0;
+        internal const byte CylinderId = 1;
+        internal const byte SphereId = 2;
         private const byte CustomShapeId = 3; // Find a way to determine id based on obj file
 
-        public bool selected;
+        /// <summary>
+        /// shape currently held by the player
+        /// </summary>
         public Shape currentShape;
 
+        /// <summary>
+        /// Left interactor
+        /// </summary>
         [SerializeField] public XRRayInteractor leftInteractor;
-        [SerializeField] private XRRayInteractor rightInteractor;
         [SerializeField] private XRInteractionManager interactionManager;
 
         [SerializeField] private InputActionReference createReference;
@@ -57,52 +64,30 @@ namespace Board.Shapes
             _index = CubeId;
         }
 
-        public Material testMaterial;
-#if UNITY_EDITOR
-        public bool test;
-
-        private void Update()
-        {
-            if (test)
-                CreateObject();
-            test = false;
-        }
-
-        private void CreateObject()
-        {
-            if (Shape.NumberOfShapes() >= 25)
-                return;
-
-            if (currentShape is not null && !currentShape.resizing)
-            {
-                currentShape.rotating = true;
-                currentShape.moving = false;
-                return;
-            }
-
-            _creating = true;
-
-            var prefab = GetShape();
-            var obj = Instantiate(prefab, shapesParent);
-            obj.GetComponent<XRSimpleInteractable>().interactionManager = interactionManager;
-
-            currentShape = obj.GetComponent<Shape>();
-            currentShape.CreateAction(leftInteractor);
-        }
-#endif
+        [SerializeField]
+        private Material testMaterial;
 
         #region SELECTOR
 
+        /// <summary>
+        /// Sets the currently spawnable shape to be a cube
+        /// </summary>
         public void SelectCube()
         {
             _index = CubeId;
         }
 
+        /// <summary>
+        /// Sets the currently spawnable shape to be a cylinder
+        /// </summary>
         public void SelectCylinder()
         {
             _index = CylinderId;
         }
 
+        /// <summary>
+        /// Sets the currently spawnable shape to be a sphere
+        /// </summary>
         public void SelectSphere()
         {
             _index = SphereId;
@@ -118,6 +103,11 @@ namespace Board.Shapes
             _index = CustomShapeId;
         }
 
+        /// <summary>
+        /// Returns the shape corresponding to <c>shapeId</c>
+        /// </summary>
+        /// <param name="shapeId"> id of the shape we are searching for </param>
+        /// <returns> corresponding shape </returns>
         public GameObject GetShape(byte shapeId)
         {
             return shapes[shapeId];
@@ -141,10 +131,10 @@ namespace Board.Shapes
             if (Shape.NumberOfShapes() >= 25)
                 return;
 
-            if (currentShape is not null && !currentShape.resizing)
+            if (currentShape is not null && !currentShape.Resizing)
             {
-                currentShape.rotating = true;
-                currentShape.moving = false;
+                currentShape.Rotating = true;
+                currentShape.Moving = false;
                 return;
             }
 
@@ -174,7 +164,7 @@ namespace Board.Shapes
             if (currentShape is null)
                 return;
 
-            if (currentShape.rotating)
+            if (currentShape.Rotating)
             {
                 currentShape.OnDeselect(null);
                 return;
@@ -217,15 +207,21 @@ namespace Board.Shapes
 
             var value = obj.ReadValue<Vector2>().y * Time.deltaTime;
 
-            currentShape.initialDistance =
-                Mathf.Clamp(currentShape.initialDistance + value * velocity, 0.5f, 100f);
+            currentShape.InitialDistance =
+                Mathf.Clamp(currentShape.InitialDistance + value * velocity, 0.5f, 100f);
         }
 
+        /// <summary>
+        /// Allows the user to change the distance between him and the object without moving
+        /// </summary>
         public void StartChangeDistance()
         {
             continuousMoveProvider.enabled = false;
         }
 
+        /// <summary>
+        /// Removes the possibility to change the distance between the user and the object and allow him to move
+        /// </summary>
         public void StopChangeDistance()
         {
             continuousMoveProvider.enabled = true;
