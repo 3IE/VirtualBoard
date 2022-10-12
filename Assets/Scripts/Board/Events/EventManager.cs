@@ -20,6 +20,7 @@ namespace Board.Events
     {
         [SerializeField] private Tools.Tools tools;
         [SerializeField] private PhotonView  view;
+        [SerializeField] private Transform   otherPlayers;
 
         [SerializeField] private GameObject vrPrefab;
         [SerializeField] private GameObject arPrefab;
@@ -96,6 +97,10 @@ namespace Board.Events
 
                 case EventCode.SendOwnership:
                     Shape.ReceiveOwnership(data as object[]);
+                    break;
+                
+                case EventCode.SendCounter:
+                    Shape.ReceiveCounter((int) data);
                     break;
 
                 default:
@@ -213,16 +218,9 @@ namespace Board.Events
         {
             base.OnPlayerEnteredRoom(newPlayer);
 
-            var raiseEventOptions = new RaiseEventOptions { TargetActors = new[] { newPlayer.ActorNumber } };
-
-            PhotonNetwork.RaiseEvent((byte) EventCode.SendNewPlayerIn, transform.position, raiseEventOptions,
-                                     SendOptions.SendReliable);
-
-            #if DEBUG
-            DebugPanel.Instance.AddPlayerSent();
-            #endif
-
             if (!PhotonNetwork.IsMasterClient) return;
+
+            var raiseEventOptions = new RaiseEventOptions { TargetActors = new[] { newPlayer.ActorNumber } };
 
             byte[] content = board.GetComponent<Board>().texture.EncodeToPNG();
 
@@ -232,10 +230,14 @@ namespace Board.Events
             #if DEBUG
             DebugPanel.Instance.AddBoardSent();
             #endif
+            
+            PhotonNetwork.RaiseEvent((byte) EventCode.SendCounter, Shape.Counter, raiseEventOptions,
+                                     SendOptions.SendReliable);
 
             foreach (object[] data in from shape in Shape.Shapes
                                       let transform1 = shape.Value.transform
-                                      select new object[] { transform1.position, transform1.rotation, shape.Key })
+                                      let id = shape.Value.ShapeId
+                                      select new object[] { transform1.position, transform1.rotation, id })
             {
                 PhotonNetwork.RaiseEvent((byte) EventCode.SendNewObject, data, raiseEventOptions,
                                          SendOptions.SendReliable);
@@ -313,6 +315,9 @@ namespace Board.Events
 
             view.ViewID = 0;
             view.ViewID = PhotonNetwork.LocalPlayer.ActorNumber;
+
+            foreach (PlayerEntity playerEntity in PhotonNetwork.PlayerListOthers.ToList().Select(AddPlayer))
+                _others.Add(playerEntity);
         }
 
         /// <inheritdoc />
@@ -371,7 +376,7 @@ namespace Board.Events
             var device = (DeviceType) newPlayer.CustomProperties.GetValueOrDefault("Device");
 
             GameObject entity = Instantiate(device == DeviceType.VR ? vrPrefab : arPrefab, new Vector3(0, 0, 0),
-                                            Quaternion.identity);
+                                            Quaternion.identity,                           otherPlayers);
 
             var playerEntity = entity.AddComponent<PlayerEntity>();
             var playerView   = entity.GetComponent<PhotonView>();

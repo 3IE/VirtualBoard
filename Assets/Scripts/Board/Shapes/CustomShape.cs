@@ -49,8 +49,6 @@ namespace Board.Shapes
         /// <inheritdoc />
         protected override void Initialize()
         {
-            base.Initialize();
-
             ShapeId = _id;
         }
 
@@ -62,8 +60,12 @@ namespace Board.Shapes
         {
             _paths = new Dictionary<byte, string>
             {
+                #if UNITY_EDITOR
                 //string[] files = Directory.GetFiles(Application.streamingAssetsPath, "*.obj");
                 { 3, /*Path.GetFullPath*/"Assets/Models/CustomShape.obj" },
+                #else
+                { 3, $"{Application.dataPath}/Models/CustomShape.obj" },
+                #endif
             };
         }
 
@@ -105,13 +107,11 @@ namespace Board.Shapes
 
             Cache.Add(new KeyValuePair<byte, GameObject>(id, mesh));
 
-            var collider     = mesh.AddComponent<MeshCollider>();
+            mesh.AddComponent<BoxCollider>();
             var interactable = mesh.AddComponent<XRSimpleInteractable>();
             var rigidbody    = mesh.AddComponent<Rigidbody>();
 
             rigidbody.useGravity = false;
-
-            collider.convex = true;
 
             var shape = mesh.AddComponent<CustomShape>();
 

@@ -23,11 +23,13 @@ namespace Users
         /// <param name="deviceType"> device of the user </param>
         /// <param name="id"> id of the user </param>
         /// <param name="user"> username </param>
-        public void SetValues(DeviceType deviceType, int id, string user)
+        public PlayerEntity SetValues(DeviceType deviceType, int id, string user)
         {
             device   = deviceType;
             photonId = id;
             username = user;
+
+            return this;
         }
 
         /// <summary>

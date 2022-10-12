@@ -14,7 +14,6 @@ namespace Board.Shapes
     /// </summary>
     public abstract class Shape : MonoBehaviour
     {
-        private static int _counter;
         private static int _defaultLayer;
         private static int _shapesLayer;
 
@@ -35,15 +34,20 @@ namespace Board.Shapes
         private bool _created;
         private bool _deleting;
 
-        private int  _id;
-        private bool _isOwner;
+        private int _id;
+
+        private Vector3 _initialScale;
+        private bool    _isOwner;
 
         private bool _locked;
 
-        private  Rigidbody _rigidbody;
-        internal float     InitialDistance;
+        private Rigidbody _rigidbody;
 
-        internal Vector3 InitialScale;
+        protected int DefaultMask;
+        protected int DefaultPlayerMask;
+
+        protected RaycastHit[] Hits;
+        internal  float        InitialDistance;
 
         /// <summary>
         ///     Material of the object
@@ -59,6 +63,10 @@ namespace Board.Shapes
         ///     Id corresponding to the type of this shape
         /// </summary>
         protected internal byte ShapeId;
+
+        protected Transform Transform;
+
+        public static int Counter { get; private set; }
 
         /// <summary>
         ///     Returns the number of shapes currently existing
@@ -80,11 +88,16 @@ namespace Board.Shapes
 
         private void Awake()
         {
-            Mat           = GetComponent<Renderer>().material;
             _rigidbody    = GetComponent<Rigidbody>();
             _defaultLayer = LayerMask.NameToLayer("Static Shapes");
             _shapesLayer  = LayerMask.NameToLayer("Shapes");
-            _id           = _counter++;
+            _id           = Counter++;
+            Transform     = transform;
+
+            Hits              = new RaycastHit[20];
+            Mat               = GetComponent<Renderer>().material;
+            DefaultMask       = LayerMask.GetMask("Default", "Static Shapes");
+            DefaultPlayerMask = LayerMask.GetMask("Default", "Player", "Static Shapes");
 
             Shapes.Add(_id, this);
 
@@ -126,11 +139,11 @@ namespace Board.Shapes
             Mat.SetFloat(Destroy1, 1);
         }
 
-        internal void CallDestroy(bool creation)
+        internal void CallDestroy(bool sendSignal)
         {
             Shapes.Remove(_id);
 
-            if (!creation)
+            if (sendSignal)
                 SendDestroy();
 
             Destroy(gameObject);
@@ -167,12 +180,6 @@ namespace Board.Shapes
         internal void StopCreateAction(IXRInteractor interactor)
         {
             StopAction();
-
-            if (transform.position.y < -1.5f)
-            {
-                CallDestroy(true);
-                return;
-            }
 
             Interactors.Remove(interactor);
 
@@ -254,6 +261,7 @@ namespace Board.Shapes
             Interactors.Clear();
 
             UpdateActionDeselect();
+            SendOwnership();
         }
 
         private void UpdateActionDeselect()
@@ -270,7 +278,6 @@ namespace Board.Shapes
 
             StopAction();
             Freeze();
-            SendOwnership();
         }
 
         private void UpdateAction()
@@ -297,7 +304,7 @@ namespace Board.Shapes
             if (InitialDistance == 0)
                 InitialDistance = 1;
 
-            InitialScale = transform.localScale;
+            _initialScale = transform.localScale;
         }
 
         private void Freeze()
@@ -327,8 +334,7 @@ namespace Board.Shapes
         {
             Debug.Log("Sending created object");
 
-            Transform transform1 = transform;
-            var       data       = new object[] { transform1.position, transform1.rotation, ShapeId };
+            var data = new object[] { Transform.position, Transform.rotation, ShapeId };
 
             SendData(EventCode.SendNewObject, data);
         }
@@ -345,18 +351,23 @@ namespace Board.Shapes
             var rotation = (Quaternion) data[1];
             var shapeId  = (byte) data[2];
 
-            Instantiate(ShapeSelector.Instance.GetShape(shapeId), position, rotation);
+            Shape shape = ShapeSelector.Instance.CreateObject(shapeId, true);
+            shape.transform.position = position;
+            shape.transform.rotation = rotation;
+
+            shape._locked  = true;
+            shape._isOwner = true;
+            shape._created = true;
         }
 
         /// <summary>
         ///     Sends the new transform of the object to the other clients
         /// </summary>
-        protected void SendTransform()
+        private void SendTransform()
         {
             if (!_isOwner || !_locked || !_created) return;
 
-            Transform transform1 = transform;
-            object[]  data       = { transform1.position, transform1.rotation, transform1.localScale, _id };
+            object[] data = { Transform.position, Transform.rotation, Transform.localScale, _id };
             SendData(EventCode.SendTransform, data);
         }
 
@@ -392,8 +403,7 @@ namespace Board.Shapes
         /// </summary>
         public static void ReceiveDestroy(int id)
         {
-            Shapes[id].Delete();
-            Shapes.Remove(id);
+            Shapes[id].CallDestroy(false);
         }
 
         /// <summary>
@@ -416,6 +426,14 @@ namespace Board.Shapes
             Shapes[id]._locked = owned;
         }
 
+        /// <summary>
+        ///     Sets the counter for the creation of new objects
+        /// </summary>
+        public static void ReceiveCounter(int data)
+        {
+            Counter = data;
+        }
+
         private static void SendData(EventCode eventCode, object data = null)
         {
             var raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
@@ -430,22 +448,107 @@ namespace Board.Shapes
 
         #endregion
 
-        #region Abstract
+        #region Physics
 
         /// <summary>
         ///     Moves the object along the ray of the controller selecting it
         /// </summary>
-        protected abstract void Move();
+        private void Move()
+        {
+            if (Physics.Raycast(Interactors[0].transform.position, Interactors[0].transform.forward,
+                                out RaycastHit hit, InitialDistance, DefaultMask))
+            {
+                Vector3 position = GetPositionFromHit(hit);
+
+                if (!CheckForCollision(position))
+                {
+                    Transform.position = position;
+                    InitialDistance    = hit.distance;
+                    return;
+                }
+            }
+
+            int size = CheckCast();
+
+            var positionFound = false;
+
+            for (int i = size - 1; i >= 0 && !positionFound; i--)
+            {
+                Vector3 position = GetPositionFromHit(Hits[i]);
+
+                if (CheckForCollision(position))
+                    continue;
+
+                Transform.position = position;
+
+                //initialDistance = hit.distance;
+                positionFound = true;
+            }
+
+            if (!positionFound)
+            {
+                Transform.position = Interactors[0].transform.position
+                                     + Interactors[0].transform.forward * InitialDistance;
+            }
+
+            SendTransform();
+        }
+
 
         /// <summary>
         ///     Resizes the object according to the distance between the two controllers
         /// </summary>
-        protected abstract void Resize();
+        private void Resize()
+        {
+            if (Interactors[0].transform.position == Interactors[1].transform.position)
+                return;
+
+            Transform.localScale =
+                _initialScale
+                / InitialDistance
+                * Vector3.Distance(Interactors[0].transform.position, Interactors[1].transform.position);
+
+            UpdateSize();
+
+            SendTransform();
+        }
 
         /// <summary>
         ///     Rotates the object according to the angle of the current controller
         /// </summary>
-        protected abstract void Rotate();
+        protected virtual void Rotate()
+        {
+            Transform.rotation = Interactors[0].transform.rotation;
+
+            SendTransform();
+        }
+
+        #endregion
+
+        #region Abstract
+
+        /// <summary>
+        ///     Checks if the object is still valid at a specific position
+        /// </summary>
+        protected abstract bool CheckForCollision(Vector3 position);
+
+        /// <summary>
+        ///     Applies a raycast corresponding to the shape of the object
+        /// </summary>
+        /// <returns> The number of hits </returns>
+        protected abstract int CheckCast();
+
+        /// <summary>
+        ///     Gets the position of the object from the hit
+        /// </summary>
+        /// <param name="hit"> point the raycast touched </param>
+        /// <returns> the position of the object </returns>
+        protected abstract Vector3 GetPositionFromHit(RaycastHit hit);
+
+        /// <summary>
+        ///     Updates the size of the object
+        /// </summary>
+        protected abstract void UpdateSize();
 
         #endregion
     }

@@ -13,7 +13,7 @@ namespace Board.Shapes
         public void OnPush()
         {
             foreach (Shape shape in Shape.Shapes.Values)
-                shape.CallDestroy(false);
+                shape.CallDestroy(true);
 
             Shape.Shapes.Clear();
         }

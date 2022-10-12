@@ -83,11 +83,16 @@ namespace Board.Shapes
 
             _creating = true;
 
-            GameObject prefab = GetShape();
+            CreateObject(_index, false);
+        }
+        
+        public Shape CreateObject(byte id, bool received)
+        {
+            GameObject prefab = GetShape(id);
 
             GameObject obj;
 
-            if (_index >= CustomShapeId)
+            if (id >= CustomShapeId)
             {
                 obj = prefab
                     ? prefab
@@ -101,7 +106,11 @@ namespace Board.Shapes
             obj.GetComponent<XRSimpleInteractable>().interactionManager = interactionManager;
 
             currentShape = obj.GetComponent<Shape>();
-            currentShape.CreateAction(leftInteractor);
+            
+            if (!received)
+                currentShape.CreateAction(leftInteractor);
+            
+            return currentShape;
         }
 
         private void StopCreateObject(InputAction.CallbackContext ctx)
@@ -142,7 +151,7 @@ namespace Board.Shapes
 
             if (Physics.Raycast(leftInteractor.transform.position, leftInteractor.transform.forward,
                                 out RaycastHit hit, 100f, LayerMask.GetMask("Static Shapes")))
-                hit.collider.GetComponent<Shape>().CallDestroy(false);
+                hit.collider.GetComponent<Shape>().CallDestroy(true);
         }
 
         private void ChangeDistance(InputAction.CallbackContext obj)
@@ -213,20 +222,24 @@ namespace Board.Shapes
         /// </summary>
         /// <param name="shapeId"> id of the shape we are searching for </param>
         /// <returns> corresponding shape </returns>
-        public GameObject GetShape(byte shapeId)
+        private GameObject GetShape(byte shapeId)
         {
-            return shapes[shapeId];
-        }
-
-        private GameObject GetShape()
-        {
-            if (_index < CustomShapeId) return shapes[_index];
+            if (shapeId < CustomShapeId) return shapes[shapeId];
 
             #if DEBUG
             DebugPanel.Instance.AddCustom();
             #endif
 
-            return CustomShape.Create(_index, testMaterial);
+            return CustomShape.Create(shapeId, testMaterial);
+        }
+
+        /// <summary>
+        ///     Returns the shape corresponding to <see cref="_index"/>
+        /// </summary>
+        /// <returns> corresponding shape </returns>
+        private GameObject GetShape()
+        {
+            return GetShape(_index);
         }
 
         #endregion

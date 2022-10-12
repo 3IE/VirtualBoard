@@ -11,8 +11,6 @@
         /// <inheritdoc />
         protected override void Initialize()
         {
-            base.Initialize();
-
             ShapeId = ShapeSelector.CylinderId;
 
             Size.y *= 2;
