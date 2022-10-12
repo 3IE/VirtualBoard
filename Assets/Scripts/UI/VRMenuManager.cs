@@ -4,8 +4,7 @@ using DeviceType = Utils.DeviceType;
 
 public class VRMenuManager : MonoBehaviour
 {
-    [Header("PlayerList")]
-    public GameObject playerListLayout;
+    [Header("PlayerList")] public GameObject playerListLayout;
 
     public  GameObject            playerListEntryPrefab;
     private List<PlayerListEntry> playerListEntries;

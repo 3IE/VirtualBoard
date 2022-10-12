@@ -11,11 +11,9 @@ namespace Board.Walls
         private static readonly int CutoutSize  = Shader.PropertyToID("_CutoutSize");
         private static readonly int FalloffSize = Shader.PropertyToID("_FalloffSize");
 
-        [SerializeField]
-        private Transform targetObject;
+        [SerializeField] private Transform targetObject;
 
-        [SerializeField]
-        private LayerMask wallMask;
+        [SerializeField] private LayerMask wallMask;
 
         private Camera _mainCamera;
 

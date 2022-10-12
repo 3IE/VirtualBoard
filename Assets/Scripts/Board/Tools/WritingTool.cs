@@ -15,7 +15,8 @@ namespace Board.Tools
         /// <summary>
         ///     Size used to know the number of pixels we should modify
         /// </summary>
-        [SerializeField] protected float penSize;
+        [SerializeField]
+        protected float penSize;
 
         private Vector3    _initialPosition;
         private Quaternion _initialRotation;

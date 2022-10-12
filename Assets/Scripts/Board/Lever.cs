@@ -7,8 +7,7 @@ namespace Board
     /// </summary>
     public class Lever : MonoBehaviour
     {
-        [SerializeField]
-        private GameObject board;
+        [SerializeField] private GameObject board;
 
         private HingeJoint _joint;
 

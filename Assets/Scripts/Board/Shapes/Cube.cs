@@ -82,8 +82,10 @@ namespace Board.Shapes
             }
 
             if (!positionFound)
+            {
                 _transform.position = Interactors[0].transform.position
                                       + Interactors[0].transform.forward * InitialDistance;
+            }
 
             SendTransform();
         }

@@ -12,26 +12,19 @@ namespace Board.Tools
     {
         private static readonly int Hover = Animator.StringToHash("Hover");
 
-        [SerializeField]
-        private int id;
+        [SerializeField] private int id;
 
-        [SerializeField]
-        private string item;
+        [SerializeField] private string item;
 
-        [SerializeField]
-        private bool selected;
+        [SerializeField] private bool selected;
 
-        [SerializeField]
-        private Animator anim;
+        [SerializeField] private Animator anim;
 
-        [SerializeField]
-        private TextMeshProUGUI itemText;
+        [SerializeField] private TextMeshProUGUI itemText;
 
-        [SerializeField]
-        private Image selectedItem;
+        [SerializeField] private Image selectedItem;
 
-        [SerializeField]
-        private Sprite icon;
+        [SerializeField] private Sprite icon;
 
         private bool _hovered;
 

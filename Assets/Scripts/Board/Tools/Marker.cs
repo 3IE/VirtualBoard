@@ -7,7 +7,8 @@ namespace Board.Tools
     /// <inheritdoc />
     public class Marker : WritingTool
     {
-        [Tooltip("The tip of the marker")] [SerializeField]
+        [Tooltip("The tip of the marker")]
+        [SerializeField]
         private GameObject tip;
 
         private Board   _board;

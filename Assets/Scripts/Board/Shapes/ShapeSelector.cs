@@ -25,7 +25,8 @@ namespace Board.Shapes
         /// <summary>
         ///     Left interactor
         /// </summary>
-        [SerializeField] public XRRayInteractor leftInteractor;
+        [SerializeField]
+        public XRRayInteractor leftInteractor;
 
         [SerializeField] private XRInteractionManager interactionManager;
 
@@ -39,8 +40,7 @@ namespace Board.Shapes
 
         [Range(0.5f, 5f)] [SerializeField] private float velocity = 0.5f;
 
-        [SerializeField]
-        private Material testMaterial;
+        [SerializeField] private Material testMaterial;
 
         private bool _creating;
 

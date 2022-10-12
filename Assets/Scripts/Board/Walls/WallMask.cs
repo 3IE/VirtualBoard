@@ -11,8 +11,7 @@ namespace Board.Walls
         private static readonly int Softness = Shader.PropertyToID("_Softness");
         private static readonly int Position = Shader.PropertyToID("_Position");
 
-        [SerializeField]
-        private Renderer[] renderers;
+        [SerializeField] private Renderer[] renderers;
 
         [SerializeField]
         [Range(0, 20, order = 0)]
