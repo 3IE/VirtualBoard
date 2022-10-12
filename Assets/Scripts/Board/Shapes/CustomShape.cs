@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Dummiesman;
 using Unity.VisualScripting;
@@ -13,15 +12,39 @@ namespace Board.Shapes
     /// <inheritdoc />
     public class CustomShape : Cube
     {
-        private const int CacheSize = 4;
-        private static readonly List<KeyValuePair<byte, GameObject>> Cache = new(CacheSize);
-        private static Dictionary<byte, string> _paths;
-
-        private Mesh _mesh;
-        private MeshFilter _meshFilter;
-        private MeshRenderer _meshRenderer;
+        private const           int                                  CacheSize = 4;
+        private static readonly List<KeyValuePair<byte, GameObject>> Cache     = new(CacheSize);
+        private static          Dictionary<byte, string>             _paths;
 
         private static byte _id;
+
+        private Mesh         _mesh;
+        private MeshFilter   _meshFilter;
+        private MeshRenderer _meshRenderer;
+
+        private void OnDestroy()
+        {
+            #if DEBUG
+            DebugPanel.Instance.RemoveCustom();
+            DebugPanel.Instance.RemoveObject();
+            #endif
+
+            for (var i = 0; i < Cache.Count; i++)
+            {
+                if (Cache[i].Key != ShapeId) continue;
+
+                if (!ReferenceEquals(Cache[i].Value, gameObject)) break;
+
+                Cache.RemoveAt(i);
+
+                Shape other = Shapes.First(pair => pair.Value.ShapeId == ShapeId).Value;
+
+                if (other is not null)
+                    Cache.Add(new KeyValuePair<byte, GameObject>(ShapeId, other.gameObject));
+
+                break;
+            }
+        }
 
         /// <inheritdoc />
         protected override void Initialize()
@@ -31,30 +54,8 @@ namespace Board.Shapes
             ShapeId = _id;
         }
 
-        private void OnDestroy()
-        {
-            #if DEBUG
-            DebugPanel.Instance.RemoveCustom();
-            DebugPanel.Instance.RemoveObject();
-            #endif
-            
-            for (var i = 0; i < Cache.Count; i++)
-            {
-                if (Cache[i].Key != ShapeId) continue;
-                if (!ReferenceEquals(Cache[i].Value, gameObject)) break;
-
-                Cache.RemoveAt(i);
-
-                var other = Shapes.First(pair => pair.Value.ShapeId == ShapeId).Value;
-                if (other is not null)
-                    Cache.Add(new KeyValuePair<byte, GameObject>(ShapeId, other.gameObject));
-
-                break;
-            }
-        }
-
         /// <summary>
-        /// Loads the custom shapes into a dictionary
+        ///     Loads the custom shapes into a dictionary
         /// </summary>
         /// TODO: change the method to load from server instead of local path
         public static void Init()
@@ -62,12 +63,12 @@ namespace Board.Shapes
             _paths = new Dictionary<byte, string>
             {
                 //string[] files = Directory.GetFiles(Application.streamingAssetsPath, "*.obj");
-                { 3, /*Path.GetFullPath*/("Assets/Models/CustomShape.obj") }
+                { 3, /*Path.GetFullPath*/"Assets/Models/CustomShape.obj" },
             };
         }
 
         /// <summary>
-        /// Creates a new custom shape
+        ///     Creates a new custom shape
         /// </summary>
         /// <param name="id"> id of the type of shape </param>
         /// <param name="material"> material to give to the object </param>
@@ -76,12 +77,13 @@ namespace Board.Shapes
         {
             _id = id;
 
-            var cached = Cache.Find(pair => pair.Key == id).Value;
+            GameObject cached = Cache.Find(pair => pair.Key == id).Value;
+
             if (cached is not null && !cached.IsDestroyed())
             {
-                var instantiation = Instantiate(cached, Vector3.zero, Quaternion.identity);
-                var instantiationInteractable = instantiation.GetComponent<XRSimpleInteractable>();
-                var instantiationShape = instantiation.GetComponent<CustomShape>();
+                GameObject instantiation             = Instantiate(cached, Vector3.zero, Quaternion.identity);
+                var        instantiationInteractable = instantiation.GetComponent<XRSimpleInteractable>();
+                var        instantiationShape        = instantiation.GetComponent<CustomShape>();
 
                 instantiationInteractable.hoverEntered.AddListener(instantiationShape.OnHoverEnter);
                 instantiationInteractable.hoverExited.AddListener(instantiationShape.OnHoverExit);
@@ -93,17 +95,19 @@ namespace Board.Shapes
                 return instantiation;
             }
 
-            var obj = new OBJLoader()
+            GameObject obj = new OBJLoader()
                 .Load(_paths[id]);
-            var mesh = obj.GetNamedChild("default");
+
+            GameObject mesh = obj.GetNamedChild("default");
 
             if (Cache.Count == CacheSize)
                 Cache.RemoveAt(0);
+
             Cache.Add(new KeyValuePair<byte, GameObject>(id, mesh));
 
-            var collider = mesh.AddComponent<MeshCollider>();
+            var collider     = mesh.AddComponent<MeshCollider>();
             var interactable = mesh.AddComponent<XRSimpleInteractable>();
-            var rigidbody = mesh.AddComponent<Rigidbody>();
+            var rigidbody    = mesh.AddComponent<Rigidbody>();
 
             rigidbody.useGravity = false;
 
@@ -118,17 +122,17 @@ namespace Board.Shapes
 
             interactable.selectMode = InteractableSelectMode.Multiple;
 
-            shape._meshFilter = mesh.GetComponent<MeshFilter>();
+            shape._meshFilter   = mesh.GetComponent<MeshFilter>();
             shape._meshRenderer = mesh.GetComponent<MeshRenderer>();
 
             shape._mesh = shape._meshFilter.mesh;
 
             shape._meshRenderer.material = material;
-            shape.Mat = shape._meshRenderer.material;
+            shape.Mat                    = shape._meshRenderer.material;
 
-            mesh.transform.localPosition = Vector3.zero;
-            mesh.transform.localRotation = Quaternion.identity;
-            mesh.transform.localScale /= shape._mesh.bounds.size.magnitude;
+            mesh.transform.localPosition =  Vector3.zero;
+            mesh.transform.localRotation =  Quaternion.identity;
+            mesh.transform.localScale    /= shape._mesh.bounds.size.magnitude;
 
             return mesh;
         }

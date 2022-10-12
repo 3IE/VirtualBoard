@@ -4,7 +4,7 @@ using DeviceType = Utils.DeviceType;
 namespace Users
 {
     /// <summary>
-    /// Utility class used to hold data about a user
+    ///     Utility class used to hold data about a user
     /// </summary>
     public class PlayerEntity : MonoBehaviour
     {
@@ -18,20 +18,20 @@ namespace Users
         public DeviceType device;
 
         /// <summary>
-        /// Sets the data of this user
+        ///     Sets the data of this user
         /// </summary>
         /// <param name="deviceType"> device of the user </param>
         /// <param name="id"> id of the user </param>
         /// <param name="user"> username </param>
         public void SetValues(DeviceType deviceType, int id, string user)
         {
-            device = deviceType;
+            device   = deviceType;
             photonId = id;
             username = user;
         }
 
         /// <summary>
-        /// Updates the position of the player
+        ///     Updates the position of the player
         /// </summary>
         /// <param name="position"> new position </param>
         public void UpdateTransform(Vector3 position)

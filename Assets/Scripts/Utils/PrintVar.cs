@@ -7,21 +7,23 @@ using UnityEngine;
 namespace Utils
 {
     /// <summary>
-    /// Class used to display a console in game
+    ///     Class used to display a console in game
     /// </summary>
     public class PrintVar : MonoBehaviour
     {
-        private static TMP_Text _text;
-        private static readonly Dictionary<uint, string> Lines = new();
-        private static readonly StringBuilder TextToPrint = new();
-    
+        private static          TMP_Text                 _text;
+        private static readonly Dictionary<uint, string> Lines       = new();
+        private static readonly StringBuilder            TextToPrint = new();
+
         private static uint _lineId;
 
-        private void Awake() 
-            => _text = GetComponent<TMP_Text>();
+        private void Awake()
+        {
+            _text = GetComponent<TMP_Text>();
+        }
 
         /// <summary>
-        /// Prints on a specific line
+        ///     Prints on a specific line
         /// </summary>
         /// <param name="n"> Index of the line </param>
         /// <param name="args"> Content to print </param>
@@ -29,7 +31,7 @@ namespace Utils
         {
             _text.faceColor = Color.black;
 
-            _lineId = Math.Max(_lineId, n);
+            _lineId  = Math.Max(_lineId, n);
             Lines[n] = string.Join("\n", args);
             TextToPrint.Clear();
             TextToPrint.AppendJoin("\n\n", Lines.Values);
@@ -37,7 +39,7 @@ namespace Utils
         }
 
         /// <summary>
-        /// Prints on the next line available
+        ///     Prints on the next line available
         /// </summary>
         /// <param name="args"> Content to print </param>
         public static void Print(params string[] args)
@@ -49,10 +51,20 @@ namespace Utils
             _text.text = TextToPrint.ToString();
         }
 
-#if UNITY_EDITOR
+        /// <summary>
+        ///     Resets the displayed content
+        /// </summary>
+        public static void Clear()
+        {
+            Lines.Clear();
+            TextToPrint.Clear();
+            _text.text = "";
+        }
+
+        #if UNITY_EDITOR
 
         /// <summary>
-        /// Prints on a specific line
+        ///     Prints on a specific line
         /// </summary>
         /// <param name="n"> Index of the line </param>
         /// <param name="args"> Content to print </param>
@@ -60,7 +72,7 @@ namespace Utils
         {
             _text.faceColor = Color.red;
 
-            _lineId = Math.Max(_lineId, n);
+            _lineId  = Math.Max(_lineId, n);
             Lines[n] = string.Join("\n", args);
             TextToPrint.Clear();
             TextToPrint.AppendJoin("\n\n", Lines.Values);
@@ -68,7 +80,7 @@ namespace Utils
         }
 
         /// <summary>
-        /// Prints on the next line available
+        ///     Prints on the next line available
         /// </summary>
         /// <param name="args"> Content to print </param>
         public static void PrintDebug(params string[] args)
@@ -80,15 +92,6 @@ namespace Utils
             _text.text = TextToPrint.ToString();
         }
 
-#endif
-
-        /// <summary>
-        /// Resets the displayed content
-        /// </summary>
-        public static void Clear() {
-            Lines.Clear();
-            TextToPrint.Clear();
-            _text.text = "";
-        }
+        #endif
     }
 }

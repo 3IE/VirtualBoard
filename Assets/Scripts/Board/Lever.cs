@@ -3,7 +3,7 @@ using UnityEngine;
 namespace Board
 {
     /// <summary>
-    /// Utility class tied to an object used to adjust the height of the board 
+    ///     Utility class tied to an object used to adjust the height of the board
     /// </summary>
     public class Lever : MonoBehaviour
     {
@@ -21,11 +21,11 @@ namespace Board
         // Update is called once per frame
         private void Update()
         {
-            var angle = _joint.angle + 60;
-            var y = angle / 120 * 3 - 1.5f;
-            var position = board.transform.position;
-            
-            position.y = y;
+            float   angle    = _joint.angle    + 60;
+            float   y        = angle / 120 * 3 - 1.5f;
+            Vector3 position = board.transform.position;
+
+            position.y               = y;
             board.transform.position = position;
         }
     }
