@@ -1,3 +1,4 @@
+using System;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
@@ -19,12 +20,10 @@ namespace Users
     public class VrPlayerManager : MonoBehaviour
     {
         // to attach to XR Origin/Camera Offset
-        [SerializeField] [Range(0.01f, 1.0f)] private float      refreshRate = 0.1f;
-        [SerializeField]                      private Transform  boardTransform;
-        [SerializeField]                      private GameObject localPingPrefab;
-
-        [SerializeField] private Transform rightHandTransform;
-        [SerializeField] private Transform leftHandTransform;
+        [SerializeField] private Transform  boardTransform;
+        [SerializeField] private Transform  rightHandTransform;
+        [SerializeField] private Transform  leftHandTransform;
+        [SerializeField] private GameObject localPingPrefab;
 
         [SerializeField] private VRMenu vrMenu;
 
@@ -34,15 +33,22 @@ namespace Users
 
         private void Awake()
         {
-            if (Performance.TrySetDisplayRefreshRate(90f))
-                Debug.Log("Could not set display refresh rate to 90Hz !");
-
             _customInputs = new XRIDefaultInputActions();
+
+            //if (Performance.TrySetDisplayRefreshRate(90f))
+            //    Debug.Log("Could not set display refresh rate to 90Hz !");
         }
 
+        #if DEBUG
         private void Start()
         {
             DebugPanel.Instance.AddPlayer(DeviceType.VR);
+        }
+        #endif
+
+        private void Update()
+        {
+            SendNewPositionEvent();
         }
 
         private void OnEnable()
@@ -52,14 +58,10 @@ namespace Users
             _customInputs.Menu.OpenMenu.started           += OpenMenu;
 
             _vrCamTransform = Camera.main!.transform;
-
-            InvokeRepeating(nameof(SendNewPositionEvent), refreshRate, refreshRate);
         }
 
         private void OnDisable()
         {
-            CancelInvoke();
-
             _customInputs.OnlineInteractions.Ping.started -= TryPing;
             _customInputs.Menu.OpenMenu.started           -= OpenMenu;
             _customInputs.Disable();
@@ -101,10 +103,16 @@ namespace Users
 
         private void SendNewPositionEvent()
         {
+            object[] data =
+            {
+                _vrCamTransform.position, _vrCamTransform.rotation, leftHandTransform.position,
+                leftHandTransform.rotation, rightHandTransform.position, rightHandTransform.rotation,
+            };
+
             var raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
 
-            PhotonNetwork.RaiseEvent((byte) EventCode.SendNewPosition, _vrCamTransform.position, raiseEventOptions,
-                                     SendOptions.SendReliable);
+            PhotonNetwork.RaiseEvent((byte) EventCode.SendNewPosition, data, raiseEventOptions,
+                                     SendOptions.SendUnreliable);
 
             #if DEBUG
             DebugPanel.Instance.AddPlayerSent();

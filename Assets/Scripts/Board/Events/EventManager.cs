@@ -98,7 +98,7 @@ namespace Board.Events
                 case EventCode.SendOwnership:
                     Shape.ReceiveOwnership(data as object[]);
                     break;
-                
+
                 case EventCode.SendCounter:
                     Shape.ReceiveCounter((int) data);
                     break;
@@ -206,17 +206,23 @@ namespace Board.Events
 
                 case >= 200:
                     Debug.Log($"Photon Event: {code}");
-                    break;
+                    return;
 
                 default:
                     throw new ArgumentException($"Invalid event code: {photonEvent.Code}");
             }
+            
+            Debug.Log($"Event : {code}");
+            DebugPanel.Instance.AddReceived();
         }
 
         /// <inheritdoc />
         public override void OnPlayerEnteredRoom(Player newPlayer)
         {
             base.OnPlayerEnteredRoom(newPlayer);
+
+            PlayerEntity playerEntity = AddPlayer(newPlayer);
+            _others.Add(playerEntity);
 
             if (!PhotonNetwork.IsMasterClient) return;
 
@@ -230,7 +236,7 @@ namespace Board.Events
             #if DEBUG
             DebugPanel.Instance.AddBoardSent();
             #endif
-            
+
             PhotonNetwork.RaiseEvent((byte) EventCode.SendCounter, Shape.Counter, raiseEventOptions,
                                      SendOptions.SendReliable);
 
@@ -299,17 +305,7 @@ namespace Board.Events
         /// <inheritdoc />
         public override void OnJoinedRoom()
         {
-            PhotonNetwork.NickName =
-                $"{((DeviceType) PhotonNetwork.LocalPlayer.CustomProperties["Device"] == DeviceType.VR ? "VR" : "AR")}"
-                + $" {PhotonNetwork.LocalPlayer.NickName}";
-
-            var raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
-
-            PhotonNetwork.RaiseEvent((byte) EventCode.SendNewPlayerIn, transform.position, raiseEventOptions,
-                                     SendOptions.SendReliable);
-
             #if DEBUG
-            DebugPanel.Instance.AddPlayerSent();
             DebugPanel.Instance.SetConnected(true);
             #endif
 
@@ -344,16 +340,8 @@ namespace Board.Events
 
                 case EventCode.SendNewPosition:
                     _others.Find(p => p.photonId == photonEvent.Sender)
-                           .UpdateTransform((Vector3) data);
+                           .UpdateObject(data as object[]);
 
-                    break;
-
-                case EventCode.SendNewPlayerIn:
-                    Player       newPlayer    = PhotonNetwork.CurrentRoom.GetPlayer(photonEvent.Sender);
-                    PlayerEntity playerEntity = AddPlayer(newPlayer);
-
-                    playerEntity.UpdateTransform((Vector3) data);
-                    _others.Add(playerEntity);
                     break;
 
                 case EventCode.SendNewPing:
@@ -378,7 +366,7 @@ namespace Board.Events
             GameObject entity = Instantiate(device == DeviceType.VR ? vrPrefab : arPrefab, new Vector3(0, 0, 0),
                                             Quaternion.identity,                           otherPlayers);
 
-            var playerEntity = entity.AddComponent<PlayerEntity>();
+            var playerEntity = entity.GetComponent<PlayerEntity>();
             var playerView   = entity.GetComponent<PhotonView>();
 
             playerEntity.SetValues(device, newPlayer.ActorNumber, newPlayer.NickName);

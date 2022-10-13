@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using DeviceType = Utils.DeviceType;
 
 namespace Users
@@ -16,6 +17,21 @@ namespace Users
 
         /// <summary> device of the user </summary>
         public DeviceType device;
+
+        [SerializeField] private GameObject player;
+        [SerializeField] private GameObject leftHand;
+        [SerializeField] private GameObject rightHand;
+
+        private Transform _transform;
+        private Transform _leftTransform;
+        private Transform _rightTransform;
+
+        private void Awake()
+        {
+            _transform      = player.transform;
+            _leftTransform  = leftHand.transform;
+            _rightTransform = rightHand.transform;
+        }
 
         /// <summary>
         ///     Sets the data of this user
@@ -36,9 +52,44 @@ namespace Users
         ///     Updates the position of the player
         /// </summary>
         /// <param name="position"> new position </param>
-        public void UpdateTransform(Vector3 position)
+        /// <param name="rotation"> new rotation </param>
+        private void UpdateTransform(Vector3 position, Quaternion rotation = default)
         {
-            transform.position = position;
+            _transform.position = position;
+            _transform.rotation = rotation;
+        }
+
+        private void UpdateHands(Vector3    left, Quaternion leftRot, Vector3 right,
+                                 Quaternion rightRot)
+        {
+            _leftTransform.position  = left;
+            _leftTransform.rotation  = leftRot;
+            _rightTransform.position = right;
+            _rightTransform.rotation = rightRot;
+        }
+
+        public void UpdateObject(object data)
+        {
+            if (device == DeviceType.VR)
+            {
+                if (data is not object[] dataArray)
+                    throw new InvalidCastException("Data is not an array");
+
+                var position = (Vector3) dataArray[0];
+                var rotation = (Quaternion) dataArray[1];
+
+                UpdateTransform(position, rotation);
+
+                var leftHandPosition  = (Vector3) dataArray[2];
+                var leftHandRotation  = (Quaternion) dataArray[3];
+                var rightHandPosition = (Vector3) dataArray[4];
+                var rightHandRotation = (Quaternion) dataArray[5];
+
+                UpdateHands(leftHandPosition, leftHandRotation, rightHandPosition,
+                            rightHandRotation);
+            }
+            else
+                UpdateTransform((Vector3) data);
         }
     }
 }

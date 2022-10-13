@@ -25,6 +25,8 @@ namespace Utils
         [SerializeField] private TextMeshProUGUI time;
         [SerializeField] private TextMeshProUGUI connectionTime;
         [SerializeField] private TextMeshProUGUI ping;
+        [SerializeField] private TextMeshProUGUI sent;
+        [SerializeField] private TextMeshProUGUI received;
 
         [SerializeField] private TextMeshProUGUI vrNb;
         [SerializeField] private TextMeshProUGUI arNb;
@@ -53,6 +55,8 @@ namespace Utils
         private float _startConnectionTime;
 
         private int _nbPing;
+        private int _nbSent;
+        private int _nbReceived;
 
         private int _vrNbValue;
         private int _arNbValue;
@@ -209,11 +213,24 @@ namespace Utils
             UpdateHoloNb();
         }
 
+        public void AddSent()
+        {
+            _nbSent++;
+            UpdateSent();
+        }
+        
+        public void AddReceived()
+        {
+            _nbReceived++;
+            UpdateReceived();
+        }
+        
         /// <summary>
         ///     Used to update the debug panel to add a message about a player being sent
         /// </summary>
         public void AddPlayerSent()
         {
+            AddSent();
             _playerSentValue++;
             UpdatePlayerSent();
         }
@@ -232,6 +249,7 @@ namespace Utils
         /// </summary>
         public void AddObjectSent()
         {
+            AddSent();
             _objectSentValue++;
             UpdateObjectSent();
         }
@@ -286,6 +304,7 @@ namespace Utils
         /// </summary>
         public void AddBoardSent()
         {
+            AddSent();
             _boardSentValue++;
             UpdateBoardSent();
         }
@@ -321,6 +340,16 @@ namespace Utils
         private void UpdateHoloNb()
         {
             holoNb.text = _holoNbValue.ToString();
+        }
+        
+        private void UpdateSent()
+        {
+            sent.text = _nbSent.ToString();
+        }
+        
+        private void UpdateReceived()
+        {
+            received.text = _nbReceived.ToString();
         }
 
         private void UpdatePlayerSent()
