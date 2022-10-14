@@ -30,10 +30,12 @@ namespace Board.Shapes
 
         [SerializeField] private XRInteractionManager interactionManager;
 
-        [SerializeField] private InputActionReference       createReference;
-        [SerializeField] private InputActionReference       destroyReference;
-        [SerializeField] private InputActionReference       changeDistance;
-        [SerializeField] private ContinuousMoveProviderBase continuousMoveProvider;
+        [SerializeField] private InputActionReference createReference;
+        [SerializeField] private InputActionReference destroyReference;
+        [SerializeField] private InputActionReference changeDistance;
+
+        [SerializeField] private TeleportationProvider teleportationProvider;
+        //[SerializeField] private ContinuousMoveProviderBase continuousMoveProvider;
 
         [SerializeField] private Transform        shapesParent;
         [SerializeField] private List<GameObject> shapes;
@@ -85,7 +87,7 @@ namespace Board.Shapes
 
             CreateObject(_index, false);
         }
-        
+
         public Shape CreateObject(byte id, bool received)
         {
             GameObject prefab = GetShape(id);
@@ -106,10 +108,10 @@ namespace Board.Shapes
             obj.GetComponent<XRSimpleInteractable>().interactionManager = interactionManager;
 
             currentShape = obj.GetComponent<Shape>();
-            
+
             if (!received)
                 currentShape.CreateAction(leftInteractor);
-            
+
             return currentShape;
         }
 
@@ -171,6 +173,7 @@ namespace Board.Shapes
         public void StartChangeDistance()
         {
             //continuousMoveProvider.enabled = false;
+            teleportationProvider.enabled = false;
         }
 
         /// <summary>
@@ -179,6 +182,7 @@ namespace Board.Shapes
         public void StopChangeDistance()
         {
             //continuousMoveProvider.enabled = true;
+            teleportationProvider.enabled = true;
         }
 
         #region SELECTOR
