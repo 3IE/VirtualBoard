@@ -170,7 +170,7 @@ namespace Board.Shapes
         /// </summary>
         public void StartChangeDistance()
         {
-            continuousMoveProvider.enabled = false;
+            //continuousMoveProvider.enabled = false;
         }
 
         /// <summary>
@@ -178,7 +178,7 @@ namespace Board.Shapes
         /// </summary>
         public void StopChangeDistance()
         {
-            continuousMoveProvider.enabled = true;
+            //continuousMoveProvider.enabled = true;
         }
 
         #region SELECTOR
