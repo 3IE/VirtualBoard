@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Board.Shapes
@@ -12,7 +14,9 @@ namespace Board.Shapes
         /// </summary>
         public void OnPush()
         {
-            foreach (Shape shape in Shape.Shapes.Values)
+            List<Shape> shapes = Shape.Shapes.Values.ToList();
+
+            foreach (Shape shape in shapes)
                 shape.CallDestroy(true);
 
             Shape.Shapes.Clear();

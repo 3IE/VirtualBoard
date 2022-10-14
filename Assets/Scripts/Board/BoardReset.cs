@@ -22,6 +22,7 @@ namespace Board
             arr = Enumerable.Repeat(c, arr.Length).ToArray();
 
             board.texture.SetPixels(arr);
+            board.texture.Apply();
 
             PlayerEvents.Clear();
         }
