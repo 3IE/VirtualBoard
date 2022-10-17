@@ -29,8 +29,8 @@ namespace Users
         private void Awake()
         {
             _transform      = player.transform;
-            _leftTransform  = leftHand.transform;
-            _rightTransform = rightHand.transform;
+            _leftTransform  = leftHand != null ? leftHand.transform : null;
+            _rightTransform = rightHand != null ? rightHand.transform : null;
         }
 
         /// <summary>
