@@ -309,6 +309,8 @@ namespace Board.Events
             DebugPanel.Instance.SetConnected(true);
             #endif
 
+            VrPlayerManager.Connected = true;
+
             view.ViewID = 0;
             view.ViewID = PhotonNetwork.LocalPlayer.ActorNumber;
 

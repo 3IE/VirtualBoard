@@ -19,6 +19,8 @@ namespace Users
     /// </summary>
     public class VrPlayerManager : MonoBehaviour
     {
+        public static bool Connected;
+
         // to attach to XR Origin/Camera Offset
         [SerializeField] private Transform  boardTransform;
         [SerializeField] private Transform  rightHandTransform;
@@ -48,7 +50,8 @@ namespace Users
 
         private void Update()
         {
-            SendNewPositionEvent();
+            if (Connected)
+                SendNewPositionEvent();
         }
 
         private void OnEnable()
@@ -137,6 +140,9 @@ namespace Users
 
         private static void SendNewPingEvent(Vector2 position)
         {
+            if (!Connected)
+                return;
+                    
             var raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
 
             PhotonNetwork.RaiseEvent((byte) EventCode.SendNewPing, position, raiseEventOptions,
