@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 2479236963262079384}
   - component: {fileID: 6638971182971223657}
   - component: {fileID: 7957718676270304641}
+  - component: {fileID: 3233010866220950702}
   m_Layer: 0
   m_Name: VR prefab
   m_TagString: Untagged
@@ -141,3 +142,21 @@ MonoBehaviour:
   AutoCreateRecorderIfNotFound: 0
   UsePrimaryRecorder: 0
   SetupDebugSpeaker: 0
+--- !u!114 &3233010866220950702
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4083266320642658348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 342696f1e0e27f74094199a5790e5d32, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  username: 
+  photonId: 0
+  device: 0
+  player: {fileID: 4083266320642658348}
+  leftHand: {fileID: 0}
+  rightHand: {fileID: 0}

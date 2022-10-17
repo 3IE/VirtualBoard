@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 3482396674255981605}
   - component: {fileID: 806460207726983796}
   - component: {fileID: 7131725561351586457}
+  - component: {fileID: 5079130808420699766}
   m_Layer: 0
   m_Name: AR prefab
   m_TagString: Untagged
@@ -259,3 +260,21 @@ MonoBehaviour:
     MinDelaySoft: 200
     MaxDelaySoft: 400
     MaxDelayHard: 1000
+--- !u!114 &5079130808420699766
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4083266320642658348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 342696f1e0e27f74094199a5790e5d32, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  username: 
+  photonId: 0
+  device: 1
+  player: {fileID: 117318942602745976, guid: b89074ae27b25e94d9b31c54f0e021e6, type: 3}
+  leftHand: {fileID: 0}
+  rightHand: {fileID: 0}

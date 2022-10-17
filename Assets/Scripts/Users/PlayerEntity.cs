@@ -70,26 +70,21 @@ namespace Users
 
         public void UpdateObject(object data)
         {
-            if (device == DeviceType.VR)
-            {
-                if (data is not object[] dataArray)
-                    throw new InvalidCastException("Data is not an array");
+            if (data is not object[] dataArray)
+                throw new InvalidCastException("Data is not an array");
 
-                var position = (Vector3) dataArray[0];
-                var rotation = (Quaternion) dataArray[1];
+            var position = (Vector3) dataArray[0];
+            var rotation = (Quaternion) dataArray[1];
 
-                UpdateTransform(position, rotation);
+            UpdateTransform(position, rotation);
 
-                var leftHandPosition  = (Vector3) dataArray[2];
-                var leftHandRotation  = (Quaternion) dataArray[3];
-                var rightHandPosition = (Vector3) dataArray[4];
-                var rightHandRotation = (Quaternion) dataArray[5];
+            var leftHandPosition  = (Vector3) dataArray[2];
+            var leftHandRotation  = (Quaternion) dataArray[3];
+            var rightHandPosition = (Vector3) dataArray[4];
+            var rightHandRotation = (Quaternion) dataArray[5];
 
-                UpdateHands(leftHandPosition, leftHandRotation, rightHandPosition,
-                            rightHandRotation);
-            }
-            else
-                UpdateTransform((Vector3) data);
+            UpdateHands(leftHandPosition, leftHandRotation, rightHandPosition,
+                        rightHandRotation);
         }
     }
 }
