@@ -1,6 +1,6 @@
-﻿using System;
-using Photon.Pun;
+﻿using Photon.Pun;
 using UnityEngine;
+using DeviceType = Utils.DeviceType;
 
 namespace Refactor
 {
@@ -10,9 +10,16 @@ namespace Refactor
         [SerializeField] private Transform leftHandTransform;
         [SerializeField] private Transform rightHandTransform;
 
+        private bool _isAr;
+        
         private void Awake()
         {
             DontDestroyOnLoad(gameObject);
+        }
+
+        public void SetDevice(DeviceType deviceType)
+        {
+            _isAr = deviceType is not DeviceType.VR;
         }
 
         public void ReplaceHandsTransforms(Transform newLeftHandTransform, Transform newRightHandTransform)
@@ -20,6 +27,9 @@ namespace Refactor
             Destroy(leftHandTransform.gameObject);
             Destroy(rightHandTransform.gameObject);
             
+            if (_isAr)
+                return;
+                
             this.leftHandTransform = newLeftHandTransform;
             this.rightHandTransform = newRightHandTransform;
         }
@@ -41,6 +51,9 @@ namespace Refactor
             {
                 playerTransform.position = (Vector3) stream.ReceiveNext();
                 playerTransform.rotation = (Quaternion) stream.ReceiveNext();
+                
+                if (_isAr)
+                    return;
                 
                 leftHandTransform.position = (Vector3) stream.ReceiveNext();
                 leftHandTransform.rotation = (Quaternion) stream.ReceiveNext();

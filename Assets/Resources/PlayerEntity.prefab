@@ -178,6 +178,7 @@ GameObject:
   - component: {fileID: 2342448387816029072}
   - component: {fileID: 7059325407672007108}
   - component: {fileID: 7796366947537708608}
+  - component: {fileID: 2665492640691109612}
   m_Layer: 0
   m_Name: PlayerEntity
   m_TagString: Untagged
@@ -261,6 +262,18 @@ MonoBehaviour:
   AutoCreateRecorderIfNotFound: 0
   UsePrimaryRecorder: 1
   SetupDebugSpeaker: 0
+--- !u!114 &2665492640691109612
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6804688412452538130}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2b64ed814b44d2d9ae5a118a5473cb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7609648570768286184
 GameObject:
   m_ObjectHideFlags: 0
