@@ -9,6 +9,8 @@ namespace Refactor
         [Tooltip("The local player instance. Use this to know if the local player is represented in the Scene")]
         public static GameObject LocalPlayerInstance;
 
+        public PlayerEntity entity;
+
         private DeviceType _deviceType;
 
         private void Awake()
@@ -22,6 +24,8 @@ namespace Refactor
                 ? (DeviceType) deviceType
                 : DeviceType.Unknown;
 
+            entity.SetDevice(_deviceType);
+            
             DontDestroyOnLoad(this.gameObject);
         }
     }
