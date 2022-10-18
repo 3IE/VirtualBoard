@@ -13,5 +13,8 @@ namespace Utils
 
         /// <summary> Code for Hololens devices </summary>
         Hololens,
+        
+        /// <summary> Code for Unknown devices </summary>
+        Unknown,
     }
 }

@@ -8,10 +8,8 @@ namespace Board
     /// <summary>
     ///     Singleton class, holds the current state of the board
     /// </summary>
-    public class Board : MonoBehaviourPunCallbacks
+    public class Board : MonoBehaviour
     {
-        private const string GameVersion = "1";
-
         /// <summary>
         ///     Texture of the board
         /// </summary>
@@ -29,10 +27,6 @@ namespace Board
 
         private void Awake()
         {
-            PhotonNetwork.GameVersion = GameVersion;
-            PhotonNetwork.SetPlayerCustomProperties(new Hashtable { { "Device", DeviceType.VR } });
-            PhotonNetwork.ConnectUsingSettings();
-
             var r = GetComponent<Renderer>();
 
             texture                        = new Texture2D((int) textureSize.x, (int) textureSize.y);
@@ -40,19 +34,6 @@ namespace Board
             r.material.mainTexture         = texture;
 
             Instance = this;
-        }
-
-        /// <inheritdoc />
-        public override void OnConnectedToMaster()
-        {
-            Debug.Log("Connected to master");
-            PhotonNetwork.JoinRandomOrCreateRoom();
-        }
-
-        /// <inheritdoc />
-        public override void OnJoinedRoom()
-        {
-            Debug.Log("Joined room");
         }
     }
 }

@@ -211,9 +211,10 @@ namespace Board.Events
                 default:
                     throw new ArgumentException($"Invalid event code: {photonEvent.Code}");
             }
-            
-            Debug.Log($"Event : {code}");
+
+            #if DEBUG
             DebugPanel.Instance.AddReceived();
+            #endif
         }
 
         /// <inheritdoc />
