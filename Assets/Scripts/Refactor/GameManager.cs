@@ -1,5 +1,6 @@
 ﻿using ExitGames.Client.Photon;
 using Photon.Pun;
+using Photon.Voice.PUN;
 using UnityEngine;
 using Utils;
 using DeviceType = Utils.DeviceType;

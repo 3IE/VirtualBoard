@@ -1,4 +1,5 @@
-﻿using Photon.Pun;
+﻿using System;
+using Photon.Pun;
 using UnityEngine;
 
 namespace Refactor
@@ -8,6 +9,11 @@ namespace Refactor
         [SerializeField] private Transform playerTransform;
         [SerializeField] private Transform leftHandTransform;
         [SerializeField] private Transform rightHandTransform;
+
+        private void Awake()
+        {
+            DontDestroyOnLoad(gameObject);
+        }
 
         public void ReplaceHandsTransforms(Transform newLeftHandTransform, Transform newRightHandTransform)
         {
