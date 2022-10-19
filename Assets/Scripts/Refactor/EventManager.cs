@@ -18,7 +18,7 @@ namespace Refactor
     /// <inheritdoc />
     public class EventManager : MonoBehaviourPunCallbacks
     {
-        [SerializeField] private Tools tools;
+        [SerializeField] private Tools      tools;
         [SerializeField] private GameObject postItPrefab;
         [SerializeField] private GameObject onlinePingPrefab;
         [SerializeField] private GameObject board;
@@ -213,6 +213,12 @@ namespace Refactor
         {
             base.OnPlayerEnteredRoom(newPlayer);
 
+            #if DEBUG
+            if (newPlayer.CustomProperties.TryGetValue("Device", out object type)
+                && type is DeviceType deviceType and not DeviceType.Unknown)
+                DebugPanel.Instance.AddPlayer(deviceType);
+            #endif
+
             if (!PhotonNetwork.IsMasterClient) return;
 
             var raiseEventOptions = new RaiseEventOptions { TargetActors = new[] { newPlayer.ActorNumber } };
@@ -320,6 +326,9 @@ namespace Refactor
                     break;
 
                 case EventCode.SendNewPosition:
+                    break;
+
+                case EventCode.SendNewPlayerIn:
                     break;
 
                 case EventCode.SendNewPing:

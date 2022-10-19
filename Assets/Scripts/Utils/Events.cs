@@ -14,6 +14,9 @@ namespace Utils
         /// <summary> Code used for updating the position of a player </summary>
         SendNewPosition,
 
+        /// <summary> Code used for signaling a player joining the room </summary>
+        SendNewPlayerIn,
+
         /// <summary> Code used for creating a new ping </summary>
         SendNewPing,
 

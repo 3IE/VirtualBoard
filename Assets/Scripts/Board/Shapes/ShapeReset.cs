@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -13,6 +14,11 @@ namespace Board.Shapes
         ///     Called when the button is pushed
         /// </summary>
         public void OnPush()
+        {
+            Invoke(nameof(ResetShapes), 0f);
+        }
+
+        private void ResetShapes()
         {
             List<Shape> shapes = Shape.Shapes.Values.ToList();
 

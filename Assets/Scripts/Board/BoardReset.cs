@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Linq;
 using Board.Events;
 using ExitGames.Client.Photon;
@@ -19,6 +20,11 @@ namespace Board
         ///     Used to clean the board
         /// </summary>
         public void OnPush()
+        {
+            Invoke(nameof(ResetBoard), 0f);
+        }
+        
+        private void ResetBoard()
         {
             Color   c   = Tools.Tools.Instance.baseColor;
             Color[] arr = board.texture.GetPixels();

@@ -36,11 +36,11 @@ namespace Refactor
         public override void OnCreatedRoom()
         {
             Debug.Log("Created room");
-            
+
             #if DEBUG
             DebugPanel.Instance.SetConnected(true);
             #endif
-            
+
             base.OnCreatedRoom();
             InstantiatePlayer();
         }
@@ -48,11 +48,11 @@ namespace Refactor
         public override void OnJoinedRoom()
         {
             Debug.Log("Joined room");
-            
+
             #if DEBUG
             DebugPanel.Instance.SetConnected(true);
             #endif
-            
+
             base.OnJoinedRoom();
             InstantiatePlayer();
         }
@@ -77,6 +77,11 @@ namespace Refactor
                 var entity = player.GetComponent<PlayerEntity>();
                 entity.SetDevice(DeviceType.VR);
                 entity.ReplaceHandsTransforms(leftInteractor, rightInteractor);
+                
+                #if DEBUG
+                DebugPanel.Instance.SetConnected(true);
+                DebugPanel.Instance.AddPlayer(DeviceType.VR);
+                #endif
             }
             else
             {
