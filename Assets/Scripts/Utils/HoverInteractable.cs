@@ -1,16 +1,14 @@
-using System;
 using UnityEngine;
 
 namespace Utils
 {
     /// <summary>
-    /// Utility class used for object we want to highlight when a controller hovers over them
+    ///     Utility class used for object we want to highlight when a controller hovers over them
     /// </summary>
     public class HoverInteractable : MonoBehaviour
     {
-        private Material _mat;
-
-        private static readonly int Hovered = Shader.PropertyToID("_hovered");
+        private static readonly int      Hovered = Shader.PropertyToID("_hovered");
+        private                 Material _mat;
 
         private void Start()
         {
@@ -18,7 +16,7 @@ namespace Utils
         }
 
         /// <summary>
-        /// Called when a controller hovers over this object
+        ///     Called when a controller hovers over this object
         /// </summary>
         public void Hover()
         {
@@ -26,7 +24,7 @@ namespace Utils
         }
 
         /// <summary>
-        /// Called when a controller stops hovering over this object
+        ///     Called when a controller stops hovering over this object
         /// </summary>
         public void HoverExit()
         {

@@ -1163,7 +1163,7 @@ public partial class @XRIDefaultInputActions : IInputActionCollection2, IDisposa
                 {
                     ""name"": """",
                     ""id"": ""5226a07e-bb48-4161-80fa-c61f79e2208c"",
-                    ""path"": ""<XRController>{LeftHand}/Primary2DAxis"",
+                    ""path"": ""<XRController>{RightHand}/Primary2DAxis"",
                     ""interactions"": """",
                     ""processors"": ""StickDeadzone"",
                     ""groups"": """",

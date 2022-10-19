@@ -7,15 +7,15 @@ using UnityEngine;
 namespace Utils
 {
     /// <summary>
-    /// Singleton class, shows the current state of the session for debug purposes.
+    ///     Singleton class, shows the current state of the session for debug purposes.
     /// </summary>
     /// WARNING: This class is for debugging purposes only and should not be used in production.
     /// TODO: Remove the DEBUG preprocessor directive to remove this object from the build.
     public class DebugPanel : MonoBehaviour
     {
-#if DEBUG
+        #if DEBUG
         /// <summary>
-        /// Instance of the class
+        ///     Instance of the class
         /// </summary>
         public static DebugPanel Instance { get; private set; }
 
@@ -25,6 +25,8 @@ namespace Utils
         [SerializeField] private TextMeshProUGUI time;
         [SerializeField] private TextMeshProUGUI connectionTime;
         [SerializeField] private TextMeshProUGUI ping;
+        [SerializeField] private TextMeshProUGUI sent;
+        [SerializeField] private TextMeshProUGUI received;
 
         [SerializeField] private TextMeshProUGUI vrNb;
         [SerializeField] private TextMeshProUGUI arNb;
@@ -53,6 +55,8 @@ namespace Utils
         private float _startConnectionTime;
 
         private int _nbPing;
+        private int _nbSent;
+        private int _nbReceived;
 
         private int _vrNbValue;
         private int _arNbValue;
@@ -84,6 +88,7 @@ namespace Utils
         private void Start()
         {
             SetConnected(false);
+
             //InvokeRepeating(nameof(SendPing), .2f, .2f);
         }
 
@@ -91,12 +96,13 @@ namespace Utils
         private void Update()
         {
             _deltaTime += (Time.deltaTime - _deltaTime) * 0.1f;
-            _pingTime = PhotonNetwork.NetworkingClient.LoadBalancingPeer.RoundTripTime;
+            _pingTime  =  PhotonNetwork.NetworkingClient.LoadBalancingPeer.RoundTripTime;
 
-            var fps = 1.0f / _deltaTime;
+            float fps = 1.0f / _deltaTime;
 
             framerate.text = Mathf.Ceil(fps).ToString(CultureInfo.InvariantCulture);
-            time.text = $"{Time.unscaledTime:0.000}";
+            time.text      = $"{Time.unscaledTime:0.000}";
+
             if (!_connected)
                 connectionTime.text = $"{Time.unscaledTime - _startConnectionTime:0.000}";
 
@@ -108,7 +114,7 @@ namespace Utils
         #region SETTERS
 
         /// <summary>
-        /// Sets <see cref="_connected"/> to the value of <c>connected</c>
+        ///     Sets <see cref="_connected" /> to the value of <c>connected</c>
         /// </summary>
         /// <param name="connected"> value to assign</param>
         public void SetConnected(bool connected)
@@ -120,7 +126,7 @@ namespace Utils
         }
 
         /// <summary>
-        /// Updates the debug panel to add a player
+        ///     Updates the debug panel to add a player
         /// </summary>
         /// <param name="deviceType"> type of player to add </param>
         /// <exception cref="ArgumentOutOfRangeException"> Occurs when the given argument is an unknown value </exception>
@@ -131,19 +137,22 @@ namespace Utils
                 case DeviceType.VR:
                     AddVrPlayer();
                     break;
+
                 case DeviceType.AR:
                     AddArPlayer();
                     break;
+
                 case DeviceType.Hololens:
                     AddHoloPlayer();
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(deviceType), deviceType, null);
             }
         }
 
         /// <summary>
-        /// Updates the debug panel to remove a player
+        ///     Updates the debug panel to remove a player
         /// </summary>
         /// <param name="deviceType"> type of player to add </param>
         /// <exception cref="ArgumentOutOfRangeException"> Occurs when the given argument is an unknown value </exception>
@@ -154,12 +163,15 @@ namespace Utils
                 case DeviceType.VR:
                     RemoveVrPlayer();
                     break;
+
                 case DeviceType.AR:
                     RemoveArPlayer();
                     break;
+
                 case DeviceType.Hololens:
                     RemoveHoloPlayer();
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(deviceType), deviceType, null);
             }
@@ -201,17 +213,30 @@ namespace Utils
             UpdateHoloNb();
         }
 
+        public void AddSent()
+        {
+            _nbSent++;
+            UpdateSent();
+        }
+        
+        public void AddReceived()
+        {
+            _nbReceived++;
+            UpdateReceived();
+        }
+        
         /// <summary>
-        /// Used to update the debug panel to add a message about a player being sent 
+        ///     Used to update the debug panel to add a message about a player being sent
         /// </summary>
         public void AddPlayerSent()
         {
+            AddSent();
             _playerSentValue++;
             UpdatePlayerSent();
         }
 
         /// <summary>
-        /// Used to update the debug panel to add a message about a player being received 
+        ///     Used to update the debug panel to add a message about a player being received
         /// </summary>
         public void AddPlayerReceived()
         {
@@ -220,16 +245,17 @@ namespace Utils
         }
 
         /// <summary>
-        /// Used to update the debug panel to add a message about an object being sent 
+        ///     Used to update the debug panel to add a message about an object being sent
         /// </summary>
         public void AddObjectSent()
         {
+            AddSent();
             _objectSentValue++;
             UpdateObjectSent();
         }
 
         /// <summary>
-        /// Used to update the debug panel to add a message about an object being received 
+        ///     Used to update the debug panel to add a message about an object being received
         /// </summary>
         public void AddObjectReceived()
         {
@@ -238,7 +264,7 @@ namespace Utils
         }
 
         /// <summary>
-        /// Used to update the debug panel to add an object
+        ///     Used to update the debug panel to add an object
         /// </summary>
         public void AddObject()
         {
@@ -247,7 +273,7 @@ namespace Utils
         }
 
         /// <summary>
-        /// Used to update the debug panel to remove an object
+        ///     Used to update the debug panel to remove an object
         /// </summary>
         public void RemoveObject()
         {
@@ -256,7 +282,7 @@ namespace Utils
         }
 
         /// <summary>
-        /// Used to update the debug panel to add a custom object
+        ///     Used to update the debug panel to add a custom object
         /// </summary>
         public void AddCustom()
         {
@@ -265,7 +291,7 @@ namespace Utils
         }
 
         /// <summary>
-        /// Used to update the debug panel to remove a custom object
+        ///     Used to update the debug panel to remove a custom object
         /// </summary>
         public void RemoveCustom()
         {
@@ -274,16 +300,17 @@ namespace Utils
         }
 
         /// <summary>
-        /// Used to update the debug panel to add a message about the board being sent 
+        ///     Used to update the debug panel to add a message about the board being sent
         /// </summary>
         public void AddBoardSent()
         {
+            AddSent();
             _boardSentValue++;
             UpdateBoardSent();
         }
 
         /// <summary>
-        /// Used to update the debug panel to add a message about the board being received 
+        ///     Used to update the debug panel to add a message about the board being received
         /// </summary>
         public void AddBoardReceived()
         {
@@ -313,6 +340,16 @@ namespace Utils
         private void UpdateHoloNb()
         {
             holoNb.text = _holoNbValue.ToString();
+        }
+        
+        private void UpdateSent()
+        {
+            sent.text = _nbSent.ToString();
+        }
+        
+        private void UpdateReceived()
+        {
+            received.text = _nbReceived.ToString();
         }
 
         private void UpdatePlayerSent()
@@ -357,12 +394,12 @@ namespace Utils
 
         #endregion
 
-#else
+        #else
     private void Awake()
     {
         Destroy(gameObject);
     }
 
-#endif
+        #endif
     }
 }

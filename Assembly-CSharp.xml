@@ -1,0 +1,1077 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Assembly-CSharp</name>
+    </assembly>
+    <members>
+        <member name="T:Board.Shapes.ShapeReset">
+            <summary>
+                Utility class used to reset the texture of the board
+            </summary>
+        </member>
+        <member name="M:Board.Shapes.ShapeReset.OnPush">
+            <summary>
+                Called when the button is pushed
+            </summary>
+        </member>
+        <member name="T:Board.Shapes.Cylinder">
+            <inheritdoc />
+        </member>
+        <member name="M:Board.Shapes.Cylinder.Initialize">
+            <inheritdoc />
+        </member>
+        <member name="T:Board.Shapes.Shape">
+            <summary>
+                3D Object which can be spawned in the scene
+            </summary>
+        </member>
+        <member name="F:Board.Shapes.Shape.Shapes">
+            <summary>
+                Holds a list of the existing shapes with their <see cref="F:Board.Shapes.Shape._id" /> as a key
+            </summary>
+        </member>
+        <member name="F:Board.Shapes.Shape.Interactors">
+            <summary>
+                List of interactors currently holding this shape
+            </summary>
+        </member>
+        <member name="F:Board.Shapes.Shape.Mat">
+            <summary>
+                Material of the object
+            </summary>
+        </member>
+        <member name="F:Board.Shapes.Shape.ShapeId">
+            <summary>
+                Id corresponding to the type of this shape
+            </summary>
+        </member>
+        <member name="M:Board.Shapes.Shape.NumberOfShapes">
+            <summary>
+                Returns the number of shapes currently existing
+            </summary>
+            <returns> number of shapes </returns>
+        </member>
+        <member name="M:Board.Shapes.Shape.OnHoverEnter(UnityEngine.XR.Interaction.Toolkit.HoverEnterEventArgs)">
+            <summary>
+                Is called when an interactor hovers over this shape
+            </summary>
+            <param name="args"> Properties tied to the event </param>
+        </member>
+        <member name="M:Board.Shapes.Shape.OnHoverExit(UnityEngine.XR.Interaction.Toolkit.HoverExitEventArgs)">
+            <summary>
+                Is called when an interactor stops hovering over this shape
+            </summary>
+            <param name="args"> Properties tied to the event </param>
+        </member>
+        <member name="M:Board.Shapes.Shape.OnSelect(UnityEngine.XR.Interaction.Toolkit.SelectEnterEventArgs)">
+            <summary>
+                Is called when an interactor selects this shape
+            </summary>
+            <param name="args"> Properties tied to the event </param>
+        </member>
+        <member name="M:Board.Shapes.Shape.OnDeselect(UnityEngine.XR.Interaction.Toolkit.SelectExitEventArgs)">
+            <summary>
+                Is called when an interactor lets go of this shape
+            </summary>
+            <param name="args"> Properties tied to the event </param>
+        </member>
+        <member name="M:Board.Shapes.Shape.SendNewObject">
+            <summary>
+                Sends a signal to create an object with these parameters
+            </summary>
+        </member>
+        <member name="M:Board.Shapes.Shape.ReceiveNewObject(System.Object[])">
+            <summary>
+                Receives a signal to create an object with these parameters
+            </summary>
+            <param name="data"> the transform and id of the object </param>
+        </member>
+        <member name="M:Board.Shapes.Shape.SendTransform">
+            <summary>
+                Sends the new transform of the object to the other clients
+            </summary>
+        </member>
+        <member name="M:Board.Shapes.Shape.ReceiveTransform(System.Object[])">
+            <summary>
+                Gets the new transform of the object from the server and applies it to the object.
+            </summary>
+        </member>
+        <member name="M:Board.Shapes.Shape.SendDestroy">
+            <summary>
+                Tells the other clients to destroy this object
+            </summary>
+        </member>
+        <member name="M:Board.Shapes.Shape.ReceiveDestroy(System.Int32)">
+            <summary>
+                Destroy the object with the corresponding id
+            </summary>
+        </member>
+        <member name="M:Board.Shapes.Shape.SendOwnership">
+            <summary>
+                Warns the other clients that this object can't be modified
+            </summary>
+        </member>
+        <member name="M:Board.Shapes.Shape.ReceiveOwnership(System.Object[])">
+            <summary>
+                Update this object so that it can't be modified until told otherwise
+            </summary>
+        </member>
+        <member name="M:Board.Shapes.Shape.ReceiveCounter(System.Int32)">
+            <summary>
+                Sets the counter for the creation of new objects
+            </summary>
+        </member>
+        <member name="M:Board.Shapes.Shape.Move">
+            <summary>
+                Moves the object along the ray of the controller selecting it
+            </summary>
+        </member>
+        <member name="M:Board.Shapes.Shape.Resize">
+            <summary>
+                Resizes the object according to the distance between the two controllers
+            </summary>
+        </member>
+        <member name="M:Board.Shapes.Shape.Rotate">
+            <summary>
+                Rotates the object according to the angle of the current controller
+            </summary>
+        </member>
+        <member name="M:Board.Shapes.Shape.CheckForCollision(UnityEngine.Vector3)">
+            <summary>
+                Checks if the object is still valid at a specific position
+            </summary>
+        </member>
+        <member name="M:Board.Shapes.Shape.CheckCast">
+            <summary>
+                Applies a raycast corresponding to the shape of the object
+            </summary>
+            <returns> The number of hits </returns>
+        </member>
+        <member name="M:Board.Shapes.Shape.GetPositionFromHit(UnityEngine.RaycastHit)">
+            <summary>
+                Gets the position of the object from the hit
+            </summary>
+            <param name="hit"> point the raycast touched </param>
+            <returns> the position of the object </returns>
+        </member>
+        <member name="M:Board.Shapes.Shape.UpdateSize">
+            <summary>
+                Updates the size of the object
+            </summary>
+        </member>
+        <member name="T:Board.Shapes.CustomShape">
+            <inheritdoc />
+        </member>
+        <member name="M:Board.Shapes.CustomShape.Initialize">
+            <inheritdoc />
+        </member>
+        <member name="M:Board.Shapes.CustomShape.Init">
+            <summary>
+                Loads the custom shapes into a dictionary
+            </summary>
+            TODO: change the method to load from server instead of local path
+        </member>
+        <member name="M:Board.Shapes.CustomShape.Create(System.Byte,UnityEngine.Material)">
+            <summary>
+                Creates a new custom shape
+            </summary>
+            <param name="id"> id of the type of shape </param>
+            <param name="material"> material to give to the object </param>
+            <returns> the newly created object </returns>
+        </member>
+        <member name="T:Board.Shapes.ShapeSelector">
+            <summary>
+                Singleton class, handles the input for the shapes.
+            </summary>
+        </member>
+        <member name="F:Board.Shapes.ShapeSelector.currentShape">
+            <summary>
+                shape currently held by the player
+            </summary>
+        </member>
+        <member name="F:Board.Shapes.ShapeSelector.leftInteractor">
+            <summary>
+                Left interactor
+            </summary>
+        </member>
+        <member name="P:Board.Shapes.ShapeSelector.Instance">
+            <summary>
+                Instance of the class
+            </summary>
+        </member>
+        <member name="M:Board.Shapes.ShapeSelector.StartChangeDistance">
+            <summary>
+                Allows the user to change the distance between him and the object without moving
+            </summary>
+        </member>
+        <member name="M:Board.Shapes.ShapeSelector.StopChangeDistance">
+            <summary>
+                Removes the possibility to change the distance between the user and the object and allow him to move
+            </summary>
+        </member>
+        <member name="M:Board.Shapes.ShapeSelector.SelectCube">
+            <summary>
+                Sets the currently spawnable shape to be a cube
+            </summary>
+        </member>
+        <member name="M:Board.Shapes.ShapeSelector.SelectCylinder">
+            <summary>
+                Sets the currently spawnable shape to be a cylinder
+            </summary>
+        </member>
+        <member name="M:Board.Shapes.ShapeSelector.SelectSphere">
+            <summary>
+                Sets the currently spawnable shape to be a sphere
+            </summary>
+        </member>
+        <member name="M:Board.Shapes.ShapeSelector.SelectCustomShape">
+            <summary>
+                Selects a custom shape.
+            </summary>
+            TODO: Find a way to select custom shape via UI
+            TODO: Find a way to determine id based on obj file (load at start and attributes at that time?)
+        </member>
+        <member name="M:Board.Shapes.ShapeSelector.GetShape(System.Byte)">
+            <summary>
+                Returns the shape corresponding to <c>shapeId</c>
+            </summary>
+            <param name="shapeId"> id of the shape we are searching for </param>
+            <returns> corresponding shape </returns>
+        </member>
+        <member name="M:Board.Shapes.ShapeSelector.GetShape">
+            <summary>
+                Returns the shape corresponding to <see cref="F:Board.Shapes.ShapeSelector._index"/>
+            </summary>
+            <returns> corresponding shape </returns>
+        </member>
+        <member name="T:Board.Shapes.Cube">
+            <inheritdoc />
+        </member>
+        <member name="F:Board.Shapes.Cube.Size">
+            <summary>
+                size of the shape
+            </summary>
+        </member>
+        <member name="M:Board.Shapes.Cube.Initialize">
+            <summary>
+                Initialises some parameters of the shape
+            </summary>
+            <remarks> Is called through <see cref="M:Board.Shapes.Cube.Start" /> </remarks>
+        </member>
+        <member name="M:Board.Shapes.Cube.CheckForCollision(UnityEngine.Vector3)">
+            <inheritdoc />
+        </member>
+        <member name="M:Board.Shapes.Cube.CheckCast">
+            <inheritdoc />
+        </member>
+        <member name="M:Board.Shapes.Cube.GetPositionFromHit(UnityEngine.RaycastHit)">
+            <inheritdoc />
+        </member>
+        <member name="M:Board.Shapes.Cube.UpdateSize">
+            <inheritdoc />
+        </member>
+        <member name="T:Board.Shapes.Sphere">
+            <inheritdoc />
+        </member>
+        <member name="M:Board.Shapes.Sphere.Rotate">
+            <summary>
+                This object does not need to be rotated as it is a sphere.
+            </summary>
+            <remarks> Does nothing </remarks>
+        </member>
+        <member name="M:Board.Shapes.Sphere.CheckForCollision(UnityEngine.Vector3)">
+            <inheritdoc />
+        </member>
+        <member name="M:Board.Shapes.Sphere.CheckCast">
+            <inheritdoc />
+        </member>
+        <member name="M:Board.Shapes.Sphere.GetPositionFromHit(UnityEngine.RaycastHit)">
+            <inheritdoc />
+        </member>
+        <member name="M:Board.Shapes.Sphere.UpdateSize">
+            <inheritdoc />
+        </member>
+        <member name="T:Board.Chat.Chat">
+            <inheritdoc cref="T:Photon.Chat.IChatClientListener" />
+        </member>
+        <member name="M:Board.Chat.Chat.DebugReturn(ExitGames.Client.Photon.DebugLevel,System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:Board.Chat.Chat.OnDisconnected">
+            <inheritDoc />
+        </member>
+        <member name="M:Board.Chat.Chat.OnConnected">
+            <inheritDoc />
+        </member>
+        <member name="M:Board.Chat.Chat.OnChatStateChange(Photon.Chat.ChatState)">
+            <inheritDoc />
+        </member>
+        <member name="M:Board.Chat.Chat.OnGetMessages(System.String,System.String[],System.Object[])">
+            <inheritDoc />
+        </member>
+        <member name="M:Board.Chat.Chat.OnPrivateMessage(System.String,System.Object,System.String)">
+            <inheritDoc />
+        </member>
+        <member name="M:Board.Chat.Chat.OnSubscribed(System.String[],System.Boolean[])">
+            <inheritDoc />
+        </member>
+        <member name="M:Board.Chat.Chat.OnUnsubscribed(System.String[])">
+            <inheritDoc />
+        </member>
+        <member name="M:Board.Chat.Chat.OnStatusUpdate(System.String,System.Int32,System.Boolean,System.Object)">
+            <inheritDoc />
+        </member>
+        <member name="M:Board.Chat.Chat.OnUserSubscribed(System.String,System.String)">
+            <inheritDoc />
+        </member>
+        <member name="M:Board.Chat.Chat.OnUserUnsubscribed(System.String,System.String)">
+            <inheritDoc />
+        </member>
+        <member name="T:Board.Events.EventManager">
+            <inheritdoc />
+        </member>
+        <member name="M:Board.Events.EventManager.OnRoomEvent(Utils.EventCode,System.Object)">
+            <summary>
+            </summary>
+            <param name="eventCode"></param>
+            <param name="data"> Unused </param>
+            <exception cref="T:System.ArgumentException"></exception>
+        </member>
+        <member name="M:Board.Events.EventManager.OnEnable">
+            <inheritdoc />
+        </member>
+        <member name="M:Board.Events.EventManager.OnDisable">
+            <inheritdoc />
+        </member>
+        <member name="M:Board.Events.EventManager.OnPlayerEnteredRoom(Photon.Realtime.Player)">
+            <inheritdoc />
+        </member>
+        <member name="M:Board.Events.EventManager.OnPlayerLeftRoom(Photon.Realtime.Player)">
+            <inheritdoc />
+        </member>
+        <member name="M:Board.Events.EventManager.OnJoinedRoom">
+            <inheritdoc />
+        </member>
+        <member name="M:Board.Events.EventManager.OnDisconnected(Photon.Realtime.DisconnectCause)">
+            <inheritdoc />
+        </member>
+        <member name="T:Board.Events.PlayerEvents">
+            <summary>
+                Utility class used to delegate the events concerning players <seealso cref="T:Board.Events.EventManager" />
+            </summary>
+        </member>
+        <member name="F:Board.Events.PlayerEvents.Pings">
+            <summary>
+                List of currently existing pings
+            </summary>
+        </member>
+        <member name="F:Board.Events.PlayerEvents.PostIts">
+            <summary>
+                List of currently existing post-its
+            </summary>
+        </member>
+        <member name="M:Board.Events.PlayerEvents.SetupPrefabs(UnityEngine.GameObject,UnityEngine.GameObject,UnityEngine.GameObject)">
+            <summary>
+                Method used to initialize some properties
+            </summary>
+            <param name="postItPrefab"> prefab used to instantiate post-its </param>
+            <param name="onlinePingPrefab"> prefab used to instantiate pings </param>
+            <param name="board"> game object holding the <see cref="T:Board.Board" /> script </param>
+        </member>
+        <member name="M:Board.Events.PlayerEvents.ReceiveNewPostIt(System.Object[])">
+            <summary>
+                Called when a new post-it is received
+            </summary>
+            <param name="data"> array holding the position and the text of the post-it </param>
+        </member>
+        <member name="M:Board.Events.PlayerEvents.ReceivePing(UnityEngine.Vector2)">
+            <summary>
+                Called when a new ping is received
+            </summary>
+            <param name="position"> position of the ping </param>
+        </member>
+        <member name="M:Board.Events.PlayerEvents.Clear">
+            <summary>
+                Removes all pings and post-its from the board
+            </summary>
+        </member>
+        <member name="T:Board.Board">
+            <summary>
+                Singleton class, holds the current state of the board
+            </summary>
+        </member>
+        <member name="F:Board.Board.texture">
+            <summary>
+                Texture of the board
+            </summary>
+        </member>
+        <member name="F:Board.Board.textureSize">
+            <summary>
+                Size of the texture
+            </summary>
+        </member>
+        <member name="P:Board.Board.Instance">
+            <summary>
+                Instance of the class
+            </summary>
+        </member>
+        <member name="M:Board.Board.OnConnectedToMaster">
+            <inheritdoc />
+        </member>
+        <member name="M:Board.Board.OnJoinedRoom">
+            <inheritdoc />
+        </member>
+        <member name="T:Board.Tools.WritingTool">
+            <summary>
+                Base class for the tools writing on the board
+            </summary>
+        </member>
+        <member name="F:Board.Tools.WritingTool.penSize">
+            <summary>
+                Size used to know the number of pixels we should modify
+            </summary>
+        </member>
+        <member name="F:Board.Tools.WritingTool.CanDraw">
+            <summary>
+                Boolean used to know if the tool is touching the board
+            </summary>
+        </member>
+        <member name="F:Board.Tools.WritingTool.Controller">
+            <summary>
+                Controller holding the tool
+            </summary>
+        </member>
+        <member name="F:Board.Tools.WritingTool.TouchedLast">
+            <summary>
+                Boolean used to know if the tool touched the board last frame
+            </summary>
+        </member>
+        <member name="M:Board.Tools.WritingTool.UpdateRotation">
+            <summary>
+                Locks the rotation of the tool if it's touching the board
+            </summary>
+        </member>
+        <member name="M:Board.Tools.WritingTool.HoverTool">
+            <summary>
+                highlights the item
+            </summary>
+        </member>
+        <member name="M:Board.Tools.WritingTool.HoverExitTool">
+            <summary>
+                Stops highlighting the item
+            </summary>
+        </member>
+        <member name="M:Board.Tools.WritingTool.OnSelected(UnityEngine.XR.Interaction.Toolkit.SelectEnterEventArgs)">
+            <summary>
+                Called when this tool is selected by a controller
+            </summary>
+            <param name="args"> properties tied to this event </param>
+        </member>
+        <member name="M:Board.Tools.WritingTool.OnDeselected">
+            <summary>
+                Called when the controller lets go of this tool
+            </summary>
+        </member>
+        <member name="T:Board.Tools.Eraser">
+            <inheritdoc />
+        </member>
+        <member name="M:Board.Tools.Eraser.Initialize">
+            <inheritdoc />
+        </member>
+        <member name="M:Board.Tools.Eraser.SendModification(System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:Board.Tools.Eraser.GenerateShape">
+            <inheritdoc />
+        </member>
+        <member name="T:Board.Tools.Marker">
+            <inheritdoc />
+        </member>
+        <member name="F:Board.Tools.Marker.LastTouchPos">
+            <summary>
+                Position on the board touched last
+            </summary>
+        </member>
+        <member name="M:Board.Tools.Marker.Initialize">
+            <summary>
+                Method called during start used to initialize the component
+            </summary>
+        </member>
+        <member name="M:Board.Tools.Marker.InBound(System.Int32,System.Int32)">
+            <summary>
+                We check if we are in the boundaries of the board
+            </summary>
+            <param name="x"> The x coordinate of the point where the marker touches the board </param>
+            <param name="y"> The y coordinate of the point where the marker touches the board </param>
+            <returns>
+                <see langword="true" /> if we are in the boundaries of the board
+                <see langword="false" /> otherwise
+            </returns>
+        </member>
+        <member name="M:Board.Tools.Marker.Draw">
+            <summary>
+                Check if we are touching the board
+                if we are not, return <see langword="false" />
+                otherwise draw while touching (interpolation used to avoid drawing only dots) and return <see langword="true" />
+                we send the modifications at each frame
+            </summary>
+        </member>
+        <member name="M:Board.Tools.Marker.GenerateShape">
+            <summary>
+                Generates a color array
+            </summary>
+            <returns> color array </returns>
+        </member>
+        <member name="M:Board.Tools.Marker.SendModification(System.Int32,System.Int32)">
+            <summary>
+                Sends a modification to the other players
+            </summary>
+            <param name="x"> x coordinate of the starting point of the modification </param>
+            <param name="y"> y coordinate of the starting point of the modification </param>
+        </member>
+        <member name="M:Board.Tools.Marker.ModifyTexture(System.Int32,System.Int32,System.Single,System.Single,UnityEngine.Color[],System.Single)">
+            <summary>
+                Applies a modification between two points on the texture of the board
+            </summary>
+            <param name="x"> x coordinate of the starting point </param>
+            <param name="y"> y coordinate of the starting point </param>
+            <param name="destX"> x coordinate of the ending point </param>
+            <param name="destY"> y coordinate of the ending point </param>
+            <param name="colors"> color array to apply at each step between the two points </param>
+            <param name="size"> size of the array </param>
+        </member>
+        <member name="M:Board.Tools.Marker.ModifyTexture(Board.Tools.Modification)">
+            <summary>
+                Applies a modification
+            </summary>
+            <param name="modification"> Modification to apply </param>
+        </member>
+        <member name="M:Board.Tools.Marker.AddModification(Board.Tools.Modification)">
+            <summary>
+                Modifies the board's texture and notifies the GPU to update its rendering
+            </summary>
+            <param name="modification"> modification to apply </param>
+        </member>
+        <member name="T:Board.Tools.Modification">
+            <summary>
+                Class used to represent a modification done to the texture of the board
+            </summary>
+        </member>
+        <member name="F:Board.Tools.Modification.Color">
+            <summary>
+                new color of the pixels
+            </summary>
+        </member>
+        <member name="F:Board.Tools.Modification.DestX">
+            <summary>
+                x coordinate of the destination point
+            </summary>
+        </member>
+        <member name="F:Board.Tools.Modification.DestY">
+            <summary>
+                y coordinate of the destination point
+            </summary>
+        </member>
+        <member name="F:Board.Tools.Modification.PenSize">
+            <summary>
+                size of the square to modify
+            </summary>
+        </member>
+        <member name="F:Board.Tools.Modification.X">
+            <summary>
+                x coordinate of the starting point
+            </summary>
+        </member>
+        <member name="F:Board.Tools.Modification.Y">
+            <summary>
+                y coordinate of the starting point
+            </summary>
+        </member>
+        <member name="M:Board.Tools.Modification.#ctor(System.Int32,System.Int32,System.Single,System.Single,UnityEngine.Color,System.Single)">
+            <summary>
+                Constructor
+            </summary>
+            <param name="x"> x coordinate of the starting point </param>
+            <param name="y"> y coordinate of the starting point </param>
+            <param name="destX"> x coordinate of the destination point </param>
+            <param name="destY"> y coordinate of the destination point </param>
+            <param name="color"> new color of the pixels </param>
+            <param name="penSize"> size of the square to modify </param>
+        </member>
+        <member name="M:Board.Tools.Modification.#ctor(System.Object)">
+            <summary>
+                Constructor used when receiving data from the network
+            </summary>
+            <param name="data"> object array holding the data used to create the object </param>
+        </member>
+        <member name="T:Board.Tools.Tools">
+            <summary>
+                Singleton class, holds a list of parameters for the tools
+            </summary>
+        </member>
+        <member name="F:Board.Tools.Tools.coverage">
+            <summary>
+                How much we want to interpolate the draw between two frames (lower values means more data is covered)
+            </summary>
+        </member>
+        <member name="F:Board.Tools.Tools.marker">
+            <summary>
+                Instance of the marker
+            </summary>
+        </member>
+        <member name="F:Board.Tools.Tools.eraser">
+            <summary>
+                Instance of the eraser
+            </summary>
+        </member>
+        <member name="F:Board.Tools.Tools.baseColor">
+            <summary>
+                Base color of the board
+            </summary>
+        </member>
+        <member name="P:Board.Tools.Tools.Instance">
+            <summary>
+                Instance of this class
+            </summary>
+        </member>
+        <member name="M:Board.Tools.Tools.UpdateGPU">
+            <summary>
+                Updates the GPU rendering of the board's rendering every <see cref="F:Board.Tools.Tools.gpuRefreshRate" />
+                The update is done only if the value of <see cref="F:Board.Tools.Tools.Modified" /> has been changed
+            </summary>
+        </member>
+        <member name="M:Board.Tools.Tools.GenerateSquare(UnityEngine.Color,System.Single)">
+            <summary>
+                Generates an array of colors
+            </summary>
+            <param name="color"> color used to populate the array </param>
+            <param name="penSize"> size of the array </param>
+            <returns> the array created </returns>
+        </member>
+        <member name="T:Board.Tools.ToolWheelController">
+            <summary>
+                Utility class used to select a tool
+            </summary>
+            <remarks> DO NOT USE </remarks>
+        </member>
+        <member name="T:Board.BoardReset">
+            <summary>
+                Utility class to reset the texture of the board
+            </summary>
+        </member>
+        <member name="M:Board.BoardReset.OnPush">
+            <summary>
+                Used to clean the board
+            </summary>
+        </member>
+        <member name="T:Board.Walls.WallMask">
+            <summary>
+                Utility class used to update the wall's shader
+            </summary>
+        </member>
+        <member name="T:Board.Walls.CutoutObject">
+            <summary>
+                Utility class used to update the wall's shader
+            </summary>
+        </member>
+        <member name="T:Board.Lever">
+            <summary>
+                Utility class tied to an object used to adjust the height of the board
+            </summary>
+        </member>
+        <member name="T:UI.VRMenu">
+            <summary>
+                Menu used to display information for the user
+            </summary>
+        </member>
+        <member name="M:UI.VRMenu.ThrowAway">
+            <summary>
+                If the menu is thrown with at sufficient speed (>throwThreshold)
+                it will fade out and disable itself
+            </summary>
+        </member>
+        <member name="M:UI.VRMenu.Open">
+            <summary>
+                Opens the menu, reset its inertia
+            </summary>
+        </member>
+        <member name="M:UI.VRMenu.Close">
+            <summary>
+                Close the menu
+            </summary>
+        </member>
+        <member name="M:UI.VRMenu.SwitchPanel(System.Int32)">
+            <summary>
+                Switches the active panel to the one specified by the index
+            </summary>
+            <param name="index"></param>
+        </member>
+        <member name="T:Utils.EventCode">
+            <summary>
+                Enum holding the different codes used for communication between the different clients
+            </summary>
+        </member>
+        <member name="F:Utils.EventCode.SendNewPostIt">
+            <summary> Code used for creating a new post-it </summary>
+        </member>
+        <member name="F:Utils.EventCode.SendNewPosition">
+            <summary> Code used for updating the position of a player </summary>
+        </member>
+        <member name="F:Utils.EventCode.SendNewPing">
+            <summary> Code used for creating a new ping </summary>
+        </member>
+        <member name="F:Utils.EventCode.Marker">
+            <summary> Code used for sending a modification made by the marker </summary>
+        </member>
+        <member name="F:Utils.EventCode.Eraser">
+            <summary> Code used for sending a modification made by the eraser </summary>
+        </member>
+        <member name="F:Utils.EventCode.Texture">
+            <summary> Code used for sending the whole texture </summary>
+        </member>
+        <member name="F:Utils.EventCode.SendNewObject">
+            <summary> Code used for creating a new object </summary>
+        </member>
+        <member name="F:Utils.EventCode.SendDestroy">
+            <summary> Code used for destroying an object </summary>
+        </member>
+        <member name="F:Utils.EventCode.SendTransform">
+            <summary> Code used for updating the transform of an object </summary>
+        </member>
+        <member name="F:Utils.EventCode.SendOwnership">
+            <summary> Code used for updating the ownership of an object </summary>
+        </member>
+        <member name="F:Utils.EventCode.SendCounter">
+            <summary> Code used to set the counter for the creation of objects </summary>
+        </member>
+        <member name="T:Utils.DebugPanel">
+            <summary>
+                Singleton class, shows the current state of the session for debug purposes.
+            </summary>
+            WARNING: This class is for debugging purposes only and should not be used in production.
+            TODO: Remove the DEBUG preprocessor directive to remove this object from the build.
+        </member>
+        <member name="P:Utils.DebugPanel.Instance">
+            <summary>
+                Instance of the class
+            </summary>
+        </member>
+        <member name="M:Utils.DebugPanel.SetConnected(System.Boolean)">
+            <summary>
+                Sets <see cref="F:Utils.DebugPanel._connected" /> to the value of <c>connected</c>
+            </summary>
+            <param name="connected"> value to assign</param>
+        </member>
+        <member name="M:Utils.DebugPanel.AddPlayer(Utils.DeviceType)">
+            <summary>
+                Updates the debug panel to add a player
+            </summary>
+            <param name="deviceType"> type of player to add </param>
+            <exception cref="T:System.ArgumentOutOfRangeException"> Occurs when the given argument is an unknown value </exception>
+        </member>
+        <member name="M:Utils.DebugPanel.RemovePlayer(Utils.DeviceType)">
+            <summary>
+                Updates the debug panel to remove a player
+            </summary>
+            <param name="deviceType"> type of player to add </param>
+            <exception cref="T:System.ArgumentOutOfRangeException"> Occurs when the given argument is an unknown value </exception>
+        </member>
+        <member name="M:Utils.DebugPanel.AddPlayerSent">
+            <summary>
+                Used to update the debug panel to add a message about a player being sent
+            </summary>
+        </member>
+        <member name="M:Utils.DebugPanel.AddPlayerReceived">
+            <summary>
+                Used to update the debug panel to add a message about a player being received
+            </summary>
+        </member>
+        <member name="M:Utils.DebugPanel.AddObjectSent">
+            <summary>
+                Used to update the debug panel to add a message about an object being sent
+            </summary>
+        </member>
+        <member name="M:Utils.DebugPanel.AddObjectReceived">
+            <summary>
+                Used to update the debug panel to add a message about an object being received
+            </summary>
+        </member>
+        <member name="M:Utils.DebugPanel.AddObject">
+            <summary>
+                Used to update the debug panel to add an object
+            </summary>
+        </member>
+        <member name="M:Utils.DebugPanel.RemoveObject">
+            <summary>
+                Used to update the debug panel to remove an object
+            </summary>
+        </member>
+        <member name="M:Utils.DebugPanel.AddCustom">
+            <summary>
+                Used to update the debug panel to add a custom object
+            </summary>
+        </member>
+        <member name="M:Utils.DebugPanel.RemoveCustom">
+            <summary>
+                Used to update the debug panel to remove a custom object
+            </summary>
+        </member>
+        <member name="M:Utils.DebugPanel.AddBoardSent">
+            <summary>
+                Used to update the debug panel to add a message about the board being sent
+            </summary>
+        </member>
+        <member name="M:Utils.DebugPanel.AddBoardReceived">
+            <summary>
+                Used to update the debug panel to add a message about the board being received
+            </summary>
+        </member>
+        <member name="T:Utils.PrintVar">
+            <summary>
+                Class used to display a console in game
+            </summary>
+        </member>
+        <member name="M:Utils.PrintVar.Print(System.UInt32,System.String[])">
+            <summary>
+                Prints on a specific line
+            </summary>
+            <param name="n"> Index of the line </param>
+            <param name="args"> Content to print </param>
+        </member>
+        <member name="M:Utils.PrintVar.Print(System.String[])">
+            <summary>
+                Prints on the next line available
+            </summary>
+            <param name="args"> Content to print </param>
+        </member>
+        <member name="M:Utils.PrintVar.Clear">
+            <summary>
+                Resets the displayed content
+            </summary>
+        </member>
+        <member name="M:Utils.PrintVar.PrintDebug(System.UInt32,System.String[])">
+            <summary>
+                Prints on a specific line
+            </summary>
+            <param name="n"> Index of the line </param>
+            <param name="args"> Content to print </param>
+        </member>
+        <member name="M:Utils.PrintVar.PrintDebug(System.String[])">
+            <summary>
+                Prints on the next line available
+            </summary>
+            <param name="args"> Content to print </param>
+        </member>
+        <member name="T:Utils.DestroyOnGrab">
+            <summary>
+                Utility class used to destroy an object when grabbed
+            </summary>
+        </member>
+        <member name="M:Utils.DestroyOnGrab.OnGrab">
+            <summary>
+                Called when the object is grabbed
+            </summary>
+        </member>
+        <member name="T:Utils.DeviceType">
+            <summary>
+                Enum holding the codes for the different types of devices
+            </summary>
+        </member>
+        <member name="F:Utils.DeviceType.VR">
+            <summary> Code for VR devices </summary>
+        </member>
+        <member name="F:Utils.DeviceType.AR">
+            <summary> Code for AR devices </summary>
+        </member>
+        <member name="F:Utils.DeviceType.Hololens">
+            <summary> Code for Hololens devices </summary>
+        </member>
+        <member name="T:Utils.HoverInteractable">
+            <summary>
+                Utility class used for object we want to highlight when a controller hovers over them
+            </summary>
+        </member>
+        <member name="M:Utils.HoverInteractable.Hover">
+            <summary>
+                Called when a controller hovers over this object
+            </summary>
+        </member>
+        <member name="M:Utils.HoverInteractable.HoverExit">
+            <summary>
+                Called when a controller stops hovering over this object
+            </summary>
+        </member>
+        <member name="T:Users.PlayerEntity">
+            <summary>
+                Utility class used to hold data about a user
+            </summary>
+        </member>
+        <member name="F:Users.PlayerEntity.username">
+            <summary> username of the user </summary>
+        </member>
+        <member name="F:Users.PlayerEntity.photonId">
+            <summary> id of the user </summary>
+        </member>
+        <member name="F:Users.PlayerEntity.device">
+            <summary> device of the user </summary>
+        </member>
+        <member name="M:Users.PlayerEntity.SetValues(Utils.DeviceType,System.Int32,System.String)">
+            <summary>
+                Sets the data of this user
+            </summary>
+            <param name="deviceType"> device of the user </param>
+            <param name="id"> id of the user </param>
+            <param name="user"> username </param>
+        </member>
+        <member name="M:Users.PlayerEntity.UpdateTransform(UnityEngine.Vector3,UnityEngine.Quaternion)">
+            <summary>
+                Updates the position of the player
+            </summary>
+            <param name="position"> new position </param>
+            <param name="rotation"> new rotation </param>
+        </member>
+        <member name="T:Users.VrPlayerManager">
+            <summary>
+                Utility class used to handle the inputs of the player
+            </summary>
+        </member>
+        <member name="M:Users.VrPlayerManager.OpenMenu(UnityEngine.InputSystem.InputAction.CallbackContext)">
+            <summary>
+                Opens the menu in front of the player, or closes it if it's already open
+            </summary>
+            <param name="obj"></param>
+        </member>
+        <member name="M:Users.VrPlayerManager.TryPing(UnityEngine.InputSystem.InputAction.CallbackContext)">
+            <summary>
+                Tries to place a ping on the board from the player's hand,
+                if the player pings a ping, it'll delete this ping
+            </summary>
+        </member>
+        <member name="M:Users.VrPlayerManager.Ping(UnityEngine.Vector3)">
+            <summary>
+                Places a ping on the board and declare its position to the other players
+            </summary>
+            <param name="position">Position of the ping</param>
+        </member>
+        <member name="T:Dummiesman.OBJObjectBuilder.ObjLoopHash">
+            <summary>
+            Loop hasher helper class
+            </summary>
+        </member>
+        <member name="M:Dummiesman.ImageLoader.SetNormalMap(UnityEngine.Texture2D@)">
+            <summary>
+            Converts a DirectX normal map to Unitys expected format
+            </summary>
+            <param name="tex">Texture to convert</param>
+        </member>
+        <member name="M:Dummiesman.ImageLoader.LoadTexture(System.IO.Stream,Dummiesman.ImageLoader.TextureFormat)">
+            <summary>
+            Loads a texture from a stream
+            </summary>
+            <param name="stream">The stream</param>
+            <param name="format">The format **NOT UNITYENGINE.TEXTUREFORMAT**</param>
+            <returns></returns>
+        </member>
+        <member name="M:Dummiesman.ImageLoader.LoadTexture(System.String)">
+            <summary>
+            Loads a texture from a file
+            </summary>
+            <param name="fn"></param>
+            <param name="normalMap"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dummiesman.OBJLoaderHelper.EnableMaterialTransparency(UnityEngine.Material)">
+            <summary>
+            Enables transparency mode on standard materials
+            </summary>
+        </member>
+        <member name="M:Dummiesman.OBJLoaderHelper.FastFloatParse(System.String)">
+            <summary>
+            Modified from https://codereview.stackexchange.com/a/76891. Faster than float.Parse
+            </summary>
+        </member>
+        <member name="M:Dummiesman.OBJLoaderHelper.FastIntParse(System.String)">
+            <summary>
+            Modified from http://cc.davelozinski.com/c-sharp/fastest-way-to-convert-a-string-to-an-int. Faster than int.Parse
+            </summary>
+        </member>
+        <member name="F:Dummiesman.OBJLoader.SplitMode">
+            <summary>
+            Determines how objects will be created
+            </summary>
+        </member>
+        <member name="M:Dummiesman.OBJLoader.LoadMaterialLibrary(System.String)">
+            <summary>
+            Helper function to load mtllib statements
+            </summary>
+            <param name="mtlLibPath"></param>
+        </member>
+        <member name="M:Dummiesman.OBJLoader.Load(System.IO.Stream)">
+            <summary>
+            Load an OBJ file from a stream. No materials will be loaded, and will instead be supplemented by a blank white material.
+            </summary>
+            <param name="input">Input OBJ stream</param>
+            <returns>Returns a GameObject represeting the OBJ file, with each imported object as a child.</returns>
+        </member>
+        <member name="M:Dummiesman.OBJLoader.Load(System.IO.Stream,System.IO.Stream)">
+            <summary>
+            Load an OBJ and MTL file from a stream.
+            </summary>
+            <param name="input">Input OBJ stream</param>
+            /// <param name="mtlInput">Input MTL stream</param>
+            <returns>Returns a GameObject represeting the OBJ file, with each imported object as a child.</returns>
+        </member>
+        <member name="M:Dummiesman.OBJLoader.Load(System.String,System.String)">
+            <summary>
+            Load an OBJ and MTL file from a file path.
+            </summary>
+            <param name="path">Input OBJ path</param>
+            /// <param name="mtlPath">Input MTL path</param>
+            <returns>Returns a GameObject represeting the OBJ file, with each imported object as a child.</returns>
+        </member>
+        <member name="M:Dummiesman.OBJLoader.Load(System.String)">
+            <summary>
+            Load an OBJ file from a file path. This function will also attempt to load the MTL defined in the OBJ file.
+            </summary>
+            <param name="path">Input OBJ path</param>
+            <returns>Returns a GameObject represeting the OBJ file, with each imported object as a child.</returns>
+        </member>
+        <member name="M:Dummiesman.ImageLoaderHelper.VerifyFormat(UnityEngine.Texture2D)">
+            <summary>
+            Verifies that a 32bpp texture is actuall 32bpp
+            </summary>
+            <returns>The verified texture</returns>
+        </member>
+        <member name="M:Dummiesman.ImageLoaderHelper.FillPixelArray(UnityEngine.Color32[],System.Byte[],System.Int32,System.Boolean)">
+            <summary>
+            A cluster for creating arrays of Unity Color 
+            </summary>
+            <param name="fillArray"></param>
+            <param name="pixelData"></param>
+            <param name="bytesPerPixel"></param>
+            <param name="bgra"></param>
+        </member>
+        <member name="M:MTLLoader.TextureLoadFunction(System.String,System.Boolean)">
+            <summary>
+            The texture loading function. Overridable for stream loading purposes.
+            </summary>
+            <param name="path">The path supplied by the OBJ file, converted to OS path seperation</param>
+            <param name="isNormalMap">Whether the loader is requesting we convert this into a normal map</param>
+            <returns>Texture2D if found, or NULL if missing</returns>
+        </member>
+        <member name="M:MTLLoader.Load(System.IO.Stream)">
+            <summary>
+            Loads a *.mtl file
+            </summary>
+            <param name="input">The input stream from the MTL file</param>
+            <returns>Dictionary containing loaded materials</returns>
+        </member>
+        <member name="M:MTLLoader.Load(System.String)">
+            <summary>
+            Loads a *.mtl file
+            </summary>
+            <param name="path">The path to the MTL file</param>
+            <returns>Dictionary containing loaded materials</returns>
+        </member>
+    </members>
+</doc>
