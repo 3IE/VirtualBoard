@@ -11,21 +11,23 @@ namespace Refactor
 
         public PlayerEntity entity;
 
-        private DeviceType _deviceType;
+        [SerializeField] private DeviceType deviceType;
 
         private void Awake()
         {
             var photonView = GetComponent<PhotonView>();
-        
+
             if (photonView.IsMine)
                 LocalPlayerInstance = this.gameObject;
+            else
+            {
+                deviceType = photonView.Owner.CustomProperties.TryGetValue("Device", out object type)
+                    ? (DeviceType) type
+                    : DeviceType.Unknown;
 
-            _deviceType = photonView.Owner.CustomProperties.TryGetValue("DeviceType", out object deviceType)
-                ? (DeviceType) deviceType
-                : DeviceType.Unknown;
+                entity.SetDevice(this.deviceType);
+            }
 
-            entity.SetDevice(_deviceType);
-            
             DontDestroyOnLoad(this.gameObject);
         }
     }

@@ -1,7 +1,4 @@
-using ExitGames.Client.Photon;
-using Photon.Pun;
 using UnityEngine;
-using DeviceType = Utils.DeviceType;
 
 namespace Board
 {

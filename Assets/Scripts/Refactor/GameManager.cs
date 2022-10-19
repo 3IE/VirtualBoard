@@ -21,7 +21,7 @@ namespace Refactor
         private void Awake()
         {
             PhotonNetwork.SetPlayerCustomProperties(new Hashtable
-                                                        { { "device", deviceType } });
+                                                        { { "Device", deviceType } });
 
             Debug.Log("Connecting");
             PhotonNetwork.ConnectUsingSettings();
@@ -75,6 +75,7 @@ namespace Refactor
                 player.transform.SetParent(mainCamera);
 
                 var entity = player.GetComponent<PlayerEntity>();
+                entity.SetDevice(DeviceType.VR);
                 entity.ReplaceHandsTransforms(leftInteractor, rightInteractor);
             }
             else

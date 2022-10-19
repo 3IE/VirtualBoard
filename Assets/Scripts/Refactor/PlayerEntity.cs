@@ -38,7 +38,7 @@ namespace Refactor
         {
             if (stream.IsWriting)
             {
-                stream.SendNext(playerTransform.position);
+                stream.SendNext(transform.position);
                 stream.SendNext(playerTransform.rotation);
                 
                 stream.SendNext(leftHandTransform.position);
@@ -49,7 +49,7 @@ namespace Refactor
             }
             else
             {
-                playerTransform.position = (Vector3) stream.ReceiveNext();
+                transform.position = (Vector3) stream.ReceiveNext();
                 playerTransform.rotation = (Quaternion) stream.ReceiveNext();
                 
                 if (_isAr)
