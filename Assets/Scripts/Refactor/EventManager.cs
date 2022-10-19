@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using Board.Events;
 using Board.Shapes;
 using Board.Tools;
 using ExitGames.Client.Photon;
@@ -13,22 +13,15 @@ using Utils;
 using DeviceType = Utils.DeviceType;
 using EventCode = Utils.EventCode;
 
-namespace Board.Events
+namespace Refactor
 {
     /// <inheritdoc />
     public class EventManager : MonoBehaviourPunCallbacks
     {
-        [SerializeField] private Tools.Tools tools;
-        [SerializeField] private PhotonView  view;
-        [SerializeField] private Transform   otherPlayers;
-
-        [SerializeField] private GameObject vrPrefab;
-        [SerializeField] private GameObject arPrefab;
+        [SerializeField] private Tools      tools;
         [SerializeField] private GameObject postItPrefab;
         [SerializeField] private GameObject onlinePingPrefab;
         [SerializeField] private GameObject board;
-
-        private List<PlayerEntity> _others;
 
         #region ROOM_EVENTS
 
@@ -63,7 +56,7 @@ namespace Board.Events
                     break;
 
                 case EventCode.Texture:
-                    Board.Instance.texture.LoadImage(data as byte[]);
+                    Board.Board.Instance.texture.LoadImage(data as byte[]);
                     break;
 
                 default:
@@ -165,8 +158,6 @@ namespace Board.Events
 
         private void Start()
         {
-            _others = new List<PlayerEntity>();
-
             PlayerEvents.SetupPrefabs(postItPrefab, onlinePingPrefab, board);
         }
 
@@ -222,14 +213,17 @@ namespace Board.Events
         {
             base.OnPlayerEnteredRoom(newPlayer);
 
-            PlayerEntity playerEntity = AddPlayer(newPlayer);
-            _others.Add(playerEntity);
+            #if DEBUG
+            if (newPlayer.CustomProperties.TryGetValue("Device", out object type)
+                && type is DeviceType deviceType and not DeviceType.Unknown)
+                DebugPanel.Instance.AddPlayer(deviceType);
+            #endif
 
             if (!PhotonNetwork.IsMasterClient) return;
 
             var raiseEventOptions = new RaiseEventOptions { TargetActors = new[] { newPlayer.ActorNumber } };
 
-            byte[] content = board.GetComponent<Board>().texture.EncodeToPNG();
+            byte[] content = board.GetComponent<Board.Board>().texture.EncodeToPNG();
 
             PhotonNetwork.RaiseEvent((byte) EventCode.Texture, content, raiseEventOptions,
                                      SendOptions.SendReliable);
@@ -290,10 +284,6 @@ namespace Board.Events
 
             Debug.Log(otherPlayer.NickName + "left the room");
 
-            PlayerEntity playerEntity = _others.Find(x => x.photonId == otherPlayer.ActorNumber);
-            _others.Remove(playerEntity);
-            Destroy(playerEntity.gameObject);
-
             #if DEBUG
             DeviceType deviceType = otherPlayer.CustomProperties.ContainsKey("Device")
                 ? (DeviceType) otherPlayer.CustomProperties["Device"]
@@ -311,12 +301,6 @@ namespace Board.Events
             #endif
 
             VrPlayerManager.Connected = true;
-
-            view.ViewID = 0;
-            view.ViewID = PhotonNetwork.LocalPlayer.ActorNumber;
-
-            foreach (PlayerEntity playerEntity in PhotonNetwork.PlayerListOthers.ToList().Select(AddPlayer))
-                _others.Add(playerEntity);
         }
 
         /// <inheritdoc />
@@ -342,9 +326,9 @@ namespace Board.Events
                     break;
 
                 case EventCode.SendNewPosition:
-                    _others.Find(p => p.photonId == photonEvent.Sender)
-                           .UpdateObject(data as object[]);
+                    break;
 
+                case EventCode.SendNewPlayerIn:
                     break;
 
                 case EventCode.SendNewPing:
@@ -358,29 +342,6 @@ namespace Board.Events
             #if DEBUG
             DebugPanel.Instance.AddPlayerReceived();
             #endif
-        }
-
-        private PlayerEntity AddPlayer(Player newPlayer)
-        {
-            print(newPlayer.NickName + " joined the room.");
-
-            var device = (DeviceType) newPlayer.CustomProperties.GetValueOrDefault("Device");
-
-            GameObject entity = Instantiate(device == DeviceType.VR ? vrPrefab : arPrefab, new Vector3(0, 0, 0),
-                                            Quaternion.identity,                           otherPlayers);
-
-            var playerEntity = entity.GetComponent<PlayerEntity>();
-            var playerView   = entity.GetComponent<PhotonView>();
-
-            playerEntity.SetValues(device, newPlayer.ActorNumber, newPlayer.NickName);
-            playerView.ViewID = 0;
-            playerView.ViewID = newPlayer.ActorNumber;
-
-            #if DEBUG
-            DebugPanel.Instance.AddPlayer(device);
-            #endif
-
-            return playerEntity;
         }
 
         #endregion

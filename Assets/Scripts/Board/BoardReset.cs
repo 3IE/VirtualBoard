@@ -1,6 +1,11 @@
+using System.Collections;
 using System.Linq;
 using Board.Events;
+using ExitGames.Client.Photon;
+using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
+using EventCode = Utils.EventCode;
 
 namespace Board
 {
@@ -16,6 +21,11 @@ namespace Board
         /// </summary>
         public void OnPush()
         {
+            Invoke(nameof(ResetBoard), 0f);
+        }
+        
+        private void ResetBoard()
+        {
             Color   c   = Tools.Tools.Instance.baseColor;
             Color[] arr = board.texture.GetPixels();
 
@@ -25,6 +35,13 @@ namespace Board
             board.texture.Apply();
 
             PlayerEvents.Clear();
+            
+            byte[] content = board.texture.EncodeToPNG();
+            
+            var raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
+
+            PhotonNetwork.RaiseEvent((byte) EventCode.Texture, content, raiseEventOptions,
+                                     SendOptions.SendReliable);
         }
     }
 }
