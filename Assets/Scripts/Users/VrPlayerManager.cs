@@ -1,9 +1,7 @@
-using System;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using UI;
-using Unity.XR.Oculus;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Utils;
@@ -142,7 +140,7 @@ namespace Users
         {
             if (!Connected)
                 return;
-                    
+
             var raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
 
             PhotonNetwork.RaiseEvent((byte) EventCode.SendNewPing, position, raiseEventOptions,

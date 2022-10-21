@@ -21,15 +21,15 @@ namespace Users
         [SerializeField] private GameObject player;
         [SerializeField] private GameObject leftHand;
         [SerializeField] private GameObject rightHand;
+        private                  Transform  _leftTransform;
+        private                  Transform  _rightTransform;
 
         private Transform _transform;
-        private Transform _leftTransform;
-        private Transform _rightTransform;
 
         private void Awake()
         {
             _transform      = player.transform;
-            _leftTransform  = leftHand != null ? leftHand.transform : null;
+            _leftTransform  = leftHand  != null ? leftHand.transform : null;
             _rightTransform = rightHand != null ? rightHand.transform : null;
         }
 

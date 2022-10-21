@@ -35,6 +35,7 @@ namespace Board.Shapes
         [SerializeField] private InputActionReference changeDistance;
 
         [SerializeField] private TeleportationProvider teleportationProvider;
+
         //[SerializeField] private ContinuousMoveProviderBase continuousMoveProvider;
 
         [SerializeField] private Transform        shapesParent;
@@ -238,7 +239,7 @@ namespace Board.Shapes
         }
 
         /// <summary>
-        ///     Returns the shape corresponding to <see cref="_index"/>
+        ///     Returns the shape corresponding to <see cref="_index" />
         /// </summary>
         /// <returns> corresponding shape </returns>
         private GameObject GetShape()

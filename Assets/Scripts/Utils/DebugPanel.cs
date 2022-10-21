@@ -218,13 +218,13 @@ namespace Utils
             _nbSent++;
             UpdateSent();
         }
-        
+
         public void AddReceived()
         {
             _nbReceived++;
             UpdateReceived();
         }
-        
+
         /// <summary>
         ///     Used to update the debug panel to add a message about a player being sent
         /// </summary>
@@ -341,12 +341,12 @@ namespace Utils
         {
             holoNb.text = _holoNbValue.ToString();
         }
-        
+
         private void UpdateSent()
         {
             sent.text = _nbSent.ToString();
         }
-        
+
         private void UpdateReceived()
         {
             received.text = _nbReceived.ToString();

@@ -1,21 +1,18 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
-using Random = UnityEngine.Random;
 
 namespace Utils
 {
     public class PhysicsButton : MonoBehaviour
     {
+        private static readonly  int      Pushed = Animator.StringToHash("pushed");
         [SerializeField] private Collider bodyButtonCollider;
         [SerializeField] private Collider buttonCollider;
-        
+
         [SerializeField] private AudioSource pressedSound;
         [SerializeField] private AudioSource releasedSound;
         [SerializeField] private UnityEvent  onPressed;
         [SerializeField] private Animator    animator;
-
-        private static readonly int Pushed = Animator.StringToHash("pushed");
 
         private void Awake()
         {
@@ -27,7 +24,7 @@ namespace Utils
             animator.SetBool(Pushed, true);
             Pressed();
         }
-        
+
         private void OnTriggerExit(Collider other)
         {
             animator.SetBool(Pushed, false);

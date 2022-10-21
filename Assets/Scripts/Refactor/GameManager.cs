@@ -1,6 +1,5 @@
 ﻿using ExitGames.Client.Photon;
 using Photon.Pun;
-using Photon.Voice.PUN;
 using UnityEngine;
 using Utils;
 using DeviceType = Utils.DeviceType;
@@ -67,26 +66,24 @@ namespace Refactor
             else if (PlayerManager.LocalPlayerInstance is null)
             {
                 Debug.LogFormat("We are Instantiating LocalPlayer from {0}\nPrefab name: {1}",
-                                SceneManagerHelper.ActiveSceneName, this.playerPrefab.name);
+                                SceneManagerHelper.ActiveSceneName, playerPrefab.name);
 
                 // we're in a room. spawn a character for the local player. it gets synced by using PhotonNetwork.Instantiate
                 GameObject player =
-                    PhotonNetwork.Instantiate(this.playerPrefab.name, mainCamera.position, mainCamera.rotation);
+                    PhotonNetwork.Instantiate(playerPrefab.name, mainCamera.position, mainCamera.rotation);
                 player.transform.SetParent(mainCamera);
 
                 var entity = player.GetComponent<PlayerEntity>();
                 entity.SetDevice(DeviceType.VR);
                 entity.ReplaceHandsTransforms(leftInteractor, rightInteractor);
-                
+
                 #if DEBUG
                 DebugPanel.Instance.SetConnected(true);
                 DebugPanel.Instance.AddPlayer(DeviceType.VR);
                 #endif
             }
             else
-            {
                 Debug.LogFormat("Ignoring scene load for {0}", SceneManagerHelper.ActiveSceneName);
-            }
         }
     }
 }

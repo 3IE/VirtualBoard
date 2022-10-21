@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Linq;
 using Board.Events;
 using ExitGames.Client.Photon;
@@ -23,7 +22,7 @@ namespace Board
         {
             Invoke(nameof(ResetBoard), 0f);
         }
-        
+
         private void ResetBoard()
         {
             Color   c   = Tools.Tools.Instance.baseColor;
@@ -35,9 +34,9 @@ namespace Board
             board.texture.Apply();
 
             PlayerEvents.Clear();
-            
+
             byte[] content = board.texture.EncodeToPNG();
-            
+
             var raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
 
             PhotonNetwork.RaiseEvent((byte) EventCode.Texture, content, raiseEventOptions,

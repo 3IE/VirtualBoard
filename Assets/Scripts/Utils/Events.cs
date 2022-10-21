@@ -42,7 +42,7 @@ namespace Utils
 
         /// <summary> Code used for updating the ownership of an object </summary>
         SendOwnership,
-        
+
         /// <summary> Code used to set the counter for the creation of objects </summary>
         SendCounter,
 

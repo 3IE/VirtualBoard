@@ -133,6 +133,37 @@ namespace Refactor
 
         #endregion
 
+        #region PLAYER_EVENTS
+
+        private void OnPlayerEvent(EventCode eventCode, object data, EventData photonEvent)
+        {
+            switch (eventCode)
+            {
+                case EventCode.SendNewPostIt:
+                    PlayerEvents.ReceiveNewPostIt(data as object[]);
+                    break;
+
+                case EventCode.SendNewPosition:
+                    break;
+
+                case EventCode.SendNewPlayerIn:
+                    break;
+
+                case EventCode.SendNewPing:
+                    PlayerEvents.ReceivePing((Vector2) data);
+                    break;
+
+                default:
+                    throw new ArgumentException("Unknown event code");
+            }
+
+            #if DEBUG
+            DebugPanel.Instance.AddPlayerReceived();
+            #endif
+        }
+
+        #endregion
+
         #region UNITY
 
         /// <inheritdoc />
@@ -310,37 +341,6 @@ namespace Refactor
             PlayerEvents.Clear();
 
             Debug.LogError($"Disconnected from server: {cause}");
-        }
-
-        #endregion
-
-        #region PLAYER_EVENTS
-
-        private void OnPlayerEvent(EventCode eventCode, object data, EventData photonEvent)
-        {
-            switch (eventCode)
-            {
-                case EventCode.SendNewPostIt:
-                    PlayerEvents.ReceiveNewPostIt(data as object[]);
-                    break;
-
-                case EventCode.SendNewPosition:
-                    break;
-
-                case EventCode.SendNewPlayerIn:
-                    break;
-
-                case EventCode.SendNewPing:
-                    PlayerEvents.ReceivePing((Vector2) data);
-                    break;
-
-                default:
-                    throw new ArgumentException("Unknown event code");
-            }
-
-            #if DEBUG
-            DebugPanel.Instance.AddPlayerReceived();
-            #endif
         }
 
         #endregion
