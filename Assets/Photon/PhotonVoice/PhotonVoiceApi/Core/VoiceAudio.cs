@@ -35,22 +35,22 @@ namespace Photon.Voice
         public void Dispose() { }
     }
     /// <summary>Audio Reader interface.</summary>
-    /// Opposed to an IAudioPusher (which will push its audio data whenever it is ready), 
+    /// Opposed to an IAudioPusher (which will push its audio data whenever it is ready),
     /// an IAudioReader will deliver audio data when it is "pulled" (it's Read function is called).
-	public interface IAudioReader<T> : IDataReader<T>, IAudioDesc
+    public interface IAudioReader<T> : IDataReader<T>, IAudioDesc
     {
     }
 
     /// <summary>Audio Pusher interface.</summary>
     /// Opposed to an IAudioReader (which will deliver audio data when it is "pulled"),
     /// an IAudioPusher will push its audio data whenever it is ready,
-	public interface IAudioPusher<T> : IAudioDesc
-	{
+    public interface IAudioPusher<T> : IAudioDesc
+    {
         /// <summary>Set the callback function used for pushing data.</summary>
         /// <param name="callback">Callback function to use.</param>
         /// <param name="bufferFactory">Buffer factory used to create the buffer that is pushed to the callback</param>
         void SetCallback(Action<T[]> callback, ObjectFactory<T[], int> bufferFactory);
-	}
+    }
 
     /// <summary>Interface for an outgoing audio stream.</summary>
     /// A LocalVoice always brings a LevelMeter and a VoiceDetector, which you can access using this interface.
@@ -110,7 +110,7 @@ namespace Photon.Voice
             }
         }
 
-    	public virtual AudioUtil.IVoiceDetector VoiceDetector { get { return voiceDetector; } }
+        public virtual AudioUtil.IVoiceDetector VoiceDetector { get { return voiceDetector; } }
         protected AudioUtil.VoiceDetector<T> voiceDetector;
         protected AudioUtil.VoiceDetectorCalibration<T> voiceDetectorCalibration;
         public virtual AudioUtil.ILevelMeter LevelMeter { get { return levelMeter; } }
@@ -135,7 +135,7 @@ namespace Photon.Voice
             : base(voiceClient, encoder, id, voiceInfo, channelId,
                   voiceInfo.SamplingRate != 0 ? voiceInfo.FrameSize * audioSourceDesc.SamplingRate / voiceInfo.SamplingRate : voiceInfo.FrameSize
                   )
-        {            
+        {
             this.channels = voiceInfo.Channels;
             if (audioSourceDesc.SamplingRate != voiceInfo.SamplingRate)
             {
@@ -192,7 +192,7 @@ namespace Photon.Voice
     public class LocalVoiceAudioShort : LocalVoiceAudio<short>
     {
         internal LocalVoiceAudioShort(VoiceClient voiceClient, IEncoder encoder, byte id, VoiceInfo voiceInfo, IAudioDesc audioSourceDesc, int channelId)
-            : base(voiceClient, encoder, id, voiceInfo,audioSourceDesc, channelId)
+            : base(voiceClient, encoder, id, voiceInfo, audioSourceDesc, channelId)
         {
             // these 2 processors go after resampler
             this.levelMeter = new AudioUtil.LevelMeterShort(this.info.SamplingRate, this.info.Channels); //1/2 sec

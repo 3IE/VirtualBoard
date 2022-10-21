@@ -15,13 +15,11 @@ namespace Photon.Voice.Unity.UtilityScripts
     /// <summary>
     /// Helper to request Microphone permission on Android or iOS.
     /// </summary>
-    [RequireComponent(typeof(Recorder))]
     public class MicrophonePermission : VoiceComponent
     {
-        private Recorder recorder;
-        #if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
+#if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
         private bool isRequesting;
-        #endif
+#endif
         private bool hasPermission;
 
         public static event Action<bool> MicrophonePermissionCallback;
@@ -42,9 +40,21 @@ namespace Photon.Voice.Unity.UtilityScripts
                 if (this.hasPermission != value)
                 {
                     this.hasPermission = value;
-                    if (this.hasPermission)
+                    if (this.hasPermission && this.autoStart)
                     {
-                        this.recorder.AutoStart = this.autoStart;
+                        var recorder = this.GetComponent<Recorder>();
+                        if (recorder != null)
+                        {
+                            if (!recorder.RecordingEnabled)
+                            {
+                                this.Logger.LogInfo("Starting recording automatically");
+                            }
+                            recorder.RecordingEnabled = true;
+                        }
+                        else
+                        {
+                            this.Logger.LogInfo("Recorder not found. Assign MicrophonePermission to an object with Recorder to automatically start recording");
+                        }
                     }
                 }
             }
@@ -53,12 +63,10 @@ namespace Photon.Voice.Unity.UtilityScripts
         protected override void Awake()
         {
             base.Awake();
-            this.recorder = this.GetComponent<Recorder>();
-            this.recorder.AutoStart = false;
             this.InitVoice();
         }
 
-        #if UNITY_IOS && !UNITY_EDITOR
+#if UNITY_IOS && !UNITY_EDITOR
         IEnumerator PermissionCheck()
         {
             this.isRequesting = true;
@@ -74,11 +82,11 @@ namespace Photon.Voice.Unity.UtilityScripts
                 this.HasPermission = false;
             }
         }
-        #endif
+#endif
 
         public void InitVoice()
         {
-            #if UNITY_ANDROID && !UNITY_EDITOR
+#if UNITY_ANDROID && !UNITY_EDITOR
             if (Permission.HasUserAuthorizedPermission(Permission.Microphone))
             {
                 this.HasPermission = true;
@@ -86,47 +94,47 @@ namespace Photon.Voice.Unity.UtilityScripts
             else
             {
                 this.Logger.LogInfo("Android Microphone Permission Request");
-                #if UNITY_2020_2_OR_NEWER
+#if UNITY_2020_2_OR_NEWER
                 var callbacks = new PermissionCallbacks();
                 callbacks.PermissionDenied += PermissionCallbacks_PermissionDenied;
                 callbacks.PermissionGranted += PermissionCallbacks_PermissionGranted;
                 callbacks.PermissionDeniedAndDontAskAgain += PermissionCallbacks_PermissionDeniedAndDontAskAgain;
                 Permission.RequestUserPermission(Permission.Microphone, callbacks);
-                #else
+#else
                 Permission.RequestUserPermission(Permission.Microphone);
-                #endif
+#endif
                 this.isRequesting = true;
             }
-            #elif UNITY_IOS && !UNITY_EDITOR
+#elif UNITY_IOS && !UNITY_EDITOR
             this.StartCoroutine(this.PermissionCheck());
-            #else
+#else
             this.HasPermission = true;
-            #endif
+#endif
         }
 
-        #if UNITY_ANDROID && !UNITY_EDITOR
-        #if UNITY_2020_2_OR_NEWER
+#if UNITY_ANDROID && !UNITY_EDITOR
+#if UNITY_2020_2_OR_NEWER
         internal void PermissionCallbacks_PermissionDeniedAndDontAskAgain(string permissionName)
         {
             this.isRequesting = false;
             this.HasPermission = false;
             this.Logger.LogInfo($"{permissionName} PermissionDeniedAndDontAskAgain");
         }
-     
+
         internal void PermissionCallbacks_PermissionGranted(string permissionName)
         {
             this.isRequesting = false;
             this.HasPermission = true;
             this.Logger.LogInfo($"{permissionName} PermissionGranted");
         }
-     
+
         internal void PermissionCallbacks_PermissionDenied(string permissionName)
         {
             this.isRequesting = false;
             this.HasPermission = false;
             this.Logger.LogInfo($"{permissionName} PermissionDenied");
         }
-        #else
+#else
         private void OnApplicationFocus(bool focus)
         {
             if (focus && this.isRequesting)
@@ -142,7 +150,7 @@ namespace Photon.Voice.Unity.UtilityScripts
                 this.isRequesting = false;
             }
         }
-        #endif
-        #endif
+#endif
+#endif
     }
 }

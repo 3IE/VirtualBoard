@@ -11,7 +11,7 @@ namespace POpusCodec
 
         private bool TisFloat;
         private int sizeofT;
-        
+
         private IntPtr _handle = IntPtr.Zero;
         private const int MaxFrameSize = 5760;
 
@@ -56,7 +56,7 @@ namespace POpusCodec
                 throw new OpusException(OpusStatusCode.AllocFail, "Memory was not allocated for the encoder");
             }
         }
-        
+
         private T[] buffer; // allocated for exactly 1 frame size as first valid frame received
         private FrameBuffer prevPacketData;
         bool prevPacketInvalid; // maybe false if prevPacket us null
@@ -68,13 +68,13 @@ namespace POpusCodec
             {
                 return EmptyBuffer;
             }
-            
+
             int numSamplesDecoded = 0;
 
             if (this.buffer == null)
             {
                 // on the first call we don't know frame size, use temporal buffer of maximal length
-                this.buffer = new T[MaxFrameSize * _channelCount];                
+                this.buffer = new T[MaxFrameSize * _channelCount];
             }
 
             bool packetInvalid;
@@ -117,7 +117,7 @@ namespace POpusCodec
                     {
                         numSamplesDecoded = TisFloat ?
                             Wrapper.opus_decode(_handle, prevPacketData, this.buffer as float[], 0, _channelCount) :
-                            Wrapper.opus_decode(_handle, prevPacketData, this.buffer as short[], 0, _channelCount);                        
+                            Wrapper.opus_decode(_handle, prevPacketData, this.buffer as short[], 0, _channelCount);
                         // prevPacketData is disposed below before copying packetData to it
                         regularDecode = true;
                     }
@@ -130,18 +130,18 @@ namespace POpusCodec
             }
             else
             {
-                #pragma warning disable 162
+#pragma warning disable 162
                 // decode or conceal current frame
                 numSamplesDecoded = TisFloat ?
                     Wrapper.opus_decode(_handle, packetData, this.buffer as float[], 0, _channelCount) :
                     Wrapper.opus_decode(_handle, packetData, this.buffer as short[], 0, _channelCount);
                 regularDecode = true;
-                #pragma warning restore 162
+#pragma warning restore 162
             }
 
             if (numSamplesDecoded == 0)
                 return EmptyBuffer;
-            
+
             if (this.buffer.Length != numSamplesDecoded * _channelCount)
             {
                 if (!regularDecode)
@@ -186,7 +186,7 @@ namespace POpusCodec
                 }
                 else
                 {
-                    // follow the same buffer initializatiopn pattern as in DecodeFrame() 
+                    // follow the same buffer initializatiopn pattern as in DecodeFrame()
                     if (this.buffer.Length != numSamplesDecoded * _channelCount)
                     {
                         // now that we know the frame size, allocate the buffer and copy data from temporal buffer

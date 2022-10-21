@@ -186,7 +186,7 @@ namespace Board.Tools
         /// <param name="modification"> Modification to apply </param>
         private void ModifyTexture(Modification modification)
         {
-            Color[] colors = Tools.GenerateSquare(modification.Color, penSize);
+            Color[] colors = Tools.GenerateSquare(modification.Color, modification.PenSize);
 
             ModifyTexture(modification.X,     modification.Y, modification.DestX,
                           modification.DestY, colors,

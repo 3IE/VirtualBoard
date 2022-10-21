@@ -9,7 +9,6 @@
 // ----------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace Photon.Voice
@@ -158,8 +157,8 @@ namespace Photon.Voice
             return f1.IsVertical != f2.IsVertical || f1.IsHorizontal != f2.IsHorizontal;
         }
 
-        // trivial implementation to avoid warnings CS0660 and CS0661 about missing overrides when == and != defined 
-        public override bool Equals(object obj) { return base.Equals(obj); } 
+        // trivial implementation to avoid warnings CS0660 and CS0661 about missing overrides when == and != defined
+        public override bool Equals(object obj) { return base.Equals(obj); }
         public override int GetHashCode() { return base.GetHashCode(); }
 
         public static Flip operator *(Flip f1, Flip f2)
@@ -317,7 +316,7 @@ namespace Photon.Voice
         public ImageBufferNativeAlloc(ImageBufferNativePool<ImageBufferNativeAlloc> pool, ImageBufferInfo info) : base(info)
         {
             this.pool = pool;
-            
+
             for (int i = 0; i < info.Stride.Length; i++)
             {
                 Planes[i] = Marshal.AllocHGlobal(info.Stride[i] * info.Height);

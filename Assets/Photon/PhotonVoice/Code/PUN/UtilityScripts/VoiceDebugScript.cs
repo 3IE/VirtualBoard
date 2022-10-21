@@ -1,4 +1,5 @@
-﻿namespace Photon.Voice.PUN.UtilityScripts
+﻿#if PUN_2_OR_NEWER
+namespace Photon.Voice.PUN.UtilityScripts
 {
     using Pun;
     using Unity;
@@ -13,7 +14,7 @@
     {
         private PhotonVoiceView photonVoiceView;
 
-        /// <summary> Make sure recorder.TransmitEnabled and recorder.IsRecording are true. </summary>
+        /// <summary> Make sure recorder.TransmitEnabled and recorder.RecordingEnabled are true. </summary>
         public bool ForceRecordingAndTransmission;
 
         /// <summary> Audio file to be broadcast when TestUsingAudioClip is enabled. </summary>
@@ -39,7 +40,7 @@
         private void Update()
         {
             this.MaxLogs();
-            if (this.photonVoiceView.IsRecorder)
+            if (this.photonVoiceView.RecorderInUse != null)
             {
                 if (this.TestUsingAudioClip)
                 {
@@ -52,20 +53,12 @@
                         this.photonVoiceView.RecorderInUse.SourceType = Recorder.InputSourceType.AudioClip;
                         this.photonVoiceView.RecorderInUse.AudioClip = this.TestAudioClip;
                         this.photonVoiceView.RecorderInUse.LoopAudioClip = true;
-                        if (this.photonVoiceView.RecorderInUse.RequiresRestart)
-                        {
-                            this.photonVoiceView.RecorderInUse.RestartRecording();
-                        }
-                        else
-                        {
-                            this.photonVoiceView.RecorderInUse.StartRecording();
-                        }
-                        this.photonVoiceView.RecorderInUse.TransmitEnabled = true;
+                        this.photonVoiceView.RecorderInUse.RestartRecording();
                     }
                 }
                 if (this.ForceRecordingAndTransmission)
                 {
-                    this.photonVoiceView.RecorderInUse.IsRecording = true;
+                    this.photonVoiceView.RecorderInUse.RecordingEnabled = true;
                     this.photonVoiceView.RecorderInUse.TransmitEnabled = true;
                 }
                 if (this.DisableVad)
@@ -78,41 +71,17 @@
         [ContextMenu("CantHearYou")]
         public void CantHearYou()
         {
-            if (!PhotonVoiceNetwork.Instance.Client.InRoom)
+            if (!PunVoiceClient.Instance.Client.InRoom)
             {
                 Debug.LogError("local voice client is not joined to a voice room");
             }
-            else if (!this.photonVoiceView.IsPhotonViewReady)
-            {
-                Debug.LogError("PhotonView is not ready yet; maybe PUN client is not joined to a room yet or this PhotonView is not valid");
-            }
-            else if (!this.photonVoiceView.IsSpeaker)
-            {
-                if (this.photonView.IsMine && !this.photonVoiceView.SetupDebugSpeaker)
-                {
-                    Debug.LogError("local object does not have SetupDebugSpeaker enabled");
-                    if (this.LocalDebug)
-                    {
-                        Debug.Log("setup debug speaker not enabled, enabling it now (1)");
-                        this.photonVoiceView.SetupDebugSpeaker = true;
-                        this.photonVoiceView.Setup();
-                    }
-                }
-                else
-                {
-                    Debug.LogError("locally not speaker (yet?) (1)");
-                    this.photonVoiceView.Setup();
-                }
-            }
             else
             {
-                if (!this.photonVoiceView.IsSpeakerLinked)
+                if (!this.photonVoiceView.SpeakerInUse.IsLinked)
                 {
                     Debug.LogError("locally speaker not linked, trying late linking & asking anyway");
-                    // late linking maybe
-                    PhotonVoiceNetwork.Instance.CheckLateLinking(this.photonVoiceView.SpeakerInUse, this.photonView.ViewID);
                 }
-                this.photonView.RPC("CantHearYou", this.photonView.Owner, PhotonVoiceNetwork.Instance.Client.CurrentRoom.Name, PhotonVoiceNetwork.Instance.Client.LoadBalancingPeer.ServerIpAddress, PhotonVoiceNetwork.Instance.Client.AppVersion);
+                this.photonView.RPC("CantHearYou", this.photonView.Owner, PunVoiceClient.Instance.Client.CurrentRoom.Name, PunVoiceClient.Instance.Client.LoadBalancingPeer.ServerIpAddress, PunVoiceClient.Instance.Client.AppVersion);
             }
         }
 
@@ -120,34 +89,34 @@
         private void CantHearYou(string roomName, string serverIp, string appVersion, PhotonMessageInfo photonMessageInfo)
         {
             string why;
-            if (!PhotonVoiceNetwork.Instance.Client.InRoom)
+            if (!PunVoiceClient.Instance.Client.InRoom)
             {
                 why = "voice client not in a room";
             }
-            else if (!PhotonVoiceNetwork.Instance.Client.CurrentRoom.Name.Equals(roomName))
+            else if (!PunVoiceClient.Instance.Client.CurrentRoom.Name.Equals(roomName))
             {
                 why = string.Format("voice client is on another room {0} != {1}",
-                    PhotonVoiceNetwork.Instance.Client.CurrentRoom.Name, roomName);
+                    PunVoiceClient.Instance.Client.CurrentRoom.Name, roomName);
             }
-            else if (!PhotonVoiceNetwork.Instance.Client.LoadBalancingPeer.ServerIpAddress.Equals(serverIp))
+            else if (!PunVoiceClient.Instance.Client.LoadBalancingPeer.ServerIpAddress.Equals(serverIp))
             {
                 why = string.Format("voice client is on another server {0} != {1}, maybe different Photon Cloud regions",
-                    PhotonVoiceNetwork.Instance.Client.LoadBalancingPeer.ServerIpAddress, serverIp);
+                    PunVoiceClient.Instance.Client.LoadBalancingPeer.ServerIpAddress, serverIp);
             }
-            else if (!PhotonVoiceNetwork.Instance.Client.AppVersion.Equals(appVersion))
+            else if (!PunVoiceClient.Instance.Client.AppVersion.Equals(appVersion))
             {
                 why = string.Format("voice client uses different AppVersion {0} != {1}",
-                    PhotonVoiceNetwork.Instance.Client.AppVersion, appVersion);
+                    PunVoiceClient.Instance.Client.AppVersion, appVersion);
             }
-            else if (!this.photonVoiceView.IsRecorder)
+            else if (this.photonVoiceView.RecorderInUse == null)
             {
                 why = "recorder not setup (yet?)";
-                this.photonVoiceView.Setup();
+                //this.photonVoiceView.Setup();
             }
-            else if (!this.photonVoiceView.RecorderInUse.IsRecording)
+            else if (!this.photonVoiceView.RecorderInUse.RecordingEnabled)
             {
                 why = "recorder is not recording";
-                this.photonVoiceView.RecorderInUse.IsRecording = true;
+                this.photonVoiceView.RecorderInUse.RecordingEnabled = true;
             }
             else if (!this.photonVoiceView.RecorderInUse.TransmitEnabled)
             {
@@ -174,16 +143,10 @@
             {
                 if (this.LocalDebug)
                 {
-                    if (this.photonVoiceView.IsSpeaker)
+                    if (this.photonVoiceView.SpeakerInUse != null)
                     {
                         why = "no idea why!, should be working (1)";
-                        this.photonVoiceView.RecorderInUse.RestartRecording(true);
-                    }
-                    else if (!this.photonVoiceView.SetupDebugSpeaker) // unreachable probably
-                    {
-                        why = "setup debug speaker not enabled, enabling it now (2)";
-                        this.photonVoiceView.SetupDebugSpeaker = true;
-                        this.photonVoiceView.Setup();
+                        this.photonVoiceView.RecorderInUse.RestartRecording();
                     }
                     else if (!this.photonVoiceView.RecorderInUse.DebugEchoMode)
                     {
@@ -193,7 +156,7 @@
                     else
                     {
                         why = "locally not speaker (yet?) (2)";
-                        this.photonVoiceView.Setup();
+                        //this.photonVoiceView.Setup();
                     }
                 }
                 else
@@ -204,7 +167,7 @@
             else
             {
                 why = "no idea why!, should be working (2)";
-                this.photonVoiceView.RecorderInUse.RestartRecording(true);
+                this.photonVoiceView.RecorderInUse.RestartRecording();
             }
             this.Reply(why, photonMessageInfo.Sender);
         }
@@ -224,19 +187,12 @@
         {
             if (this.IncreaseLogLevels)
             {
-                this.photonVoiceView.LogLevel = DebugLevel.ALL;
-                PhotonVoiceNetwork.Instance.LogLevel = DebugLevel.ALL;
-                PhotonVoiceNetwork.Instance.GlobalRecordersLogLevel = DebugLevel.ALL;
-                PhotonVoiceNetwork.Instance.GlobalSpeakersLogLevel = DebugLevel.ALL;
-                if (this.photonVoiceView.IsRecorder)
+                foreach (var l in FindObjectsOfType<VoiceLogger>())
                 {
-                    this.photonVoiceView.RecorderInUse.LogLevel = DebugLevel.ALL;
-                }
-                if (this.photonVoiceView.IsSpeaker)
-                {
-                    this.photonVoiceView.SpeakerInUse.LogLevel = DebugLevel.ALL;
+                    l.LogLevel = DebugLevel.ALL;
                 }
             }
         }
     }
 }
+#endif

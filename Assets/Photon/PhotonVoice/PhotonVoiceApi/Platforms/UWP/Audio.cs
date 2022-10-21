@@ -91,7 +91,7 @@ namespace Photon.Voice.UWP
 
             device.StartRecordingAsync(mep, (buf, flags) =>
             {
-                    //                    logger.LogInfo("[PV] [AI] " + buf.Length + ": " + BitConverter.ToString(buf, 0, buf.Length > 20 ? 20 : buf.Length));
+                // logger.LogInfo("[PV] [AI] " + buf.Length + ": " + BitConverter.ToString(buf, 0, buf.Length > 20 ? 20 : buf.Length));
                 if (buf != null)
                 {
                     var sb = bufferFactory.New(buf.Length / 2);

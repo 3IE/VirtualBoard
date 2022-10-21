@@ -314,7 +314,7 @@ namespace Photon.Voice
                     return endFloat(s as float[]);
                 }
             }
-            
+
             int processFloat(float[] s, float[] d)
             {
                 int dPos = 0;
@@ -864,7 +864,7 @@ namespace Photon.Voice
             /// <param name="durationMs">Duration of the calibration procedure (in milliseconds).</param>
             /// <param name="onCalibrated">Optional callback that is called after calibration is complete.</param>
             /// <remarks>
-            /// This activates the Calibration process. 
+            /// This activates the Calibration process.
             /// It will reset the given LevelMeter's AccumAvgPeakAmp (accumulated average peak amplitude),
             /// and when the duration has passed, use it for the VoiceDetector's detection threshold.
             /// </remarks>
@@ -1092,7 +1092,7 @@ namespace Photon.Voice
             /// <summary>Start calibration</summary>
             /// <param name="durationMs">Duration of the calibration procedure (in milliseconds).</param>
             /// <param name="onCalibrated">Called when calibration is complete. Parameter is new threshold value.</param>
-            /// This activates the Calibration process. 
+            /// This activates the Calibration process.
             /// It will reset the given LevelMeter's AccumAvgPeakAmp (accumulated average peak amplitude),
             /// and when the duration has passed, use it for the VoiceDetector's detection threshold.
             public void Calibrate(int durationMs, Action<float> onCalibrated = null)

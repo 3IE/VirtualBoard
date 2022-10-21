@@ -1,5 +1,195 @@
 Photon Voice 2 Change Log
 
+v2.50 (October 2022)
+   PUN2: v2.41 (PUN2.41) 
+   RT/lib:4.1.6.18f2
+   PhotonVoiceApi: revision 6358
+   Unity: 2019.4.39 or higher (supporting Android x86_64 and UWP ARM64)
+Migration Guide:
+  - Backup
+  - Remove Assets/Photon/PhotonVoice folder
+  - Import Voice2 asset
+  - Make sure that either a Speaker is attached to the prefab representing a voice (PhotonVoiceView or VoiceNetworkObject) or the Speaker prefab property is set in UnityVoiceClient, PunVoiceClient or FusionVoiceClient
+  - Update Speaker Play Delay in Editor if you used non-default Playback Delay Settings
+  - Set Recorder.RecordingEnabled to true if Recorder.AutoStart was true before the update
+  Fusion:
+  - Remove UnityVoiceClient (former VoiceConnection) and make sure that FusionVoiceClient component is attached (it should automatically replace no longer existing FusionVoiceBridge)
+  FMOD:
+  - Replace Speaker with SpeakerFMOD and remove missing script (no longer existing FMODSpeakerSetup)  
+  Code:
+  - Rename VoiceConnection -> UnityVoiceClient
+  - Rename PhotonVoiceNetwork -> PunVoiceClient
+  - Remove Logger.Is*Enabled checks
+  - Replace Recorder.IsRecording with RecordingEnabled
+  - Replace Recorder.MicrophonesEnumerator with an enumerator created with Platform.CreateAudioInEnumerator() in user code
+  - Replace Recorder.UnityMicrophoneDevice and Recorder.PhotonMicrophoneDeviceId with Recorder.MicrophoneDevice
+  - Replace Recorder.PlaybackDelayMinSoft with Recorder.PlayDelay and remove occurrences of PlaybackDelayMaxSoft and PlaybackDelayMaxHard
+  - Remove all occurrences of GlobalPlaybackDelayMinSoft, GlobalPlaybackDelayMaxSoft, GlobalPlaybackDelayMaxHard, PlaybackDelayMinSoft, PlaybackDelayMaxSoft, PlaybackDelayMaxHard
+  - Update other API calls according to the changes list below
+  - If the code taken from a Voice2 demo does not compile, see how this demo has changed in the package
+PhotonVoiceAPI:
+   BREAKING: AudioOutDelayControl<T>.OutPos and FMOD.AudioInEnumerator() signatures changed
+   FIXED: the output buffer cleanup procedure called OutWrite(zeroFrame) at least once in each AudioOutDelayControl.Service() call even if OutPos did not change (could be hundreds of times per sec. in Unity because Service() is called in Update())
+   FIXED: Unity MicWrapperPusher (using OnAudioFilterRead)
+   FIXED: PS4/PS5: Unity MicWrapper/MicWrapperPusher sampling rate selection from the fixed set supported by the platform
+   FIXED: OSX native audio input: AudioComponentInstanceDispose is called on audio unit when destroying component: other sounds ducked on capture initialization restore their normal level
+   CHANGED: LocalVoiceFramed<T>.PushData() does not skip audio processing and encoding if voiceClient is not connected (set TransmitEnabled to false to skip processing)
+   ADDED: LocalVoiceFramedBase.RemoveProcessor()
+VoiceConnection:
+   CHANGED: VoiceConnection is not instantiated directly, but is a base class for Unity, PUN and Fusion integration implementations: extended class needs to define how to use PrimaryRecorder and SpeakerPrefab
+   CHANGED: initialization: a component that owns or creates the Recorder (PUN.PhotonVoiceView or Fusion.VoiceNetworkObject or VoiceConnection instance itself owning PrimaryRecorder) calls VoiceConnection.AddRecorder() to register and initialize the Recorder
+   BREAKING: removed VoiceConnection.AutoCreateSpeakerIfNotFound, VoiceConnection does not create Speaker if it's not specified: SpeakerPrefab must be set for Speaker creation
+   BREAKING: removed SpeakerFactory, use SpeakerPrefab with proper Speaker implementation
+   ADDED: VoiceConnectionClient.UsePrimaryRecorder property (PUN and Fusion integrations start PrimaryRecorder directly if true)
+UnityVoiceClient:
+   CHANGED: UnityVoiceClient is a Unity integration extending VoiceConnection, it uses PrimaryRecorder for outgoing stream and instantiates Speakers from SpeakerPrefab
+   CHANGED: ignores UsePrimaryRecorder and always starts PrimaryRecorder as before
+   CHANGED: UnityVoiceClientEditor does not hide app settings when client is connected
+   ADDED: application settings can be optionally read from VoiceAppSettings scriptable object available in Editor
+PUN:
+   BREAKING: renamed PhotonVoiceNetwork -> PunVoiceClient
+   CHANGED: PunVoiceClient creates Recorder only if photonView.IsMine and always creates Speaker
+   ADDED: PrimaryRecorder started directly if VoiceConnection.UsePrimaryRecorder is set (PhotonVoiceView prefab is not required)
+   ADDED: SpeakerPrefab instantiated directly on PunVoiceClient object if userData is null (remote voice of PrimaryRecorder started directly)
+   REMOVED: PunVoiceClient.WorkInOfflineMode: Voice does not support offline mode   
+   REMOVED: PhotonVoiceView.UsePrimaryRecorder: PrimaryRecorder is used automatically if the Recorder is not found in PhotonVoiceView object hierarchy
+   CHANGED: PhotonVoiceView Speaker initialization: either the Speaker found in the object hierarchy or PunVoiceClient.SpeakerPrefab is used
+   ADDED: PunVoiceClient.UsePunAppSettings public property (this setting was only available in editor)
+   BREAKING: removed PhotonVoiceView serialized 'speakerInUse' and 'recorderInUse': it's no longer possible to specify Recorder and Speaker via direct reference in Editor
+   BREAKING: removed PhotonVoiceView.RecorderInUse and SpeakerInUse public setters: it's not longer possible to set Recorder and Speaker in runtime
+   BREAKING: removed PhotonVoiceView.AutoCreateRecorderIfNotFound (Recorders never created automatically)
+   BREAKING: removed PhotonVoiceView.SetupDebugSpeaker: Speaker is always created if specified
+   BREAKING: removed PhotonVoiceView.IsSetup
+   BREAKING: removed PhotonVoiceView.IsSpeaker, use this.SpeakerInUse != null
+   BREAKING: removed PhotonVoiceView.IsRecorder, use this.RecorderInUse != null
+   BREAKING: removed PhotonVoiceView.IsSpeakerLinked, use this.SpeakerInUse.IsLinked
+   BREAKING: removed PhotonVoiceView.IsPhotonViewReady, assuming always ready
+Fusion:
+   REMOVED: FusionVoiceBridge referenced VoiceConnection
+   ADDED: FusionVoiceClient extending VoiceConnection
+   NOTE: remove existing UnityVoiceClient (former VoiceConnection) and make sure that FusionVoiceClient component is attached (it should automatically replace no longer existing FusionVoiceBridge)
+   ADDED: PrimaryRecorder started directly if VoiceConnection.UsePrimaryRecorder is set (VoiceNetworkObject prefab is not required)
+   ADDED: SpeakerPrefab instantiated directly on FusionVoiceClient object if userData is null (remote voice of PrimaryRecorder started directly)
+   CHANGED: VoiceNetworkObject Speaker initialization: either the Speaker found in the object hierarchy or specified FusionVoiceClient.SpeakerPrefab is used
+   BREAKING: removed VoiceNetworkObject serialized 'speakerInUse' and 'recorderInUse': it's no longer possible to specify Recorder and Speaker via direct reference in Editor
+   BREAKING: removed VoiceNetworkObject.RecorderInUse and SpeakerInUse public setters: it's not longer possible to set Recorder and Speaker in runtime
+   BREAKING: removed VoiceNetworkObject.AutoCreateRecorderIfNotFound (Recorders never created automatically)
+   BREAKING: removed VoiceNetworkObject.SetupDebugSpeaker: Speaker is always created if specified
+   BREAKING: removed VoiceNetworkObject.IsSetup
+   BREAKING: removed VoiceNetworkObject.IsSpeaker, use this.SpeakerInUse != null
+   BREAKING: removed VoiceNetworkObject.IsRecorder, use this.RecorderInUse != null
+   BREAKING: removed VoiceNetworkObject.IsSpeakerLinked, use this.SpeakerInUse.IsLinked
+   BREAKING: VoiceNetworkObject Recorder initialization: either PrimaryRecorder or attached Recorder is used without falling back to the latter if UsePrimaryRecorder is true but PrimaryRecorder is not set
+   REMOVED: Fusion 0-Minimal demo, it's almost the same as 1-SpeakerPrefab demo but relies on automatic Speaker creation which is no longer supported
+Recorder:
+   ADDED: Recorder.RecordingEnabled, controls recording state on start and while Recorder is running, exposed in Editor, default is true
+   BREAKING: removed Recorder.IsRecording, use RecordingEnabled instead
+   BREAKING: removed Recorder.AutoStart, use RecordingEnabled instead
+   BREAKING: removed Recorder.StartRecording/StopRecording, use RecordingEnabled instead
+   BREAKING: removed Recorder.RequiresRestart, obsolete RequiresInit obsolete ReInit()
+   BREAKING: removed 'force' parameter of Recorder.RestartRecording()
+   CHANGED: Recorder.RestartRecording() restarts only if RecordingEnabled is true
+   CHANGED: Recorder.RestartRecording() returns RecordingEnabled value for convenience
+   CHANGED: Recorder.TransmitEnabled is true by default
+   BREAKING: renamed Recorder.RecordOnlyWhenJoined to RecordWhenJoined, it updates RecordingEnabled property only when joining or leaving the room, it's still possible to record outside the room, the setter does not tries to start or stop the Recorder
+   BREAKING: removed Recorder.RecordOnlyWhenEnabled, 'enable' state is not processed (OnEnable/OnDisable removed): since Update() restarts the Recorder, restart won't work while disabled
+   BREAKING: MicrophonePermission helper starts associated Recorder instead of manipulating with its AutoStart property which is no longer available
+   REMOVED: RestartRecording button in RecorderEditor.OnInspectorGUI
+   BREAKING: removed Recorder.IsInitialized
+   BREAKING: removed Recorder.Init (made private)
+   BREAKING: removed Recorder.MicrophonesEnumerator, it does not affect Recorder behavior (except checks removed below): create device enumeration instances in user code if necessary
+   BREAKING: removed Recorder.UnityMicrophoneDevice
+   BREAKING: removed Recorder.PhotonMicrophoneDeviceId
+   BREAKING: removed (WSA) Recorder.PhotonMicrophoneDeviceIdString
+   BREAKING: removed obsolete Recorder.PhotonMicrophoneEnumerator
+   BREAKING: removed deprecated Recorder.ReactOnSystemChanges (use AudioChangesHandler instead)
+   BREAKING: removed Recorder.IsDefaultUnityMic()
+   BREAKING: removed Recorder.TrySamplingRateMatch and sampling rate matching logic
+   CHANGED: 3 platform-specific device ids properties and manipulations over them are replaced with uniform single DeviceInfo exposed in existing MicrophoneDevice property
+   REMOVED: IsValidUnityMic() and CheckIfThereIsAtLeastOneMic() checks based on microphone list which is no longer available in Recorder, local voice creation should fail gracefully w/o these checks
+   CHANGED: the same IDeviceEnumerator instance is used for Photon and Unity microphones types, GetMicrophonesEnumerator() code moved to MicrophonesEnumerator getter and refactored
+   CHANGED: if Recorder.SourceType is Factory and InputFactory is not set, it's assigned with ToneAudioReader() factory automatically
+   REMOVED: obsolete SampleTypeConv enum and TypeConvert property
+   REMOVED: obsolete Recorder.AudioGroup
+   FIXED: updating voiceDetectionDelayMs and voiceDetection with values from VoiceDetector overrode deserialized values (GetActivityDelayFromDetector and GetStatusFromDetector removed)
+Recorder Editor:
+   REMOVED: microphones list (with enumerators and AudioSettings.OnAudioConfigurationChanged handling)
+   REMOVED: 'Enabled WebRtcAudioDsp component' button
+   ADDED: 'Remove WebRtcAudioDsp component' button available if the component is present
+   ADDED: 'Remove AudioChangesHandler component' button available if the component is present
+   CHANGED: iOS and Android specific session parameters and APIs are present on all platforms
+   CHANGED: iOS and Android settings are visible regardless of Recorder MicrophoneType
+   CHANGED: iOS audio session presets and custom settings handlinging Editor (Recorder stores the preset for use in Editor only; in runtime, only iosAudioSessionParameters are used)
+   CHANGED: RecorderEditor no longer hides fields 'non-relevant' to the currently selected SourceType
+   CHANGED: Recorder.DebugEcho is always visible in Editor regardless of InterestGroup
+   CHANGED: WebRtcAudioDsp control is available on all platforms even if the component is not supported
+AudioChangesHandler:
+   REMOVED: HandleConfigChange and AudioSettings.GetConfiguration() change detection: it does not make sense because this configuration is for output and its change can't be triggered by microphone configuration change
+   NOTE: AudioSettings.OnAudioConfigurationChanged handling is preserved even though it's not triggered by microphone configuration change according to the documentation
+   REMOVED: StartWhenDeviceChange, set Recorder.RecordingEnabled to true instead
+   REMOVED: UseNativePluginChangeNotifier and UseOnAudioConfigurationChanged: Photon AudioInChangeNotifier used if supported by the platform, otherwise Unity's AudioSettings.OnAudioConfigurationChanged handled
+   CHANGED: removed iOS_AlwaysHandleDeviceChange and Android_AlwaysHandleDeviceChange with confusing semantics and replaced with HandleDeviceChangeIOS and HandleDeviceChangeAndroid overriding HandleDeviceChange for correspondent platforms
+Speaker:
+   BREAKING: removed VoiceConnection.globalPlaybackDelaySettings
+   BREAKING: removed PlaybackOnlyWhenEnabled
+   BREAKING: removed PlaybackDelayMinSoft, PlaybackDelayMaxSoft, PlaybackDelayMaxHard
+   BREAKING: removed Speaker.SetPlaybackDelaySettings() methods
+   BREAKING: removed obsolete PlayDelayMs
+   BREAKING: removed PlaybackDelaySettings wrapper, Speaker uses AudioOutDelayControl.PlayDelayConfig directly   
+   ADDED: PlayDelayConfig getter and setter
+   ADDED: PlayDelay getter and setter: updates PlayDelayConfig based on the single given value (simplified API)
+   CHANGED: Editor exposes single Speaker.PlayDelay value instead of 3 values of PlayDelayConfig
+   CHANGED: play delay settings are never checked but passed as is to AudioOut which corrects them if necessary
+   BREAKING: removed Actor property, use RemoteVoice.PlayerId instead
+   BREAKING: removed PlaybackStarted
+   BREAKING: removed StartPlayback() and StopPlayback() (hopefully used only internally)
+   BREAKING: RestartPlayback() does not accept 'reinit' parameter, it always stops and starts audioOutput
+   BREAKING: USE_ONAUDIOFILTERREAD conditional compilation replaced with SpeakerAudioFilterRead extending Speaker
+   BREAKING: removed AudioOutFactory and GlobalAudioOutFactory
+   ADDED: RestartOnDeviceChange property: if true (default), the Speaker is restarted in AudioSettings.OnAudioConfigurationChanged handler (FIXED: 'AudioClip.SetData failed; AudioClip UnityAudioOut contains no data' errors after output device change like when switching to bluetooth on Android)
+WebRTCAudioDsp:
+   ADDED: missing AgcTargetLevel property
+   ADDED: IsSupported property
+   BREAKING: removed ForceNormalAecInMobile, proc.AECMobile set if Application.isMobilePlatform is true
+   BREAKING: removed AutoRestartOnAudioChannelsMismatch, never restarts on channel count mismatch in OnAudioOutFrameFloat, OnAudioConfigurationChanged should handle this change
+   REMOVED: obsolete and not used AECMobile
+   REMOVED: obsolete and not used AECMobileComfortNoise
+   CHANGED: NoiseSuppression is true by default
+   CHANGED: all controls are always visible in WebRTCAudioDspEditor
+MicAmplifier:
+   FIXED: AmplificationFactor was cast to short for MicAmplifierShort, allowing only integer factors
+   REMOVED: BoostValue which only added harmful constant offset to the audio signal
+   REMOVED: unused MaxBefore and MaxAfter
+FMOD:
+   BREAKING: Speaker's companion FMODSpeakerSetup replaced with SpeakerFMOD extending Speaker
+   BREAKING: removed FMODRecorderSetup.MicrophoneDevice, FMODMicrophoneDeviceId: Recorder MicrophoneDevice is used instead
+   BREAKING: FMODRecorderSetup.autoRestartOnChange serialized field, always restarting if FMODMicrophoneDeviceId property has changed
+   REMOVED: microphones list from FMODRecorderSetupEditor
+DemoVoiceUI: 
+   CHANGED: Unity type microphones are processed consistently with Photon type, via enumerator
+   CHANGED: no more special processing for WSA platform microphones
+   CHANGED: the demo relies on its own IDeviceEnumerator instances
+   CHANGED: menu items hold only Recorder.MicType and DeviceInfo that significantly simplified exchange between menu and Recorder MicrophoneType/MicrophoneDevice
+   CHANGED: Unity and Photon default microphones added to the dropdown
+   ADDED: AGC Target level slider
+Logging:
+   CHANGED: single global logging level applies to all voice components, it's exposed by VoiceConnection instance (UnityVoiceClient, PunVoiceClient, FusionVoiceClient) in Editor
+   NOTE: global logging level is stored in VoiceLogger object at the root of the scene, different levels can still be applied: a Voicelogger component added to the object sets logging level for voice components attached to this object and all its descendants
+   BREAKING: removed ILoggable (LogLevel, Logger), ILoggableDependent (IgnoreGlobalLogLevel)
+   BREAKING: removed VoiceComponent.Logger, LogLevel, IgnoreGlobalLogLevel
+Other:
+   BREAKING: removed VoiceLogger.IsErrorEnabled, IsWarningEnabled, IsInfoEnabled and IsDebugEnabled used mostly for redundant logging level checks, such checks pollute sources and usually don't improve the performance, use VoiceLogger.LogLevel if the check is certainly necessary
+   BREAKING: removed VoiceComponent.CurrentPlatform, use Application.platform instead
+   REMOVED: PUN, PhotonRealtime and PhotonChat demos
+   CHANGED: simple WaveWriter (used in SaveOutgoingStreamToFile and SaveIncomingStreamToFile) extracted from CSCore library and placed in Code/UtilityScripts
+   REMOVED: CSCore library
+   FIXED: SaveOutgoingStreamToFile uses AddPostProcessor() instead of AddPreProcessor(), otherwise the stream in Process() mismatches VoiceInfo in PhotonVoiceCreated
+   BREAKING: removed placeholders for deleted files
+   ADDED: RecorderPreset component overriding Recorder (Microphone Type, DSP Enabled) and WebRtcAudioDsp (AEC, VAD) settings per platform
+
+v2.32-v2.49
+   Skipped due to significant changes
+
 v2.31 (March 22nd, 2022)
    PUN2: v2.40 (14f52ea) [RT/lib:4.1.6.11]
    PhotonVoiceApi: revision 6358

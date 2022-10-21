@@ -65,8 +65,8 @@ namespace Photon.Voice
         /// <summary>Returns Info structure assigned on local voice cration.</summary>
         public VoiceInfo Info { get { return info; } }
         /// <summary>If true, stream data broadcasted.</summary>
-        public bool TransmitEnabled 
-        { 
+        public bool TransmitEnabled
+        {
             get
             {
                 return transmitEnabled;
@@ -89,9 +89,9 @@ namespace Photon.Voice
         private bool transmitEnabled = true;
 
         /// <summary>Returns true if stream broadcasts.</summary>
-        public bool IsCurrentlyTransmitting 
-        { 
-            get { return Environment.TickCount - lastTransmitTime < NO_TRANSMIT_TIMEOUT_MS; } 
+        public bool IsCurrentlyTransmitting
+        {
+            get { return Environment.TickCount - lastTransmitTime < NO_TRANSMIT_TIMEOUT_MS; }
         }
 
         /// <summary>Sent frames counter.</summary>
@@ -196,7 +196,7 @@ namespace Photon.Voice
 
         private const int NO_TRANSMIT_TIMEOUT_MS = 100; // should be greater than SendFrame() call interval
         private int lastTransmitTime = Environment.TickCount - NO_TRANSMIT_TIMEOUT_MS;
-        
+
         internal virtual void service()
         {
             while (true)
@@ -212,7 +212,7 @@ namespace Photon.Voice
                     sendFrame(x, f);
                 }
             }
-            
+
             if (LocalUserServiceable != null)
             {
                 LocalUserServiceable.Service(this);
@@ -270,7 +270,7 @@ namespace Photon.Voice
             {
                 this.eventTimestamps[evNumber] = Environment.TickCount;
             }
-            evNumber++;            
+            evNumber++;
 
             if (compressed.Count > 0 && (flags & FrameFlags.Config) == 0) // otherwise the frame is config or control (EOS)
             {
@@ -317,7 +317,7 @@ namespace Photon.Voice
             this.OnRemoteVoiceRemoveAction = null;
         }
 
-		/// <summary>
+        /// <summary>
         /// Create default audio decoder and register a method to be called when a data frame is decoded.
         /// </summary>
         public void SetOutput(Action<FrameOut<float>> output)
@@ -342,7 +342,7 @@ namespace Photon.Voice
             }
             setOutput<short>(output);
         }
-        
+
         private void setOutput<T>(Action<FrameOut<T>> output)
         {
             logger.LogInfo(logPrefix + ": Creating default decoder " + voiceInfo.Codec + " for output FrameOut<" + typeof(T) + ">");
@@ -419,9 +419,9 @@ namespace Photon.Voice
         }
         private string shortName { get { return "v#" + voiceId + "ch#" + voiceClient.channelStr(channelId) + "p#" + playerId; } }
         public string LogPrefix { get; private set; }
-       
+
         SpacingProfile receiveSpacingProfile = new SpacingProfile(1000);
-        
+
         /// <summary>
         /// Starts input frames time spacing profiling. Once started, it can't be stopped.
         /// </summary>
@@ -446,9 +446,9 @@ namespace Photon.Voice
         }
 
         internal void receiveBytes(ref FrameBuffer receivedBytes, byte evNumber)
-        {            
+        {
             // receive-gap detection and compensation
-            if (evNumber != this.lastEvNumber) // skip check for 1st event 
+            if (evNumber != this.lastEvNumber) // skip check for 1st event
             {
                 int missing = byteDiff(evNumber, this.lastEvNumber);
                 if (missing == 0)
@@ -457,15 +457,17 @@ namespace Photon.Voice
                 }
                 else if (missing < 127)
                 {
-                    this.voiceClient.logger.LogWarning(LogPrefix + " evNumer: " + evNumber + " playerVoice.lastEvNumber: " + this.lastEvNumber + " missing: " + missing + " r/b " + receivedBytes.Length);
+                    this.voiceClient.logger.LogDebug(LogPrefix + " evNumer: " + evNumber + " playerVoice.lastEvNumber: " + this.lastEvNumber + " missing: " + missing + " r/b " + receivedBytes.Length);
                     this.voiceClient.FramesLost += missing;
                     this.lastEvNumber = evNumber;
                     // restoring missing frames
                     receiveNullFrames(missing);
-                } else {
+                }
+                else
+                {
                     // late (out of order) frames, just ignore them
                     // these frames already counted in FramesLost
-                    this.voiceClient.logger.LogWarning(LogPrefix + " evNumer: " + evNumber + " playerVoice.lastEvNumber: " + this.lastEvNumber + " late: " + (255 - missing) + " r/b " + receivedBytes.Length);
+                    this.voiceClient.logger.LogDebug(LogPrefix + " evNumer: " + evNumber + " playerVoice.lastEvNumber: " + this.lastEvNumber + " late: " + (255 - missing) + " r/b " + receivedBytes.Length);
                 }
             }
             this.receiveFrame(ref receivedBytes);
@@ -482,7 +484,7 @@ namespace Photon.Voice
             if (disposed) return;
 
             options.Decoder.Input(ref frame);
-            frame.Release();
+            // frame.Release() is not required in single-threaded variant because VoiceClient.onFrame() caller always calls Release() for the frame
 #else
             lock (disposeLock) // sync with Dispose and decodeThread 'finally'
             {
@@ -509,7 +511,7 @@ namespace Photon.Voice
             {
                 if (disposed) return;
 
-                
+
                 for (int i = 0; i < count; i++)
                 {
                     receiveSpacingProfile.Update(true, false);
@@ -524,9 +526,9 @@ namespace Photon.Voice
 
         void decodeThread()
         {
-            //#if UNITY_5_3_OR_NEWER
-            //            UnityEngine.Profiling.Profiler.BeginThreadProfiling("PhotonVoice", LogPrefix);
-            //#endif
+#if UNITY_5_3_OR_NEWER // #if UNITY
+            // UnityEngine.Profiling.Profiler.BeginThreadProfiling("PhotonVoice", LogPrefix);
+#endif
 
             voiceClient.logger.LogInfo(LogPrefix + ": Starting decode thread");
 
@@ -543,9 +545,9 @@ namespace Photon.Voice
                 {
                     frameQueueReady.WaitOne(); // Wait until data is pushed to the queue or Dispose signals.
 
-//#if UNITY_5_3_OR_NEWER
-//                    UnityEngine.Profiling.Profiler.BeginSample("Decoder");
-//#endif
+#if UNITY_5_3_OR_NEWER // #if UNITY
+                    // UnityEngine.Profiling.Profiler.BeginSample("Decoder");
+#endif
 
                     while (true) // Dequeue and process while the queue is not empty
                     {
@@ -557,7 +559,7 @@ namespace Photon.Voice
                         {
                             var df = 0;
                             // if flushing, process all frames in the queue
-                            // otherwise keep the queue length equal DelayFrames, also check DelayFrames for validity                            
+                            // otherwise keep the queue length equal DelayFrames, also check DelayFrames for validity
                             if (flushingFramePosInQueue < 0 && DelayFrames > 0 && DelayFrames < 300) // 10 sec. of video or max 3 sec. audio
                             {
                                 df = DelayFrames;
@@ -584,12 +586,12 @@ namespace Photon.Voice
                         {
                             decoder.Input(ref f);
                             f.Release();
-                        }                        
+                        }
                     }
 
-                    //#if UNITY_5_3_OR_NEWER
-                    //                    UnityEngine.Profiling.Profiler.EndSample();
-                    //#endif
+#if UNITY_5_3_OR_NEWER // #if UNITY
+                    // UnityEngine.Profiling.Profiler.EndSample();
+#endif
 
                 }
             }
@@ -623,9 +625,9 @@ namespace Photon.Voice
 #endif
                 voiceClient.logger.LogInfo(LogPrefix + ": Exiting decode thread");
 
-//#if UNITY_5_3_OR_NEWER
-//                UnityEngine.Profiling.Profiler.EndThreadProfiling();
-//#endif
+#if UNITY_5_3_OR_NEWER // #if UNITY
+                // UnityEngine.Profiling.Profiler.EndThreadProfiling();
+#endif
 
             }
         }

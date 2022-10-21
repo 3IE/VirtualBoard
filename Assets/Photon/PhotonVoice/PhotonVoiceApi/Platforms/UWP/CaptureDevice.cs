@@ -10,9 +10,9 @@ using Windows.Media.MediaProperties;
 namespace Photon.Voice.UWP
 {
     public delegate void MediaCaptureInitConmpleted(MediaCapture mediaCpture, bool ok);
-    
+
     class CaptureDevice
-    {        
+    {
         public enum Media
         {
             Audio,
@@ -42,7 +42,7 @@ namespace Photon.Voice.UWP
         }
 
         /// <summary>
-        ///  Handler for the wrapped MediaCapture object's Failed event. It just wraps and forward's MediaCapture's 
+        ///  Handler for the wrapped MediaCapture object's Failed event. It just wraps and forward's MediaCapture's
         ///  Failed event as own CaptureFailed event
         /// </summary>
         private void mediaCapture_Failed(MediaCapture sender, MediaCaptureFailedEventArgs errorEventArgs)
@@ -323,7 +323,7 @@ namespace Photon.Voice.UWP
 
     public class AudioInEnumerator : DeviceEnumerator
     {
-        public AudioInEnumerator(ILogger logger) 
+        public AudioInEnumerator(ILogger logger)
             : base(logger, Windows.Devices.Enumeration.DeviceClass.AudioCapture)
         {
         }

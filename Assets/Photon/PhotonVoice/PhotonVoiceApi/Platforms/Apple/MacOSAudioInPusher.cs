@@ -67,7 +67,7 @@ namespace Photon.Voice.MacOS
             this.pushCallback = callback;
         }
         private void push(IntPtr buf, int len)
-        {            
+        {
             if (this.pushCallback != null)
             {
                 var bufManaged = bufferFactory.New(len);
@@ -78,7 +78,7 @@ namespace Photon.Voice.MacOS
 
         public int Channels { get { return 1; } }
 
-		public int SamplingRate { get { return 44100; } }
+        public int SamplingRate { get { return 44100; } }
 
         public string Error { get; private set; }
 

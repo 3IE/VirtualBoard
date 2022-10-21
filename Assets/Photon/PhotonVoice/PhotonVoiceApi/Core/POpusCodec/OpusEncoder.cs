@@ -27,7 +27,7 @@ namespace POpusCodec
         private int _frameSizePerChannel = 960;
         private SamplingRate _inputSamplingRate = SamplingRate.Sampling48000;
         private Channels _inputChannels = Channels.Stereo;
-        
+
         public SamplingRate InputSamplingRate
         {
             get
@@ -51,7 +51,7 @@ namespace POpusCodec
         private Delay _encoderDelay = Delay.Delay20ms;
 
         /// <summary>
-        /// Using a duration of less than 10 ms will prevent the encoder from using the LPC or hybrid modes. 
+        /// Using a duration of less than 10 ms will prevent the encoder from using the LPC or hybrid modes.
         /// </summary>
         public Delay EncoderDelay
         {

@@ -36,13 +36,20 @@ namespace Photon.Voice.Windows
             try
             {
                 handle = Photon_Audio_In_CreateMicEnumerator();
-                var count = Photon_Audio_In_MicEnumerator_Count(handle);
-                devices = new List<DeviceInfo>();
-                for (int i = 0; i < count; i++)
+                if (handle != null)
                 {
-                    devices.Add(new DeviceInfo(Photon_Audio_In_MicEnumerator_IDAtIndex(handle, i), Marshal.PtrToStringAuto(Photon_Audio_In_MicEnumerator_NameAtIndex(handle, i))));
+                    var count = Photon_Audio_In_MicEnumerator_Count(handle);
+                    devices = new List<DeviceInfo>();
+                    for (int i = 0; i < count; i++)
+                    {
+                        devices.Add(new DeviceInfo(Photon_Audio_In_MicEnumerator_IDAtIndex(handle, i), Marshal.PtrToStringAuto(Photon_Audio_In_MicEnumerator_NameAtIndex(handle, i))));
+                    }
+                    Error = null;
                 }
-                Error = null;
+                else
+                {
+                    Error = "Photon_Audio_In_CreateMicEnumerator() failed";
+                }
             }
             catch (Exception e)
             {

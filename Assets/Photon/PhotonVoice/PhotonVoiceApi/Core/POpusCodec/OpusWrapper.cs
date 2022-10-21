@@ -1,9 +1,9 @@
-#if ((UNITY_IOS || UNITY_SWITCH) && !UNITY_EDITOR) || __IOS__
+﻿#if ((UNITY_IOS || UNITY_SWITCH) && !UNITY_EDITOR) || __IOS__
 #define DLL_IMPORT_INTERNAL
 #endif
 
 #if NONE //UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_WSA
-// opus.* lib built from original opus repo 
+// opus.* lib built from original opus repo
 #else
 #define OPUS_EGPV // opus_egpv.* lib with interop helpers (we still may use such libs for the platforms where helpers are not required)
 #endif
@@ -291,7 +291,7 @@ namespace POpusCodec
             {
                 var infoMsg = "";
                 foreach (var i in info) infoMsg += i.ToString() + ":";
-                throw new OpusException(statusCode, infoMsg  + Marshal.PtrToStringAnsi(opus_strerror(statusCode)));
+                throw new OpusException(statusCode, infoMsg + Marshal.PtrToStringAnsi(opus_strerror(statusCode)));
             }
         }
     }

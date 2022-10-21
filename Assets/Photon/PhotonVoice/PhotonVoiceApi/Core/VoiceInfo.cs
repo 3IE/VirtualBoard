@@ -8,12 +8,10 @@
 // <author>developer@photonengine.com</author>
 // ----------------------------------------------------------------------------
 
-using System.Collections.Generic;
-
 namespace Photon.Voice
 {
-	/// <summary>Describes stream properties.</summary>
-	public struct VoiceInfo
+    /// <summary>Describes stream properties.</summary>
+    public struct VoiceInfo
     {
         /// <summary>
         /// Create stream info for an Opus audio stream.
@@ -36,26 +34,26 @@ namespace Photon.Voice
                 UserData = userdata
             };
         }
-		/// <summary>
-		/// Create stream info for an audio stream.
-		/// </summary>
-		/// <param name="codec">Audio codec.</param>
-		/// <param name="samplingRate">Audio sampling rate.</param>
-		/// <param name="channels">Number of channels.</param>
-		/// <param name="frameDurationUs">Uncompressed frame (audio packet) size in microseconds.</param>
-		/// <param name="userdata">Optional user data. Should be serializable by Photon.</param>
-		/// <returns>VoiceInfo instance.</returns>
-		static public VoiceInfo CreateAudio(Codec codec, int samplingRate, int channels, int frameDurationUs, object userdata = null)
-		{
-			return new VoiceInfo()
-			{
-				Codec = codec,
-				SamplingRate = (int)samplingRate,
-				Channels = channels,
-				FrameDurationUs = (int)frameDurationUs,
-				UserData = userdata
-			};
-		}
+        /// <summary>
+        /// Create stream info for an audio stream.
+        /// </summary>
+        /// <param name="codec">Audio codec.</param>
+        /// <param name="samplingRate">Audio sampling rate.</param>
+        /// <param name="channels">Number of channels.</param>
+        /// <param name="frameDurationUs">Uncompressed frame (audio packet) size in microseconds.</param>
+        /// <param name="userdata">Optional user data. Should be serializable by Photon.</param>
+        /// <returns>VoiceInfo instance.</returns>
+        static public VoiceInfo CreateAudio(Codec codec, int samplingRate, int channels, int frameDurationUs, object userdata = null)
+        {
+            return new VoiceInfo()
+            {
+                Codec = codec,
+                SamplingRate = (int)samplingRate,
+                Channels = channels,
+                FrameDurationUs = (int)frameDurationUs,
+                UserData = userdata
+            };
+        }
 
 #if PHOTON_VOICE_VIDEO_ENABLE
         /// <summary>
@@ -66,8 +64,8 @@ namespace Photon.Voice
         /// <param name="width">Streamed video width. If 0, width and height of video source used (no rescaling).</param>
         /// <param name="heigth">Streamed video height. If -1, aspect ratio preserved during rescaling.</param>
         /// <param name="fps">Streamed video frames per second.</param>
-        /// <param name="keyFrameInt">Keyframes interval in frames.</param>/// 
-        /// <param name="userdata">Optional user data. Should be serializable by Photon.</param>        
+        /// <param name="keyFrameInt">Keyframes interval in frames.</param>///
+        /// <param name="userdata">Optional user data. Should be serializable by Photon.</param>
         /// <returns>VoiceInfo instance.</returns>
         static public VoiceInfo CreateVideo(Codec codec, int bitrate, int width, int heigth, int fps, int keyFrameInt, object userdata = null)
         {
@@ -112,7 +110,7 @@ namespace Photon.Voice
         /// <summary>Uncompressed frame (data packet) size in samples.</summary>
         public int FrameDurationSamples { get { return (int)(this.SamplingRate * (long)this.FrameDurationUs / 1000000); } }
         /// <summary>Uncompressed frame (data packet) array size.</summary>
-        public int FrameSize { get { return this.FrameDurationSamples * this.Channels; } }        
+        public int FrameSize { get { return this.FrameDurationSamples * this.Channels; } }
     }
 
     /// <summary>Information about a remote voice (incoming stream).</summary>

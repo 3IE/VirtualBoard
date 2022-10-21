@@ -196,7 +196,6 @@ namespace Refactor
                     break;
 
                 case >= 200:
-                    Debug.Log($"Photon Event: {code}");
                     return;
 
                 default:

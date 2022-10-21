@@ -63,15 +63,15 @@ namespace Photon.Voice.Unity.Editor
                 return Directory.Exists("Assets/Photon/PhotonVoice/PhotonVoiceApi/Core/Video");
             }
         }
-        
+
         [MenuItem("Window/Photon Voice/Remove PUN", true, 1)]
         private static bool RemovePunValidate()
         {
-            #if PHOTON_UNITY_NETWORKING
+#if PHOTON_UNITY_NETWORKING
             return true;
-            #else
+#else
             return HasPun;
-            #endif
+#endif
         }
 
         [MenuItem("Window/Photon Voice/Remove PUN", false, 1)]
@@ -152,7 +152,7 @@ namespace Photon.Voice.Unity.Editor
                 Debug.LogWarningFormat("File \"{0}\" does not exist.", path);
             }
         }
-        
+
         public static bool IsInTheSceneInPlayMode(GameObject go)
         {
             return Application.isPlaying && !IsPrefab(go);
@@ -229,7 +229,7 @@ namespace Photon.Voice.Unity.Editor
             }
         }
 
-		/// <summary>
+        /// <summary>
         /// Removes a given scripting define symbol to all build target groups
         /// You can see all scripting define symbols ( not the internal ones, only the one for this project), in the PlayerSettings inspector
         /// </summary>
@@ -261,20 +261,20 @@ namespace Photon.Voice.Unity.Editor
             }
         }
 
-		/// <summary>
-		/// Check if a GameObject is a prefab asset or part of a prefab asset, as opposed to an instance in the scene hierarchy
-		/// </summary>
-		/// <returns><c>true</c>, if a prefab asset or part of it, <c>false</c> otherwise.</returns>
-		/// <param name="go">The GameObject to check</param>
-		public static bool IsPrefab(GameObject go)
-		{
-            #if UNITY_2021_2_OR_NEWER
+        /// <summary>
+        /// Check if a GameObject is a prefab asset or part of a prefab asset, as opposed to an instance in the scene hierarchy
+        /// </summary>
+        /// <returns><c>true</c>, if a prefab asset or part of it, <c>false</c> otherwise.</returns>
+        /// <param name="go">The GameObject to check</param>
+        public static bool IsPrefab(GameObject go)
+        {
+#if UNITY_2021_2_OR_NEWER
             return UnityEditor.SceneManagement.PrefabStageUtility.GetPrefabStage(go) != null || EditorUtility.IsPersistent(go);
-            #elif UNITY_2018_3_OR_NEWER
+#elif UNITY_2018_3_OR_NEWER
             return UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage(go) != null || EditorUtility.IsPersistent(go);
-            #else
+#else
             return EditorUtility.IsPersistent(go);
-			#endif
+#endif
         }
 
         /// <summary>

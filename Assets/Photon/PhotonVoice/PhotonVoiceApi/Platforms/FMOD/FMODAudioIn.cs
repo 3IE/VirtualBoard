@@ -17,14 +17,14 @@ namespace Photon.Voice.FMOD
         private int device;
         ILogger logger;
 
-        FMODLib.System coreSystem;                
+        FMODLib.System coreSystem;
         FMODLib.Sound sound;
         readonly FMODLib.SOUND_FORMAT soundFormat;
         public bool isRecording;
         int samplingRate;
         int channels;
         int bufLengthSamples;
-        
+
 
         public AudioInReader(FMODLib.System coreSystem, int device, int suggestedFrequency, ILogger logger)
         {
@@ -74,7 +74,7 @@ namespace Photon.Voice.FMOD
                 exinfo.defaultfrequency = samplingRate;
                 bufLengthSamples = samplingRate * BUF_LENGTH_MS / 1000;
                 exinfo.length = (uint)(bufLengthSamples * channels * sizeofT);
-                
+
                 FMODLib.MODE soundMode = FMODLib.MODE.OPENUSER | FMODLib.MODE.LOOP_NORMAL;
                 res = this.coreSystem.createSound("Photon AudioIn", soundMode, ref exinfo, out sound);
 

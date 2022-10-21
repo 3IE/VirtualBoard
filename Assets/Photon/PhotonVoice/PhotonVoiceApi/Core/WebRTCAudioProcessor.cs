@@ -74,8 +74,8 @@ namespace Photon.Voice
                     {
                         logger.LogError("[PV] WebRTCAudioProcessor: new AGCCompressionGain value {0} not in range [0..90]", value);
                     }
-                    else 
-                    { 
+                    else
+                    {
                         agcCompressionGain = value;
                         if (proc != IntPtr.Zero)
                         {
@@ -291,9 +291,9 @@ namespace Photon.Voice
                 {
                     reverseStreamQueueReady.WaitOne(); // Wait until data is pushed to the queue or Dispose signals.
 
-                    //#if UNITY_5_3_OR_NEWER
-                    //                    UnityEngine.Profiling.Profiler.BeginSample("Encoder");
-                    //#endif
+#if UNITY_5_3_OR_NEWER // #if UNITY
+                    // UnityEngine.Profiling.Profiler.BeginSample("Encoder");
+#endif
 
                     while (true) // Dequeue and process while the queue is not empty
                     {
@@ -427,7 +427,7 @@ namespace Photon.Voice
             NS_LEVEL = 42,
 
             AGC = 51,
-//            AGC_MODE = 52,
+            // AGC_MODE = 52,
             AGC_TARGET_LEVEL_DBFS = 55,
             AGC_COMPRESSION_GAIN = 56,
             AGC_LIMITER = 57,

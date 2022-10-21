@@ -1,14 +1,11 @@
 using UnityEngine;
-using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Collections;
 
 namespace Photon.Voice.Unity
 {
     public class AudioInEnumerator : DeviceEnumeratorBase
     {
-        public AudioInEnumerator(ILogger logger) : base (logger)
+        public AudioInEnumerator(ILogger logger) : base(logger)
         {
             Refresh();
         }
@@ -26,11 +23,11 @@ namespace Photon.Voice.Unity
 
 #if UNITY_WEBGL
         public override bool IsSupported => false;
-        
+
         public override string Error { get { return "Current platform " + Application.platform + " is not supported by AudioInEnumerator."; } }
 #else
         public override string Error { get { return null; } }
-        #endif
+#endif
 
         public override void Dispose()
         {

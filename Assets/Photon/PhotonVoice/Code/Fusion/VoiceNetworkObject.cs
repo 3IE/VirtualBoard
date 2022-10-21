@@ -6,507 +6,146 @@ namespace Photon.Voice.Fusion
     using UnityEngine;
     using ExitGames.Client.Photon;
 
-    public class VoiceNetworkObject : NetworkBehaviour, ILoggableDependent
+    [AddComponentMenu("Photon Voice/Fusion/Voice Network Object")]
+    public class VoiceNetworkObject : NetworkBehaviour
     {
-        #region Private Fields
+#region Private Fields
+
+        // VoiceComponentImpl instance instead if VoiceComponent inheritance
+        private VoiceComponentImpl voiceComponentImpl = new VoiceComponentImpl();
 
         private VoiceConnection voiceConnection;
 
-        [SerializeField]
-        private Speaker speakerInUse;
+#endregion
+#region Properties
 
-        [SerializeField]
-        private Recorder recorderInUse;
-        
-        [SerializeField]
-        protected DebugLevel logLevel = DebugLevel.ERROR;
+        protected Voice.ILogger Logger => voiceComponentImpl.Logger;
 
-        private VoiceLogger logger;
-
-        [SerializeField, HideInInspector]
-        private bool ignoreGlobalLogLevel;
-
-        #endregion
-
-        #region Public Fields
-
-        /// <summary> If true, a Recorder component will be added to the same GameObject if not found already. </summary>
-        public bool AutoCreateRecorderIfNotFound;
-        /// <summary> If true, VoiceConnection.PrimaryRecorder will be used by this VoiceNetworkObject </summary>
-        public bool UsePrimaryRecorder;
-        /// <summary> If true, a Speaker component will be setup to be used for the DebugEcho mode </summary>
-        public bool SetupDebugSpeaker;
-
-        #endregion
-
-        #region Properties
-
-        public VoiceLogger Logger
-        {
-            get
-            {
-                if (this.logger == null)
-                {
-                    this.logger = new VoiceLogger(this, string.Format("{0}.{1}", this.name, this.GetType().Name), this.logLevel);
-                }
-                return this.logger;
-            }
-            protected set => this.logger = value;
-        }
-
-        public DebugLevel LogLevel
-        {
-            get
-            {
-                if (this.Logger != null)
-                {
-                    this.logLevel = this.Logger.LogLevel;
-                }
-                return this.logLevel;
-            }
-            set
-            {
-                this.logLevel = value;
-                if (this.Logger == null)
-                {
-                    return;
-                }
-                this.Logger.LogLevel = this.logLevel;
-            }
-        }
-
-        public bool IgnoreGlobalLogLevel
-        {
-            get => this.ignoreGlobalLogLevel;
-            set => this.ignoreGlobalLogLevel = value;
-        }
+        // to set logging level from code
+        public VoiceLogger VoiceLogger => voiceComponentImpl.VoiceLogger;
 
         /// <summary> The Recorder component currently used by this VoiceNetworkObject </summary>
-        public Recorder RecorderInUse
-        {
-            get => this.recorderInUse;
-            set
-            {
-                if (value != this.recorderInUse)
-                {
-                    this.recorderInUse = value;
-                    this.IsRecorder = false;
-                }
-                if (this.RequiresRecorder)
-                {
-                    this.SetupRecorderInUse();
-                }
-                else if (this.IsNetworkObjectReady)
-                {
-                    if (this.Logger.IsWarningEnabled)
-                    {
-                        this.Logger.LogWarning("No need to set Recorder as this is a remote NetworkObject.");
-                    }
-                }
-            }
-        }
+        public Recorder RecorderInUse { get; private set; }
 
         /// <summary> The Speaker component currently used by this VoiceNetworkObject </summary>
-        public Speaker SpeakerInUse
-        {
-            get => this.speakerInUse;
-            set
-            {
-                if (this.speakerInUse != value)
-                {
-                    this.speakerInUse = value;
-                    this.IsSpeaker = false;
-                }
-                if (this.RequiresSpeaker)
-                {
-                    this.SetupSpeakerInUse();
-                }
-                else if (this.IsNetworkObjectReady)
-                {
-                    if (this.Logger.IsWarningEnabled)
-                    {
-                        this.Logger.LogWarning("Speaker not set because this is a local NetworkObject and SetupDebugSpeaker is disabled.");
-                    }
-                }
-            }
-        }
+        public Speaker SpeakerInUse { get; private set; }
 
-        /// <summary> If true, this VoiceNetworkObject is setup and ready to be used </summary>
-        public bool IsSetup => this.IsNetworkObjectReady && (!this.RequiresRecorder || this.IsRecorder) && (!this.RequiresSpeaker || this.IsSpeaker);
-
-        /// <summary> If true, this VoiceNetworkObject has a Speaker setup for playback of received audio frames from remote audio source </summary>
-        public bool IsSpeaker { get; private set; }
         /// <summary> If true, this VoiceNetworkObject has a Speaker that is currently playing received audio frames from remote audio source </summary>
-        public bool IsSpeaking => this.IsSpeaker && this.SpeakerInUse.IsPlaying;
+        public bool IsSpeaking => this.SpeakerInUse != null && this.SpeakerInUse.IsPlaying;
 
-        /// <summary> If true, this VoiceNetworkObject has a Recorder setup for transmission of audio stream from local audio source </summary>
-        public bool IsRecorder { get; private set; }
         /// <summary> If true, this VoiceNetworkObject has a Recorder that is currently transmitting audio stream from local audio source </summary>
-        public bool IsRecording => this.IsRecorder && this.RecorderInUse.IsCurrentlyTransmitting;
+        public bool IsRecording => this.RecorderInUse != null && this.RecorderInUse.IsCurrentlyTransmitting;
 
-        /// <summary> If true, the SpeakerInUse is linked to the remote voice stream </summary>
-        public bool IsSpeakerLinked => this.IsSpeaker && this.SpeakerInUse.IsLinked;
+#endregion
 
-        /// <summary> If true, the NetworkObject is found, non null & valid.</summary>
-        internal bool IsNetworkObjectReady => this.Object && !ReferenceEquals(null, this.Object) && this.Object && this.Object.IsValid;
+#region Private Methods
 
-        internal bool RequiresSpeaker => this.IsNetworkObjectReady && this.IsPlayer && (this.SetupDebugSpeaker || !this.IsLocal);
-
-        internal bool RequiresRecorder => this.IsNetworkObjectReady && this.IsPlayer && this.IsLocal;
-
-        internal bool IsPlayer => this.Runner.IsPlayer;
-
-        internal bool IsLocal => this.Object.HasInputAuthority;
-
-        #endregion
-
-        #region Private Methods
-
-        internal void Setup()
+        private void SetupRecorder()
         {
-            if (this.IsSetup)
-            {
-                if (this.Logger.IsDebugEnabled)
-                {
-                    this.Logger.LogDebug("VoiceNetworkObject already setup");
-                }
-                return;
-            }
-            this.SetupRecorderInUse();
-            this.SetupSpeakerInUse();
-        }
+            Recorder recorder = null;
 
-        private bool SetupRecorder()
-        {
-            if (ReferenceEquals(null, this.recorderInUse)) // not manually assigned by user
+            Recorder[] recorders = this.GetComponentsInChildren<Recorder>();
+            if (recorders.Length > 0)
             {
-                if (this.UsePrimaryRecorder)
+                if (recorders.Length > 1)
                 {
-                    if (!ReferenceEquals(null, this.voiceConnection.PrimaryRecorder) && this.voiceConnection.PrimaryRecorder)
-                    {
-                        this.recorderInUse = this.voiceConnection.PrimaryRecorder;
-                        return this.SetupRecorder(this.recorderInUse);
-                    } 
-                    if (this.Logger.IsErrorEnabled)
-                    {
-                        this.Logger.LogError("PrimaryRecorder is not set.");
-                    }
+                    this.Logger.LogWarning("Multiple Recorder components found attached to the GameObject or its children.");
                 }
-                Recorder[] recorders = this.GetComponentsInChildren<Recorder>();
-                if (recorders.Length > 0)
-                {
-                    Recorder recorder  = recorders[0];
-                    if (recorders.Length > 1 && this.Logger.IsWarningEnabled)
-                    {
-                        this.Logger.LogWarning("Multiple Recorder components found attached to the GameObject or its children.");
-                    }
-                    if (!ReferenceEquals(null, recorder) && recorder)
-                    {
-                        this.recorderInUse = recorder;
-                        return this.SetupRecorder(this.recorderInUse);
-                    }
-                }
-                if (!this.AutoCreateRecorderIfNotFound)
-                {
-                    if (this.Logger.IsWarningEnabled)
-                    {
-                        this.Logger.LogWarning("No Recorder found to be setup.");
-                    }
-                    return false;
-                }
-                this.recorderInUse = this.gameObject.AddComponent<Recorder>();
+                recorder = recorders[0];
             }
-            return this.SetupRecorder(this.recorderInUse);
-        }
 
-        private bool SetupRecorder(Recorder recorder)
-        {
-            if (ReferenceEquals(null, recorder))
+            if (null == recorder && null != this.voiceConnection.PrimaryRecorder)
             {
-                if (this.Logger.IsWarningEnabled)
-                {
-                    this.Logger.LogWarning("Cannot setup a null Recorder.");
-                }
-                return false;
+                recorder = this.voiceConnection.PrimaryRecorder;
             }
-            if (!recorder)
-            {
-                if (this.Logger.IsWarningEnabled)
-                {
-                    this.Logger.LogWarning("Cannot setup a destroyed Recorder.");
-                }
-                return false;
-            }
-            if (!this.IsNetworkObjectReady)
-            {
-                if (this.Logger.IsWarningEnabled)
-                {
-                    this.Logger.LogWarning("Recorder setup cannot be done as the NetworkObject is not valid or not ready yet.");
-                }
-                return false;
-            }
-            recorder.UserData = this.GetUserData();
-            if (!recorder.IsInitialized)
-            {
-                this.RecorderInUse.Init(this.voiceConnection);
-            }
-            if (recorder.RequiresRestart)
-            {
-                recorder.RestartRecording();
-            }
-            return recorder.IsInitialized;
-        }
 
-        private bool SetupSpeaker()
-        {
-            if (ReferenceEquals(null, this.speakerInUse)) // not manually assigned by user
+            if (null == recorder)
             {
-                Speaker[] speakers = this.GetComponentsInChildren<Speaker>(true);
-                if (speakers.Length > 0)
-                {
-                    this.speakerInUse = speakers[0];
-                    if (speakers.Length > 1 && this.Logger.IsWarningEnabled)
-                    {
-                        this.Logger.LogWarning("Multiple Speaker components found attached to the GameObject or its children. Using the first one we found.");
-                    }
-                }
-                if (ReferenceEquals(null, this.speakerInUse))
-                {
-                    bool instantiated = false;
-                    if (!ReferenceEquals(null, this.voiceConnection.SpeakerPrefab))
-                    {
-                        GameObject go = Instantiate(this.voiceConnection.SpeakerPrefab, this.transform, false);
-                        speakers = go.GetComponentsInChildren<Speaker>(true);
-                        if (speakers.Length > 0)
-                        {
-                            this.speakerInUse = speakers[0];
-                            if (speakers.Length > 1 && this.Logger.IsWarningEnabled)
-                            {
-                                this.Logger.LogWarning("Multiple Speaker components found attached to the GameObject (VoiceConnection.SpeakerPrefab) or its children. Using the first one we found.");
-                            }
-                        }
-                        if (ReferenceEquals(null, this.speakerInUse))
-                        {
-                            if (this.Logger.IsErrorEnabled)
-                            {
-                                this.Logger.LogError("SpeakerPrefab does not have a component of type Speaker in its hierarchy.");
-                            }
-                            Destroy(go);
-                        }
-                        else
-                        {
-                            instantiated = true;
-                        }
-                    }
-                    if (!instantiated)
-                    {
-                        if (!this.voiceConnection.AutoCreateSpeakerIfNotFound)
-                        {
-                            return false;
-                        }
-                        this.speakerInUse = this.gameObject.AddComponent<Speaker>();
-                    }
-                }
-            }
-            return this.SetupSpeaker(this.speakerInUse);
-        }
-
-        private bool SetupSpeaker(Speaker speaker)
-        {
-            if (ReferenceEquals(null, this.speakerInUse))
-            {
-                if (this.Logger.IsWarningEnabled)
-                {
-                    this.Logger.LogWarning("Cannot setup a null Speaker");
-                }
-                return false;
-            }
-            if (!this.speakerInUse)
-            {
-                if (this.Logger.IsWarningEnabled)
-                {
-                    this.Logger.LogWarning("Cannot setup a destroyed Speaker");
-                }
-                return false;
-            }
-            #if !PHOTON_VOICE_FMOD_ENABLE
-            AudioSource audioSource = speaker.GetComponent<AudioSource>();
-            if (ReferenceEquals(null, audioSource))
-            {
-                if (this.Logger.IsWarningEnabled)
-                {
-                    this.Logger.LogWarning("Unexpected (null?): no AudioSource found attached to the same GameObject as the Speaker component");
-                }
-                return false;
-            }
-            if (!audioSource)
-            {
-                if (this.Logger.IsWarningEnabled)
-                {
-                    this.Logger.LogWarning("Unexpected (destroyed?): no AudioSource found attached to the same GameObject as the Speaker component");
-                }
-                return false;
-            }
-            if (audioSource.mute)
-            {
-                if (this.Logger.IsWarningEnabled)
-                {
-                    this.Logger.LogWarning("audioSource.mute is true, playback may not work properly");
-                }
-            }
-            if (audioSource.volume <= 0f)
-            {
-                if (this.Logger.IsWarningEnabled)
-                {
-                    this.Logger.LogWarning("audioSource.volume is zero, playback may not work properly");
-                }
-            }
-            if (!audioSource.enabled)
-            {
-                if (this.Logger.IsWarningEnabled)
-                {
-                    this.Logger.LogWarning("audioSource.enabled is false, playback may not work properly");
-                }
-            }
-            #endif
-            return true;
-        }
-
-        internal void SetupRecorderInUse()
-        {
-            if (this.IsRecorder)
-            {
-                if (this.Logger.IsInfoEnabled)
-                {
-                    this.Logger.LogInfo("Recorder already setup");
-                }
-                return;
-            }
-            if (!this.RequiresRecorder)
-            {
-                if (this.IsNetworkObjectReady)
-                {
-                    if (this.Logger.IsInfoEnabled)
-                    {
-                        this.Logger.LogInfo("Recorder not needed");
-                    }
-                }
-                return;
-            }
-            this.IsRecorder = this.SetupRecorder();
-            if (!this.IsRecorder)
-            {
-                if (this.Logger.IsWarningEnabled)
-                {
-                    this.Logger.LogWarning("Recorder not setup for VoiceNetworkObject: playback may not work properly.");
-                }
+                this.Logger.LogWarning("Cannot find Recorder. Assign a Recorder to VoiceNetworkObject object or set up FusionVoiceClient.PrimaryRecorder.");
             }
             else
             {
-                if (!this.RecorderInUse.IsRecording && !this.RecorderInUse.AutoStart)
-                {
-                    if (this.Logger.IsWarningEnabled)
-                    {
-                        this.Logger.LogWarning("VoiceNetworkObject.RecorderInUse.AutoStart is false, don't forget to start recording manually using recorder.StartRecording() or recorder.IsRecording = true.");
-                    }
-                }
-                if (!this.RecorderInUse.TransmitEnabled)
-                {
-                    if (this.Logger.IsWarningEnabled)
-                    {
-                        this.Logger.LogWarning("VoiceNetworkObject.RecorderInUse.TransmitEnabled is false, don't forget to set it to true to enable transmission.");
-                    }
-                }
-                if (!this.RecorderInUse.isActiveAndEnabled && this.RecorderInUse.RecordOnlyWhenEnabled)
-                {
-                    if (this.Logger.IsWarningEnabled)
-                    {
-                        this.Logger.LogWarning("VoiceNetworkObject.RecorderInUse may not work properly as RecordOnlyWhenEnabled is set to true and recorder is disabled or attached to an inactive GameObject.");
-                    }
-                }
+                recorder.UserData = this.GetUserData();
+                this.voiceConnection.AddRecorder(recorder);
             }
+            this.RecorderInUse = recorder;
         }
 
-        internal void SetupSpeakerInUse()
+        private void SetupSpeaker()
         {
-            if (this.IsSpeaker)
+            Speaker speaker = null;
+
+            Speaker[] speakers = this.GetComponentsInChildren<Speaker>(true);
+            if (speakers.Length > 0)
             {
-                if (this.Logger.IsInfoEnabled)
+                speaker = speakers[0];
+                if (speakers.Length > 1)
                 {
-                    this.Logger.LogInfo("Speaker already setup");
+                    this.Logger.LogWarning("Multiple Speaker components found attached to the GameObject or its children. Using the first one we found.");
                 }
-                return;
             }
-            if (!this.RequiresSpeaker)
+
+            if (null == speaker && null != this.voiceConnection.SpeakerPrefab)
             {
-                if (this.IsNetworkObjectReady)
-                {
-                    if (this.Logger.IsInfoEnabled)
-                    {
-                        this.Logger.LogInfo("Speaker not needed");
-                    }
-                }
-                return;
+                speaker = this.voiceConnection.InstantiateSpeakerPrefab(this.gameObject, false);
             }
-            this.IsSpeaker = this.SetupSpeaker();
-            if (!this.IsSpeaker)
+
+            if (null == speaker)
             {
-                if (this.Logger.IsWarningEnabled)
-                {
-                    this.Logger.LogWarning("Speaker not setup for VoiceNetworkObject: voice chat will not work.");
-                }
+                this.Logger.LogError("No Speaker component or prefab found. Assign a Speaker to VoiceNetworkObject object or set up FusionVoiceClient.SpeakerPrefab.");
             }
             else
             {
-                this.CheckLateLinking();
+                this.Logger.LogInfo("Speaker instantiated.");
             }
+            this.SpeakerInUse = speaker;
         }
-        
+
         private object GetUserData()
         {
             return this.Object.Id;
         }
 
-        private void CheckLateLinking()
+        public override void Spawned()
         {
-            if (this.voiceConnection.Client.InRoom)
+            voiceComponentImpl.Awake(this);
+
+            this.voiceConnection = this.Runner.GetComponent<VoiceConnection>();
+
+            if (this.Object.HasInputAuthority)
             {
-                if (this.IsSpeaker)
+                this.SetupRecorder();
+                if (this.RecorderInUse == null)
                 {
-                    if (!this.IsSpeakerLinked)
-                    {
-                        if (this.voiceConnection.TryLateLinkingUsingUserData(this.SpeakerInUse, this.GetUserData()))
-                        {
-                            if (this.Logger.IsDebugEnabled)
-                            {
-                                this.Logger.LogDebug("Late linking attempt succeeded.");
-                            }
-                        }
-                        else if (this.Logger.IsDebugEnabled)
-                        {
-                            this.Logger.LogDebug("Late linking attempt failed.");
-                        }
-                    }
-                    else if (this.Logger.IsDebugEnabled)
-                    {
-                        this.Logger.LogDebug("Speaker already linked");
-                    }
-                } 
-                else if (this.Logger.IsDebugEnabled)
+                    this.Logger.LogWarning("Recorder not setup for VoiceNetworkObject: playback may not work properly.");
+                }
+                else
                 {
-                    this.Logger.LogDebug("VoiceNetworkObject does not have a Speaker and may not need late linking check");
+                    if (!this.RecorderInUse.TransmitEnabled)
+                    {
+                        this.Logger.LogWarning("VoiceNetworkObject.RecorderInUse.TransmitEnabled is false, don't forget to set it to true to enable transmission.");
+                    }
+                    if (!this.RecorderInUse.isActiveAndEnabled)
+                    {
+                        this.Logger.LogWarning("VoiceNetworkObject.RecorderInUse may not work properly as RecordOnlyWhenEnabled is set to true and recorder is disabled or attached to an inactive GameObject.");
+                    }
                 }
             }
-            else if (this.Logger.IsDebugEnabled)
+
+            this.SetupSpeaker();
+            if (this.SpeakerInUse == null)
             {
-                this.Logger.LogDebug("Voice client is still not in a room, skipping late linking check");
+                this.Logger.LogWarning("Speaker not setup for VoiceNetworkObject: voice chat will not work.");
+            }
+            else
+            {
+                this.voiceConnection.AddSpeaker(this.SpeakerInUse, this.GetUserData());
             }
         }
 
-        public override void Spawned()
+        public override void Despawned(NetworkRunner runner, bool hasState)
         {
-            this.voiceConnection = this.Runner.GetComponent<VoiceConnection>();
-            this.Setup();
+            this.voiceConnection.RemoveRecorder(this.RecorderInUse);
         }
 
         #endregion

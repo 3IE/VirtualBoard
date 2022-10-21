@@ -48,7 +48,7 @@ namespace Photon.Pun
 
         /// <summary>Limits the number of datagrams that are created in each LateUpdate.</summary>
         /// <remarks>Helps spreading out sending of messages minimally.</remarks>
-        public static int MaxDatagrams = 3;
+        public static int MaxDatagrams = 10;
 
         /// <summary>Signals that outgoing messages should be sent in the next LateUpdate call.</summary>
         /// <remarks>Up to MaxDatagrams are created to send queued messages.</remarks>
@@ -184,6 +184,10 @@ namespace Photon.Pun
                     sendCounter++;
                     Profiler.EndSample();
                 }
+                if (sendCounter >= MaxDatagrams)
+                {
+                    SendAsap = true;
+                }
 
                 this.nextSendTickCount = currentMsSinceStart + this.UpdateInterval;
             }
@@ -258,10 +262,11 @@ namespace Photon.Pun
             var views = PhotonNetwork.PhotonViewCollection;
             foreach (var view in views)
             {
-                if (!view.IsRoomView) continue;
-                
-                view.OwnerActorNr= newMasterClient.ActorNumber;
-                view.ControllerActorNr = newMasterClient.ActorNumber;
+                if (view.IsRoomView)
+                {
+                    view.OwnerActorNr= newMasterClient.ActorNumber;
+                    view.ControllerActorNr = newMasterClient.ActorNumber;
+                }
             }
         }
 

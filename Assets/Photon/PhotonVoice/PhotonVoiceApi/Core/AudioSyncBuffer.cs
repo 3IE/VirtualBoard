@@ -32,20 +32,20 @@ namespace Photon.Voice
             this.logPrefix = logPrefix;
             this.debugInfo = debugInfo;
         }
-        public int Lag 
-        { 
-            get 
+        public int Lag
+        {
+            get
             {
                 lock (this)
                 {
                     return (int)((float)this.frameQueue.Count * this.frameSamples * 1000 / sampleRate);
                 }
-            } 
+            }
         }
 
         public bool IsPlaying
         {
-            get 
+            get
             {
                 lock (this)
                 {
@@ -107,7 +107,7 @@ namespace Photon.Voice
         public void Service()
         {
         }
-        
+
         public void Read(T[] outBuf, int outChannels, int outSampleRate)
         {
             lock (this)
@@ -117,7 +117,7 @@ namespace Photon.Voice
                     int outPos = 0;
                     // enough data in remaining frames to fill entire out buffer
                     // framesElemRem / this.sampleRate >= outElemRem / outSampleRate
-                    while ((this.frameQueue.Count * this.frameSamples - this.curPlayingFrameSamplePos) * this.channels * outSampleRate >= (outBuf.Length - outPos) * this.sampleRate) 
+                    while ((this.frameQueue.Count * this.frameSamples - this.curPlayingFrameSamplePos) * this.channels * outSampleRate >= (outBuf.Length - outPos) * this.sampleRate)
                     {
                         int playingFramePos = this.curPlayingFrameSamplePos * this.channels;
                         var frame = frameQueue.Peek();
@@ -130,7 +130,7 @@ namespace Photon.Voice
                         {
                             // frame remainder is large enough to fill outBuf remainder, keep this frame and return
                             //int framePosDelta = this.channels * outChannels * this.sampleRate / (outElemRem * outSampleRate);
-                            int framePosDelta = outElemRem * this.channels* this.sampleRate / (outChannels * outSampleRate);
+                            int framePosDelta = outElemRem * this.channels * this.sampleRate / (outChannels * outSampleRate);
                             if (this.sampleRate == outSampleRate && this.channels == outChannels)
                             {
                                 System.Buffer.BlockCopy(frame, playingFramePos * elementSize, outBuf, outPos * elementSize, outElemRem * elementSize);
@@ -244,7 +244,7 @@ namespace Photon.Voice
                 }
                 if (this.debugInfo)
                 {
-                    this.logger.LogWarning("{0} AudioSynctBuffer overrun {1} {2} {3} {4}", this.logPrefix, targetPlayDelaySamples - maxDevPlayDelaySamples, targetPlayDelaySamples + maxDevPlayDelaySamples, lagSamples, framesCnt, this.curPlayingFrameSamplePos);
+                    this.logger.LogDebug("{0} AudioSynctBuffer overrun {1} {2} {3} {4}", this.logPrefix, targetPlayDelaySamples - maxDevPlayDelaySamples, targetPlayDelaySamples + maxDevPlayDelaySamples, lagSamples, framesCnt, this.curPlayingFrameSamplePos);
                 }
             }
             else if (lagSamples < targetPlayDelaySamples - maxDevPlayDelaySamples)
@@ -258,7 +258,7 @@ namespace Photon.Voice
 
                 if (this.debugInfo)
                 {
-                    this.logger.LogWarning("{0} AudioSyncBuffer underrun {1} {2} {3} {4}", this.logPrefix, targetPlayDelaySamples - maxDevPlayDelaySamples, targetPlayDelaySamples + maxDevPlayDelaySamples, lagSamples, framesCnt, this.curPlayingFrameSamplePos);
+                    this.logger.LogDebug("{0} AudioSyncBuffer underrun {1} {2} {3} {4}", this.logPrefix, targetPlayDelaySamples - maxDevPlayDelaySamples, targetPlayDelaySamples + maxDevPlayDelaySamples, lagSamples, framesCnt, this.curPlayingFrameSamplePos);
                 }
             }
         }

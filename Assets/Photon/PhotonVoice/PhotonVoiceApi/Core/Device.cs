@@ -9,52 +9,80 @@ using System.Runtime.InteropServices;
 
 namespace Photon.Voice
 {
+    public enum CameraFacing
+    {
+        Undef,
+        Front,
+        Back,
+    }
+
+    public class DeviceFeatures
+    {
+        public DeviceFeatures()
+        {
+        }
+        public DeviceFeatures(CameraFacing facing)
+        {
+            CameraFacing = facing;
+        }
+        public CameraFacing CameraFacing { get; private set; }
+
+        static internal DeviceFeatures Default = new DeviceFeatures();
+    }
+
     public struct DeviceInfo
     {
         // used internally for Default property creation
-        private DeviceInfo(bool isDefault, int idInt, string idString, string name)
+        private DeviceInfo(bool isDefault, int idInt, string idString, string name, DeviceFeatures features = null)
         {
             IsDefault = isDefault;
             IDInt = idInt;
             IDString = idString;
             Name = name;
             useStringID = false;
+            this.features = features;
         }
 
         // numeric id
-        public DeviceInfo(int id, string name)
+        public DeviceInfo(int id, string name, DeviceFeatures features = null)
         {
             IsDefault = false;
             IDInt = id;
             IDString = "";
             Name = name;
             useStringID = false;
+            this.features = features;
         }
 
         // string id
-        public DeviceInfo(string id, string name)
+        public DeviceInfo(string id, string name, DeviceFeatures features = null)
         {
             IsDefault = false;
             IDInt = 0;
             IDString = id;
             Name = name;
             useStringID = true;
+            this.features = features;
         }
 
         // name is id (Unity Microphone and WebCamTexture APIs)
-        public DeviceInfo(string name)
+        public DeviceInfo(string name, DeviceFeatures features = null)
         {
             IsDefault = false;
             IDInt = 0;
             IDString = name;
             Name = name;
             useStringID = true;
+            this.features = features;
         }
 
         public bool IsDefault { get; private set; }
         public int IDInt { get; private set; }
         public string IDString { get; private set; }
         public string Name { get; private set; }
+        public DeviceFeatures Features => features == null ? DeviceFeatures.Default : features;
+        DeviceFeatures features;
+
         private bool useStringID;
 
         public static bool operator ==(DeviceInfo d1, DeviceInfo d2)
@@ -66,7 +94,7 @@ namespace Photon.Voice
             return !d1.Equals(d2);
         }
 
-        // trivial implementation to avoid warnings CS0660 and CS0661 about missing overrides when == and != defined 
+        // trivial implementation to avoid warnings CS0660 and CS0661 about missing overrides when == and != defined
         public override bool Equals(object obj)
         {
             return base.Equals(obj);

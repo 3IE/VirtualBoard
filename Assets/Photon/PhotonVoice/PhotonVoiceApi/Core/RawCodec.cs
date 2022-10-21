@@ -79,7 +79,7 @@ namespace Photon.Voice
             T[] buf = new T[0];
             int sizeofT = System.Runtime.InteropServices.Marshal.SizeOf(default(T));
 
-			public void Input(ref FrameBuffer byteBuf)
+            public void Input(ref FrameBuffer byteBuf)
             {
                 if (byteBuf.Array == null)
                 {

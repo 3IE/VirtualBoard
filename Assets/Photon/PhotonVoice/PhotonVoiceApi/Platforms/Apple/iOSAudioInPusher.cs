@@ -87,10 +87,10 @@ namespace Photon.Voice.IOS
         public void SetCallback(Action<float[]> callback, ObjectFactory<float[], int> bufferFactory)
         {
             this.bufferFactory = bufferFactory;
-            this.pushCallback = callback;            
+            this.pushCallback = callback;
         }
         private void push(IntPtr buf, int len)
-        {            
+        {
             if (this.pushCallback != null)
             {
                 var bufManaged = bufferFactory.New(len);

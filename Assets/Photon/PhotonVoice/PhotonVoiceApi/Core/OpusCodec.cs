@@ -225,7 +225,7 @@ namespace Photon.Voice
                             {
                                 output(frameOut.Set(res1, false));
                             }
-                            else                            
+                            else
                             {
                                 // swap results to reuse the code below
                                 res2 = res1;
@@ -242,7 +242,7 @@ namespace Photon.Voice
                             output(frameOut.Set(res, false));
                         }
                     }
-                    
+
                 }
             }
         }

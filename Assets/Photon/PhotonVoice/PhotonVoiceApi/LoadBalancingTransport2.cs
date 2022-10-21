@@ -27,7 +27,7 @@ namespace Photon.Voice
             this.LoadBalancingPeer.ReuseEventInstance = true;             // this won't store references to the event anyways
         }
 
-		const int DATA_OFFSET = 4;
+        const int DATA_OFFSET = 4;
         public override void SendFrame(ArraySegment<byte> data, FrameFlags flags, byte evNumber, byte voiceId, int channelId, int targetPlayerId, bool reliable, LocalVoice localVoice)
         {
             // this uses a pooled slice, which is released within the send method (here RaiseEvent at the bottom)
@@ -60,7 +60,7 @@ namespace Photon.Voice
             this.OpRaiseEvent(VoiceEvent.FrameCode, frameData, opt, sendOpt);
 
             // each voice has it's own connection? else, we could aggregate voices data in less count of datagrams
-            while (this.LoadBalancingPeer.SendOutgoingCommands());
+            while (this.LoadBalancingPeer.SendOutgoingCommands()) ;
         }
 
 
@@ -119,7 +119,7 @@ namespace Photon.Voice
                 {
                     buffer = new FrameBuffer(content, dataOffset, contentLength - dataOffset, flags, null);
                 }
-                
+
                 this.voiceClient.onFrame(channelId, playerId, voiceId, evNumber, ref buffer, playerId == localPlayerId);
                 buffer.Release();
             }
