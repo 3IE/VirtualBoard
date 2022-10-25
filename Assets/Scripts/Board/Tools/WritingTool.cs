@@ -76,12 +76,11 @@ namespace Board.Tools
         {
             if (!other.CompareTag("Ceiling")) return;
 
-            _rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+            _rigidbody.velocity = Vector3.zero;
+            _rigidbody.angularVelocity = Vector3.zero;
 
             _transform.position = _initialPosition;
             _transform.rotation = _initialRotation;
-
-            _rigidbody.constraints = RigidbodyConstraints.None;
         }
 
         /// <summary>

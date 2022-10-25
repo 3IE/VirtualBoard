@@ -10,6 +10,9 @@ namespace Board.Tools
         [Tooltip("The tip of the marker")]
         [SerializeField]
         private GameObject tip;
+        [Tooltip("The handle of the marker")]
+        [SerializeField]
+        private GameObject handle;
 
         private Board   _board;
         private Color[] _colors;
@@ -19,6 +22,10 @@ namespace Board.Tools
         private Transform  _tipTransform;
         private RaycastHit _touch;
         private Vector2    _touchPos;
+        
+        private bool _previousCouldDraw;
+        
+        private Vector3 _direction;
 
         /// <summary>
         ///     Position on the board touched last
@@ -29,6 +36,8 @@ namespace Board.Tools
         private void Start()
         {
             Initialize();
+
+            _direction = -Board.Instance.transform.up;
         }
 
         private void Update()
@@ -36,7 +45,16 @@ namespace Board.Tools
             UpdateRotation();
 
             if (CanDraw)
+            {
                 Tools.Instance.Modified = Draw() || Tools.Instance.Modified;
+                
+                if (_previousCouldDraw)
+                    handle.layer = LayerMask.NameToLayer("Ghost");
+            }
+            else if (_previousCouldDraw)
+                handle.layer = LayerMask.NameToLayer("Tools");
+            
+            _previousCouldDraw = CanDraw;
         }
 
         /// <summary>
@@ -73,7 +91,7 @@ namespace Board.Tools
         private bool Draw()
         {
             // We check if we are touching the board with the marker
-            if (Physics.Raycast(_tipTransform.position, _tipTransform.forward, out _touch,
+            if (Physics.Raycast(_tipTransform.position, _direction, out _touch,
                                 _tipTransform.localScale.z / 2)
                 && _touch.transform.CompareTag("Board"))
             {
@@ -197,7 +215,7 @@ namespace Board.Tools
         ///     Modifies the board's texture and notifies the GPU to update its rendering
         /// </summary>
         /// <param name="modification"> modification to apply </param>
-        public void AddModification(Modification modification)
+        public static void AddModification(Modification modification)
         {
             ModifyTexture(modification);
             Tools.Instance.Modified = true;

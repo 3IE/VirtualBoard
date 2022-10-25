@@ -48,11 +48,11 @@ namespace Refactor
             switch (eventCode)
             {
                 case EventCode.Marker:
-                    tools.marker.AddModification(new Modification(data));
+                    Marker.AddModification(new Modification(data));
                     break;
 
                 case EventCode.Eraser:
-                    tools.eraser.AddModification(new Modification(data));
+                    Marker.AddModification(new Modification(data));
                     break;
 
                 case EventCode.Texture:

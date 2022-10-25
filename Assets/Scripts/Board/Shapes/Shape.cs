@@ -33,6 +33,7 @@ namespace Board.Shapes
 
         private bool _created;
         private bool _deleting;
+        private bool _clipping;
 
         private int _id;
 
@@ -455,34 +456,37 @@ namespace Board.Shapes
         /// </summary>
         private void Move()
         {
-            if (Physics.Raycast(Interactors[0].transform.position, Interactors[0].transform.forward,
-                                out RaycastHit hit, InitialDistance, DefaultMask))
-            {
-                Vector3 position = GetPositionFromHit(hit);
-
-                if (!CheckForCollision(position))
-                {
-                    Transform.position = position;
-                    InitialDistance    = hit.distance;
-                    return;
-                }
-            }
-
-            int size = CheckCast();
-
             var positionFound = false;
 
-            for (int i = size - 1; i >= 0 && !positionFound; i--)
+            if (_clipping)
             {
-                Vector3 position = GetPositionFromHit(Hits[i]);
+                if (Physics.Raycast(Interactors[0].transform.position, Interactors[0].transform.forward,
+                                    out RaycastHit hit, InitialDistance, DefaultMask))
+                {
+                    Vector3 position = GetPositionFromHit(hit);
 
-                if (CheckForCollision(position))
-                    continue;
+                    if (!CheckForCollision(position))
+                    {
+                        Transform.position = position;
+                        InitialDistance    = hit.distance;
+                        return;
+                    }
+                }
 
-                Transform.position = position;
+                int size = CheckCast();
 
-                //initialDistance = hit.distance;
-                positionFound = true;
+                for (int i = size - 1; i >= 0 && !positionFound; i--)
+                {
+                    Vector3 position = GetPositionFromHit(Hits[i]);
+
+                    if (CheckForCollision(position))
+                        continue;
+
+                    Transform.position = position;
+
+                    //initialDistance = hit.distance;
+                    positionFound = true;
+                }
             }
 
             if (!positionFound)
