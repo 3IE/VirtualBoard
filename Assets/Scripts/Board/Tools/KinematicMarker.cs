@@ -85,7 +85,41 @@ namespace Board.Tools
 
         private void Update()
         {
+            if (!_canDraw)
+                return;
             
+            Vector3    currentPos;
+            Quaternion currentRot;
+
+            if (_controller is not null)
+            {
+                Transform controllerTransform = _controller.transform;
+
+                currentPos = controllerTransform.position;
+                currentRot = controllerTransform.rotation;
+            }
+            else
+            {
+                currentPos = _transform.position;
+                currentRot = _transform.rotation;
+            }
+
+            float distance = Mathf.Abs(_snapPosition.z - currentPos.z);
+
+            if (distance >= snapDistance && currentPos.z + snapDistance <= _snapPosition.z)
+            {
+                StopDrawing();
+                return;
+            }
+
+            _transform.position =
+                new Vector3(currentPos.x, currentPos.y, _snapPosition.z);
+            _transform.rotation = currentRot;
+
+            if (_controller is null)
+                return;
+
+            _transform.Rotate(Vector3.right, 90f);
             
             Tools.Instance.Modified = Draw() || Tools.Instance.Modified;
         }
@@ -109,42 +143,6 @@ namespace Board.Tools
                 StartDrawing();
                 couldDraw = true;
             }
-            
-            if (!_canDraw)
-                return;
-
-            Vector3    currentPos;
-            Quaternion currentRot;
-
-            if (_controller is not null)
-            {
-                Transform controllerTransform = _controller.transform;
-
-                currentPos = controllerTransform.position;
-                currentRot = controllerTransform.rotation;
-            }
-            else
-            {
-                currentPos = _transform.position;
-                currentRot = _transform.rotation;
-            }
-
-            float distance = Vector3.Distance(_snapPosition, currentPos);
-
-            if (distance >= snapDistance && currentPos.z + snapDistance <= _snapPosition.z)
-            {
-                StopDrawing();
-                return;
-            }
-
-            _transform.position =
-                new Vector3(currentPos.x, currentPos.y, _snapPosition.z);
-            _transform.rotation = currentRot;
-
-            if (_controller is null)
-                return;
-
-            _transform.Rotate(Vector3.right, 90f);
         }
 
         private void OnTriggerEnter(Collider other)
@@ -275,7 +273,8 @@ namespace Board.Tools
 
                 if (_touchedLast)
                 {
-                    if (Vector2.Distance(new Vector2(x, y), _lastTouchPos) < 0.01f)
+                    float magnitude = (new Vector2(x, y) - _lastTouchPos).magnitude;
+                    if (magnitude < 0.01f)
                         return false;
 
                     // ReSharper disable once Unity.NoNullPropagation
