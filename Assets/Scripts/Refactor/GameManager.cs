@@ -68,6 +68,8 @@ namespace Refactor
                 Debug.LogFormat("We are Instantiating LocalPlayer from {0}\nPrefab name: {1}",
                                 SceneManagerHelper.ActiveSceneName, playerPrefab.name);
 
+                Debug.LogErrorFormat("Instantiating player at time {0}", Time.unscaledTime);
+                
                 // we're in a room. spawn a character for the local player. it gets synced by using PhotonNetwork.Instantiate
                 GameObject player =
                     PhotonNetwork.Instantiate(playerPrefab.name, mainCamera.position, mainCamera.rotation);
@@ -77,10 +79,16 @@ namespace Refactor
                 entity.SetDevice(DeviceType.VR);
                 entity.ReplaceHandsTransforms(leftInteractor, rightInteractor);
 
+                System.Diagnostics.Debug.Assert(Camera.main is not null, "Camera.main is null");
+                Camera.main.gameObject.SetActive(true);
+
                 #if DEBUG
                 DebugPanel.Instance.SetConnected(true);
                 DebugPanel.Instance.AddPlayer(DeviceType.VR);
                 #endif
+                
+                Debug.LogErrorFormat("Finished Instantiating player at time {0}", Time.unscaledTime);
+
             }
             else
                 Debug.LogFormat("Ignoring scene load for {0}", SceneManagerHelper.ActiveSceneName);

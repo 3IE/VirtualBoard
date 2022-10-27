@@ -25,6 +25,8 @@ namespace Board
 
         private void ResetBoard()
         {
+            OVRMetricsToolSDK.Instance.AppendCsvDebugString("ResetBoardStart");
+            
             Color   c   = Tools.Tools.Instance.baseColor;
             Color[] arr = board.texture.GetPixels();
 
@@ -41,6 +43,8 @@ namespace Board
 
             PhotonNetwork.RaiseEvent((byte) EventCode.Texture, content, raiseEventOptions,
                                      SendOptions.SendReliable);
+            
+            OVRMetricsToolSDK.Instance.AppendCsvDebugString("ResetBoardEnd");
         }
     }
 }

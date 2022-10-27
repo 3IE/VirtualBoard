@@ -6,12 +6,12 @@ using Utils;
 
 namespace Board.Tools
 {
-    public sealed class KinematicMarker : MonoBehaviour
+    public class KinematicMarker : MonoBehaviour
     {
         [SerializeField] private List<HoverInteractable> hover;
 
-        [SerializeField] private float penSize;
-        [SerializeField] private float snapDistance;
+        [SerializeField] protected float penSize;
+        [SerializeField] private   float snapDistance;
 
         [SerializeField] private Collider markerCollider;
         [SerializeField] private Collider tipCollider;
@@ -73,21 +73,14 @@ namespace Board.Tools
         // Start is called before the first frame update
         private void Start()
         {
-            _transform        = transform;
-            _tipTransform     = tip.transform;
-            _direction        = -Board.Instance.transform.up;
-            _grabInteractable = GetComponent<XRGrabInteractable>();
-            _renderer         = tip.GetComponent<Renderer>();
-            _rigidbody        = GetComponent<Rigidbody>();
-
-            _touchedLast = false;
+            Initialize();
         }
 
         private void Update()
         {
             if (!_canDraw)
                 return;
-            
+
             Vector3    currentPos;
             Quaternion currentRot;
 
@@ -120,7 +113,7 @@ namespace Board.Tools
                 return;
 
             _transform.Rotate(Vector3.right, 90f);
-            
+
             Tools.Instance.Modified = Draw() || Tools.Instance.Modified;
         }
 
@@ -140,9 +133,22 @@ namespace Board.Tools
                 if (!hits[i].collider.CompareTag("Kinematic Board"))
                     continue;
 
-                StartDrawing();
+                if (!_canDraw)
+                    StartDrawing();
                 couldDraw = true;
             }
+        }
+
+        protected virtual void Initialize()
+        {
+            _transform        = transform;
+            _tipTransform     = tip.transform;
+            _direction        = -Board.Instance.transform.up;
+            _grabInteractable = GetComponent<XRGrabInteractable>();
+            _renderer         = tip.GetComponent<Renderer>();
+            _rigidbody        = GetComponent<Rigidbody>();
+
+            _touchedLast = false;
         }
 
         private void OnTriggerEnter(Collider other)
@@ -209,6 +215,8 @@ namespace Board.Tools
             _canDraw               = true;
             tipCollider.enabled    = true;
             markerCollider.enabled = false;
+
+            OVRMetricsToolSDK.Instance.AppendCsvDebugString("DrawCheckStart");
         }
 
         private void StopDrawing()
@@ -221,6 +229,8 @@ namespace Board.Tools
             _touchedLast           = false;
             tipCollider.enabled    = false;
             markerCollider.enabled = true;
+
+            OVRMetricsToolSDK.Instance.AppendCsvDebugString("DrawCheckStop");
         }
 
         private void ResetPosition()
@@ -274,6 +284,7 @@ namespace Board.Tools
                 if (_touchedLast)
                 {
                     float magnitude = (new Vector2(x, y) - _lastTouchPos).magnitude;
+
                     if (magnitude < 0.01f)
                         return false;
 
@@ -296,13 +307,20 @@ namespace Board.Tools
                     }
                 }
                 else
+                {
                     _colors = GenerateShape();
+
+                    OVRMetricsToolSDK.Instance.AppendCsvDebugString("DrawStart");
+                }
 
                 _lastTouchPos = new Vector2(x, y);
                 _touchedLast  = true;
 
                 return true;
             }
+
+            if (_touchedLast)
+                OVRMetricsToolSDK.Instance.AppendCsvDebugString("DrawStop");
 
             _board       = null;
             _touchedLast = false;
@@ -314,7 +332,7 @@ namespace Board.Tools
         ///     Generates a color array
         /// </summary>
         /// <returns> color array </returns>
-        private Color[] GenerateShape()
+        protected virtual Color[] GenerateShape()
         {
             return Tools.GenerateSquare(_renderer.material.color, penSize);
 
@@ -347,12 +365,13 @@ namespace Board.Tools
                                           float destY, Color[] colors, float size)
         {
             var castSize = (int) size;
+            int mipLevel = Board.Instance.texture.loadedMipmapLevel;
 
             Board.Instance.texture.SetPixels(x, y, castSize,
-                                             castSize, colors);
+                                             castSize, colors, mipLevel);
 
             Board.Instance.texture.SetPixels((int) destX, (int) destY, castSize,
-                                             castSize, colors);
+                                             castSize, colors, mipLevel);
 
             // Interpolation
             for (var f = 0.01f; f < 1.00f; f += Tools.Instance.coverage)
@@ -361,8 +380,10 @@ namespace Board.Tools
                 var lerpY = (int) Mathf.Lerp(destY, y, f);
 
                 Board.Instance.texture.SetPixels(lerpX, lerpY, castSize,
-                                                 castSize, colors);
+                                                 castSize, colors, mipLevel);
             }
+            
+            Board.Instance.texture.Apply(false);
         }
 
         /// <summary>
