@@ -418,7 +418,7 @@
     },
     "m_ActiveTargets": [
         {
-            "m_Id": "b9868c95a68f47d19c1e5729aee7bfff"
+            "m_Id": "4ba7dc7bf50c4dfc91f4d738fb12efc7"
         }
     ]
 }
@@ -1009,6 +1009,26 @@
         "m_Guid": ""
     },
     "m_DefaultType": 0
+}
+
+{
+    "m_SGVersion": 1,
+    "m_Type": "UnityEditor.Rendering.Universal.ShaderGraph.UniversalTarget",
+    "m_ObjectId": "4ba7dc7bf50c4dfc91f4d738fb12efc7",
+    "m_ActiveSubTarget": {
+        "m_Id": "955b296f05e24d77b28f0cbce979a96d"
+    },
+    "m_AllowMaterialOverride": false,
+    "m_SurfaceType": 0,
+    "m_ZTestMode": 4,
+    "m_ZWriteControl": 0,
+    "m_AlphaMode": 0,
+    "m_RenderFace": 2,
+    "m_AlphaClip": false,
+    "m_CastShadows": true,
+    "m_ReceiveShadows": true,
+    "m_CustomEditorGUI": "",
+    "m_SupportVFX": false
 }
 
 {
@@ -1787,14 +1807,6 @@
 
 {
     "m_SGVersion": 0,
-    "m_Type": "UnityEditor.Rendering.BuiltIn.ShaderGraph.BuiltInLitSubTarget",
-    "m_ObjectId": "8cdb479e6a9545158d382cc2f04f636f",
-    "m_WorkflowMode": 1,
-    "m_NormalDropOffSpace": 0
-}
-
-{
-    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.Internal.Texture2DShaderProperty",
     "m_ObjectId": "9422d8a0339d4ff8a8fd4c16f72e4e07",
     "m_Guid": {
@@ -1821,6 +1833,16 @@
     "useTilingAndOffset": false,
     "m_Modifiable": true,
     "m_DefaultType": 0
+}
+
+{
+    "m_SGVersion": 1,
+    "m_Type": "UnityEditor.Rendering.Universal.ShaderGraph.UniversalLitSubTarget",
+    "m_ObjectId": "955b296f05e24d77b28f0cbce979a96d",
+    "m_WorkflowMode": 1,
+    "m_NormalDropOffSpace": 0,
+    "m_ClearCoat": false,
+    "m_BlendModePreserveSpecular": true
 }
 
 {
@@ -2230,23 +2252,6 @@
     "m_Property": {
         "m_Id": "9422d8a0339d4ff8a8fd4c16f72e4e07"
     }
-}
-
-{
-    "m_SGVersion": 2,
-    "m_Type": "UnityEditor.Rendering.BuiltIn.ShaderGraph.BuiltInTarget",
-    "m_ObjectId": "b9868c95a68f47d19c1e5729aee7bfff",
-    "m_ActiveSubTarget": {
-        "m_Id": "8cdb479e6a9545158d382cc2f04f636f"
-    },
-    "m_AllowMaterialOverride": false,
-    "m_SurfaceType": 0,
-    "m_ZWriteControl": 0,
-    "m_ZTestMode": 4,
-    "m_AlphaMode": 0,
-    "m_RenderFace": 2,
-    "m_AlphaClip": false,
-    "m_CustomEditorGUI": ""
 }
 
 {

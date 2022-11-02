@@ -256,13 +256,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 126494ae2a10a34499272ed97a6c9f5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  logLevel: 2
-  ignoreGlobalLogLevel: 0
-  recorderInUse: {fileID: 0}
-  speakerInUse: {fileID: 3445220926701429981}
-  AutoCreateRecorderIfNotFound: 0
-  UsePrimaryRecorder: 1
-  SetupDebugSpeaker: 0
 --- !u!1 &7609648570768286184
 GameObject:
   m_ObjectHideFlags: 0
@@ -325,7 +318,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: fd00eb5cd4277cc479a5edf876a1c6be, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -425,14 +418,3 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4951118959072832212, guid: 207c14c3f675fb142932c5d07e79844c, type: 3}
   m_PrefabInstance: {fileID: 7744513899084058120}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &3445220926701429981 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4951118959072832213, guid: 207c14c3f675fb142932c5d07e79844c, type: 3}
-  m_PrefabInstance: {fileID: 7744513899084058120}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dd7fea91fe63f4e1b884ef1e16a975c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

@@ -63,7 +63,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: fd00eb5cd4277cc479a5edf876a1c6be, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -454,18 +454,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8290ba70c5f445adbe24f719a455ff85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonTopRigid: {fileID: 8038083723882585534}
-  buttonTop: {fileID: 1669323365604163158}
-  buttonLowerLimit: {fileID: 213376847470147644}
-  buttonUpperLimit: {fileID: 8853874537131151335}
-  threshHold: 0.5
-  force: 10
-  isPressed: 0
+  bodyButtonCollider: {fileID: 0}
+  buttonCollider: {fileID: 0}
   pressedSound: {fileID: 264619349198097275}
   releasedSound: {fileID: 264619349198097275}
-  collidersToIgnore:
-  - {fileID: 0}
-  - {fileID: 0}
   onPressed:
     m_PersistentCalls:
       m_Calls:
@@ -484,6 +476,7 @@ MonoBehaviour:
   onReleased:
     m_PersistentCalls:
       m_Calls: []
+  animator: {fileID: 0}
 --- !u!114 &1736035049973357133
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -707,7 +700,7 @@ Transform:
   - {fileID: 937167760804075138}
   - {fileID: 1140369591813964684}
   m_Father: {fileID: 0}
-  m_RootOrder: -1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8091711942309109900
 GameObject:
@@ -999,18 +992,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8290ba70c5f445adbe24f719a455ff85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonTopRigid: {fileID: 490318466893370292}
-  buttonTop: {fileID: 5602324909926298634}
-  buttonLowerLimit: {fileID: 2524850699198961267}
-  buttonUpperLimit: {fileID: 675700808655334802}
-  threshHold: 0.5
-  force: 10
-  isPressed: 0
+  bodyButtonCollider: {fileID: 0}
+  buttonCollider: {fileID: 0}
   pressedSound: {fileID: 8706164639780620956}
   releasedSound: {fileID: 8706164639780620956}
-  collidersToIgnore:
-  - {fileID: 0}
-  - {fileID: 0}
   onPressed:
     m_PersistentCalls:
       m_Calls:
@@ -1029,6 +1014,7 @@ MonoBehaviour:
   onReleased:
     m_PersistentCalls:
       m_Calls: []
+  animator: {fileID: 0}
 --- !u!114 &1797846725613153492
 MonoBehaviour:
   m_ObjectHideFlags: 0
