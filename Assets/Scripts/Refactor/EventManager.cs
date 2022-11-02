@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Board.Events;
 using Board.Shapes;
@@ -22,6 +23,8 @@ namespace Refactor
         [SerializeField] private GameObject postItPrefab;
         [SerializeField] private GameObject onlinePingPrefab;
         [SerializeField] private GameObject board;
+
+        internal static Dictionary<int, PlayerEntityV2> _players;
 
         #region ROOM_EVENTS
 
@@ -144,6 +147,7 @@ namespace Refactor
                     break;
 
                 case EventCode.SendNewPosition:
+                    _players[photonEvent.Sender].UpdateTransforms(data as object[]);
                     break;
 
                 case EventCode.SendNewPlayerIn:
@@ -185,6 +189,8 @@ namespace Refactor
         private void Awake()
         {
             CustomShape.Init();
+
+            _players = new Dictionary<int, PlayerEntityV2>();
         }
 
         private void Start()

@@ -12,6 +12,7 @@ namespace Utils
         [SerializeField] private AudioSource pressedSound;
         [SerializeField] private AudioSource releasedSound;
         [SerializeField] private UnityEvent  onPressed;
+        [SerializeField] private UnityEvent  onReleased;
         [SerializeField] private Animator    animator;
 
         private void Awake()
@@ -42,6 +43,7 @@ namespace Utils
         {
             releasedSound.pitch = Random.Range(1.1f, 1.2f);
             releasedSound.Play();
+            onReleased.Invoke();
         }
     }
 }

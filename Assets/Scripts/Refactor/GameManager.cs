@@ -63,7 +63,7 @@ namespace Refactor
                 Debug.LogError("<Color=Red><a>Missing</a></Color> playerPrefab Reference. Please set it up in GameObject 'Game Manager'",
                                this);
             }
-            else if (PlayerManager.LocalPlayerInstance is null)
+            else if (PlayerManagerV2.LocalPlayerInstance is null)
             {
                 Debug.LogFormat("We are Instantiating LocalPlayer from {0}\nPrefab name: {1}",
                                 SceneManagerHelper.ActiveSceneName, playerPrefab.name);
@@ -75,7 +75,7 @@ namespace Refactor
                     PhotonNetwork.Instantiate(playerPrefab.name, mainCamera.position, mainCamera.rotation);
                 player.transform.SetParent(mainCamera);
 
-                var entity = player.GetComponent<PlayerEntity>();
+                var entity = player.GetComponent<PlayerEntityV2>();
                 entity.SetDevice(DeviceType.VR);
                 entity.ReplaceHandsTransforms(leftInteractor, rightInteractor);
 

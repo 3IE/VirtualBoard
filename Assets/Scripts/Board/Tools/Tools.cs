@@ -31,7 +31,7 @@ namespace Board.Tools
         /// </summary>
         public Color baseColor;
 
-        [SerializeField] private float gpuRefreshRate = 0.1f;
+        [SerializeField] private float gpuRefreshRate = 0.2f;
 
         internal bool Modified;
 

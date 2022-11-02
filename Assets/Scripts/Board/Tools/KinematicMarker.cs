@@ -201,9 +201,10 @@ namespace Board.Tools
         public void OnDeselected()
         {
             if (_lineVisual is not null)
-                _lineVisual.enabled = false;
+                _lineVisual.enabled = true;
 
             _controller = null;
+            _lineVisual = null;
         }
 
         private void StartDrawing()
