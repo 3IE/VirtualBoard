@@ -1,4 +1,5 @@
-﻿using Photon.Pun;
+﻿using System;
+using Photon.Pun;
 using UnityEngine;
 using DeviceType = Utils.DeviceType;
 
@@ -11,7 +12,16 @@ namespace Refactor
 
         public PlayerEntityV2 entity;
 
+        private MarkerSync _markerSync;
+        private GameObject _marker;
+
         [SerializeField] private DeviceType deviceType;
+        [SerializeField] private GameObject markerPrefab;
+
+        private void OnDestroy()
+        {
+            Destroy(_marker);
+        }
 
         private void Awake()
         {
@@ -20,8 +30,13 @@ namespace Refactor
             if (photonView.IsMine)
             {
                 LocalPlayerInstance = gameObject;
+
+                _markerSync = MarkerSync.LocalInstance;
+                _marker     = _markerSync.gameObject;
+
+                entity.SetOwnership(); 
                 
-                entity.SetOwnership();
+                EventManager.Players.Add(PhotonNetwork.LocalPlayer.ActorNumber, this);
             }
             else
             {
@@ -29,10 +44,34 @@ namespace Refactor
                     ? (DeviceType) type
                     : DeviceType.Unknown;
 
+                _marker     = Instantiate(markerPrefab, Vector3.zero, Quaternion.identity);
+                _markerSync = _marker.GetComponent<MarkerSync>();
+                
+                _marker.SetActive(false);
+
                 entity.SetDevice(deviceType);
+                
+                EventManager.Players.Add(photonView.Owner.ActorNumber, this);
             }
 
             DontDestroyOnLoad(gameObject);
+        }
+
+        public void ReceiveMarkerGrab(object data)
+        {
+            var grabbed = (bool) data;
+            
+            _marker.SetActive(grabbed);
+        }
+
+        public void ReceiveMarkerPosition(object data)
+        {
+            _markerSync.ReceiveTransform(data as object[]);
+        }
+
+        public void ReceiveMarkerColor(object data)
+        {
+            _markerSync.SetColor(data as object[]);
         }
     }
 }

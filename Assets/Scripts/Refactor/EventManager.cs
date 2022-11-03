@@ -24,7 +24,7 @@ namespace Refactor
         [SerializeField] private GameObject onlinePingPrefab;
         [SerializeField] private GameObject board;
 
-        internal static Dictionary<int, PlayerEntityV2> _players;
+        internal static Dictionary<int, PlayerManagerV2> Players;
 
         #region ROOM_EVENTS
 
@@ -46,7 +46,7 @@ namespace Refactor
 
         #region TOOL_EVENTS
 
-        private void OnToolEvent(EventCode eventCode, object data)
+        private void OnToolEvent(EventCode eventCode, object data, EventData photonEvent)
         {
             switch (eventCode)
             {
@@ -60,6 +60,18 @@ namespace Refactor
 
                 case EventCode.Texture:
                     Board.Board.Instance.texture.LoadImage(data as byte[]);
+                    break;
+                
+                case EventCode.MarkerGrab:
+                    Players[photonEvent.Sender].ReceiveMarkerGrab(data);
+                    break;
+                
+                case EventCode.MarkerPosition:
+                    Players[photonEvent.Sender].ReceiveMarkerPosition(data);
+                    break;
+                
+                case EventCode.MarkerColor:
+                    Players[photonEvent.Sender].ReceiveMarkerColor(data);
                     break;
 
                 default:
@@ -147,7 +159,7 @@ namespace Refactor
                     break;
 
                 case EventCode.SendNewPosition:
-                    _players[photonEvent.Sender].UpdateTransforms(data as object[]);
+                    Players[photonEvent.Sender].entity.UpdateTransforms(data as object[]);
                     break;
 
                 case EventCode.SendNewPlayerIn:
@@ -190,7 +202,7 @@ namespace Refactor
         {
             CustomShape.Init();
 
-            _players = new Dictionary<int, PlayerEntityV2>();
+            Players = new Dictionary<int, PlayerManagerV2>();
         }
 
         private void Start()
@@ -217,7 +229,7 @@ namespace Refactor
                     break;
 
                 case < 30:
-                    OnToolEvent(code, photonEvent.CustomData);
+                    OnToolEvent(code, photonEvent.CustomData, photonEvent);
                     break;
 
                 case < 60:
@@ -259,13 +271,13 @@ namespace Refactor
 
             var raiseEventOptions = new RaiseEventOptions { TargetActors = new[] { newPlayer.ActorNumber } };
 
-            byte[] content = board.GetComponent<Board.Board>().texture.EncodeToPNG();
+            //byte[] content = board.GetComponent<Board.Board>().texture.EncodeToPNG();
 
-            PhotonNetwork.RaiseEvent((byte) EventCode.Texture, content, raiseEventOptions,
-                                     SendOptions.SendReliable);
+            //PhotonNetwork.RaiseEvent((byte) EventCode.Texture, content, raiseEventOptions,
+            //                         SendOptions.SendReliable);
 
             #if DEBUG
-            DebugPanel.Instance.AddBoardSent();
+            //DebugPanel.Instance.AddBoardSent();
             #endif
 
             PhotonNetwork.RaiseEvent((byte) EventCode.SendCounter, Shape.Counter, raiseEventOptions,

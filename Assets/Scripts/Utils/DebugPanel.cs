@@ -354,12 +354,12 @@ namespace Utils
 
         private void UpdatePlayerSent()
         {
-            playerSent.text = _playerSentValue.ToString();
+            //playerSent.text = _playerSentValue.ToString();
         }
 
         private void UpdatePlayerReceived()
         {
-            playerReceived.text = _playerReceivedValue.ToString();
+            //playerReceived.text = _playerReceivedValue.ToString();
         }
 
         private void UpdateObjectSent()

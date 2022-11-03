@@ -439,13 +439,13 @@
     },
     "m_Name": "Split",
     "m_DrawState": {
-        "m_Expanded": true,
+        "m_Expanded": false,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -418.9674987792969,
-            "y": -4.967517852783203,
-            "width": 120.0,
-            "height": 149.0
+            "x": -420.0000305175781,
+            "y": -16.000024795532228,
+            "width": 119.0,
+            "height": 77.0
         }
     },
     "m_Slots": [
@@ -969,7 +969,7 @@
         "m_Id": "49424f977cfa494dad3bcc4b409493f6"
     },
     "m_AllowMaterialOverride": false,
-    "m_SurfaceType": 0,
+    "m_SurfaceType": 1,
     "m_ZTestMode": 4,
     "m_ZWriteControl": 0,
     "m_AlphaMode": 0,
@@ -1196,7 +1196,7 @@
     },
     "m_Name": "Split",
     "m_DrawState": {
-        "m_Expanded": true,
+        "m_Expanded": false,
         "m_Position": {
             "serializedVersion": "2",
             "x": -866.0,

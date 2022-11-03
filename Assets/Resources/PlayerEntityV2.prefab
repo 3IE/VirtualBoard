@@ -102,6 +102,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entity: {fileID: 7636310644528225582}
   deviceType: 0
+  markerPrefab: {fileID: 5640421813213010301, guid: e2dd9810cb71a424499bb5d3529f5e2d, type: 3}
 --- !u!1 &7261037337459677492
 GameObject:
   m_ObjectHideFlags: 0

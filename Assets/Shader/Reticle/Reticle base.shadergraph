@@ -393,7 +393,7 @@
         "m_Id": "53f60d71d8be48998c2270ac208bfd37"
     },
     "m_AllowMaterialOverride": false,
-    "m_SurfaceType": 0,
+    "m_SurfaceType": 1,
     "m_ZTestMode": 4,
     "m_ZWriteControl": 0,
     "m_AlphaMode": 0,
@@ -461,8 +461,8 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -335.0,
-            "y": 215.0,
+            "x": -336.0,
+            "y": 200.0,
             "width": 105.0,
             "height": 34.0
         }
@@ -770,13 +770,13 @@
     },
     "m_Name": "Split",
     "m_DrawState": {
-        "m_Expanded": true,
+        "m_Expanded": false,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -189.0,
-            "y": 282.0,
-            "width": 120.0,
-            "height": 149.0
+            "x": -209.0,
+            "y": 249.0,
+            "width": 119.0,
+            "height": 77.0
         }
     },
     "m_Slots": [

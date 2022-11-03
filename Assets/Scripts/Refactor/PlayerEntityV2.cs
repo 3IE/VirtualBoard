@@ -27,16 +27,17 @@ namespace Refactor
         private void Awake()
         {
             DontDestroyOnLoad(gameObject);
-            
-            EventManager._players.Add(PhotonNetwork.LocalPlayer.ActorNumber, this);
         }
 
         private void FixedUpdate()
         {
+            if (!_isMine)
+                return;
+
             var data = new object[]
             {
                 playerTransform.position, leftHandTransform.position, rightHandTransform.position,
-                playerTransform.rotation, leftHandTransform.rotation, rightHandTransform.rotation
+                playerTransform.rotation, leftHandTransform.rotation, rightHandTransform.rotation,
             };
             var raiseEventOptions = new RaiseEventOptions { Receivers = ReceiverGroup.Others };
 
@@ -48,25 +49,25 @@ namespace Refactor
         {
             if (_isMine)
                 return;
-            
+
             playerTransform.position    = _playerPos;
             leftHandTransform.position  = _leftHandPos;
-            rightHandTransform.position = _leftHandPos;
+            rightHandTransform.position = _rightHandPos;
 
             playerTransform.rotation    = _playerRot;
             leftHandTransform.rotation  = _leftHandRot;
-            rightHandTransform.rotation = _leftHandRot;
+            rightHandTransform.rotation = _rightHandRot;
         }
 
         public void UpdateTransforms(object[] data)
         {
-            _playerPos   = (Vector3) data[0];
-            _leftHandPos = (Vector3) data[1];
-            _leftHandPos = (Vector3) data[2];
+            _playerPos    = (Vector3) data[0];
+            _leftHandPos  = (Vector3) data[1];
+            _rightHandPos = (Vector3) data[2];
 
-            _playerRot   = (Quaternion) data[3];
-            _leftHandRot = (Quaternion) data[4];
-            _leftHandRot = (Quaternion) data[5];
+            _playerRot    = (Quaternion) data[3];
+            _leftHandRot  = (Quaternion) data[4];
+            _rightHandRot = (Quaternion) data[5];
         }
 
         public void SetDevice(DeviceType deviceType)

@@ -171,9 +171,10 @@ GameObject:
   - component: {fileID: 7959743974999051074}
   - component: {fileID: 7959743974999051075}
   - component: {fileID: 8401917775233437459}
+  - component: {fileID: 1232914448074766663}
   m_Layer: 13
   m_Name: Board
-  m_TagString: Untagged
+  m_TagString: Board
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -276,6 +277,19 @@ MonoBehaviour:
   boardResetRenderer: {fileID: 7770963457270026928}
   renderTexture: {fileID: 8400000, guid: 486f2a03430748d45919fdcd9d853a01, type: 2}
   boardSetter: {fileID: 542012520782233567}
+--- !u!65 &1232914448074766663
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7959743974999051072}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 10.000005, y: 0.06, z: 10.000002}
+  m_Center: {x: 0, y: 0.05, z: 0}
 --- !u!1 &8737548373697833659
 GameObject:
   m_ObjectHideFlags: 0
