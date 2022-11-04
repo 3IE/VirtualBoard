@@ -11,11 +11,19 @@ namespace Refactor
         [Tooltip("The prefab to use for representing the player")]
         public GameObject playerPrefab;
 
+        [SerializeField] private Transform board;
         [SerializeField] private Transform mainCamera;
         [SerializeField] private Transform leftInteractor;
         [SerializeField] private Transform rightInteractor;
 
         [SerializeField] private DeviceType deviceType = DeviceType.VR;
+
+        public static GameManager Instance;
+        
+        public Transform Board
+        {
+            get { return board; }
+        }
 
         private void Awake()
         {
@@ -26,6 +34,8 @@ namespace Refactor
 
             Debug.Log("Connecting");
             PhotonNetwork.ConnectUsingSettings();
+            
+            Instance = this;
         }
 
         public override void OnConnectedToMaster()

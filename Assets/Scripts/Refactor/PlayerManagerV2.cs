@@ -1,5 +1,4 @@
-﻿using System;
-using Photon.Pun;
+﻿using Photon.Pun;
 using UnityEngine;
 using DeviceType = Utils.DeviceType;
 
@@ -53,6 +52,8 @@ namespace Refactor
                 
                 EventManager.Players.Add(photonView.Owner.ActorNumber, this);
             }
+            
+            _markerSync.Board = GameManager.Instance.Board;
 
             DontDestroyOnLoad(gameObject);
         }

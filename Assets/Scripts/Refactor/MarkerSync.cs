@@ -34,6 +34,11 @@ namespace Refactor
         private Material _material;
         private Material _traceMaterial;
 
+        public Transform Board
+        {
+            set { board = value; }
+        }
+
         public void SendColor()
         {
             Color    color = _material.color;
