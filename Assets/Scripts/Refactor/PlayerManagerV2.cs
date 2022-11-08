@@ -22,7 +22,7 @@ namespace Refactor
             Destroy(_marker);
         }
 
-        private void Awake()
+        private void Start()
         {
             var photonView = GetComponent<PhotonView>();
 
@@ -33,8 +33,8 @@ namespace Refactor
                 _markerSync = MarkerSync.LocalInstance;
                 _marker     = _markerSync.gameObject;
 
-                entity.SetOwnership(); 
-                
+                entity.SetOwnership();
+
                 EventManager.Players.Add(PhotonNetwork.LocalPlayer.ActorNumber, this);
             }
             else
@@ -45,14 +45,14 @@ namespace Refactor
 
                 _marker     = Instantiate(markerPrefab, Vector3.zero, Quaternion.identity);
                 _markerSync = _marker.GetComponent<MarkerSync>();
-                
+
                 _marker.SetActive(false);
 
                 entity.SetDevice(deviceType);
-                
+
                 EventManager.Players.Add(photonView.Owner.ActorNumber, this);
             }
-            
+
             _markerSync.Board = GameManager.Instance.Board;
 
             DontDestroyOnLoad(gameObject);
@@ -61,7 +61,7 @@ namespace Refactor
         public void ReceiveMarkerGrab(object data)
         {
             var grabbed = (bool) data;
-            
+
             _marker.SetActive(grabbed);
         }
 

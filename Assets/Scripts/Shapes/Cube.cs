@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Board.Shapes
+namespace Shapes
 {
     /// <inheritdoc />
     public class Cube : Shape

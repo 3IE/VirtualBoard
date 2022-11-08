@@ -19,7 +19,7 @@ namespace Refactor
         [SerializeField] private DeviceType deviceType = DeviceType.VR;
 
         public static GameManager Instance;
-        
+
         public Transform Board
         {
             get { return board; }
@@ -28,13 +28,13 @@ namespace Refactor
         private void Awake()
         {
             mainCamera.gameObject.SetActive(false);
-            
+
             PhotonNetwork.SetPlayerCustomProperties(new Hashtable
                                                         { { "Device", deviceType } });
 
             Debug.Log("Connecting");
             PhotonNetwork.ConnectUsingSettings();
-            
+
             Instance = this;
         }
 

@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Board.Events;
-using Board.Shapes;
-using Board.Tools;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
+using Shapes;
 using TMPro;
 using UnityEngine;
 using Users;
@@ -19,12 +18,13 @@ namespace Refactor
     /// <inheritdoc />
     public class EventManager : MonoBehaviourPunCallbacks
     {
-        [SerializeField] private Tools      tools;
         [SerializeField] private GameObject postItPrefab;
         [SerializeField] private GameObject onlinePingPrefab;
         [SerializeField] private GameObject board;
 
         internal static Dictionary<int, PlayerManagerV2> Players;
+
+        private BoardSetter _boardSetter;
 
         #region ROOM_EVENTS
 
@@ -50,26 +50,18 @@ namespace Refactor
         {
             switch (eventCode)
             {
-                case EventCode.Marker:
-                    Marker.AddModification(new Modification(data));
-                    break;
-
-                case EventCode.Eraser:
-                    Marker.AddModification(new Modification(data));
-                    break;
-
                 case EventCode.Texture:
-                    Board.Board.Instance.texture.LoadImage(data as byte[]);
+                    _boardSetter.SetTexture(data as object[]);
                     break;
-                
+
                 case EventCode.MarkerGrab:
                     Players[photonEvent.Sender].ReceiveMarkerGrab(data);
                     break;
-                
+
                 case EventCode.MarkerPosition:
                     Players[photonEvent.Sender].ReceiveMarkerPosition(data);
                     break;
-                
+
                 case EventCode.MarkerColor:
                     Players[photonEvent.Sender].ReceiveMarkerColor(data);
                     break;
@@ -159,7 +151,14 @@ namespace Refactor
                     break;
 
                 case EventCode.SendNewPosition:
-                    Players[photonEvent.Sender].entity.UpdateTransforms(data as object[]);
+                    try
+                    {
+                        Players[photonEvent.Sender].entity.UpdateTransforms(data as object[]);
+                    } catch (Exception)
+                    {
+                        Debug.LogWarning("Player not found, probably not instantiated yet");
+                    }
+
                     break;
 
                 case EventCode.SendNewPlayerIn:
@@ -201,6 +200,8 @@ namespace Refactor
         private void Awake()
         {
             CustomShape.Init();
+
+            _boardSetter = board.GetComponent<BoardSetter>();
 
             Players = new Dictionary<int, PlayerManagerV2>();
         }
@@ -271,22 +272,19 @@ namespace Refactor
 
             var raiseEventOptions = new RaiseEventOptions { TargetActors = new[] { newPlayer.ActorNumber } };
 
-            //byte[] content = board.GetComponent<Board.Board>().texture.EncodeToPNG();
+            object[] content = _boardSetter.GetTexture();
 
-            //PhotonNetwork.RaiseEvent((byte) EventCode.Texture, content, raiseEventOptions,
-            //                         SendOptions.SendReliable);
-
-            #if DEBUG
-            //DebugPanel.Instance.AddBoardSent();
-            #endif
+            if (content is not null)
+                PhotonNetwork.RaiseEvent((byte) EventCode.Texture, content, raiseEventOptions,
+                                         SendOptions.SendReliable);
 
             PhotonNetwork.RaiseEvent((byte) EventCode.SendCounter, Shape.Counter, raiseEventOptions,
                                      SendOptions.SendReliable);
 
             foreach (object[] data in from shape in Shape.Shapes
-                                      let transform1 = shape.Value.transform
+                                      let shapeTransform = shape.Value.transform
                                       let id = shape.Value.ShapeId
-                                      select new object[] { transform1.position, transform1.rotation, id })
+                                      select new object[] { shapeTransform.position, shapeTransform.rotation, id })
             {
                 PhotonNetwork.RaiseEvent((byte) EventCode.SendNewObject, data, raiseEventOptions,
                                          SendOptions.SendReliable);

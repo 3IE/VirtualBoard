@@ -1,4 +1,4 @@
-﻿namespace Board.Shapes
+﻿namespace Shapes
 {
     /// <inheritdoc />
     public class Cylinder : Cube

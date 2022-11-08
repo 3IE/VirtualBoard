@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Board.Shapes
+namespace Shapes
 {
     /// <summary>
     ///     Utility class used to reset the texture of the board

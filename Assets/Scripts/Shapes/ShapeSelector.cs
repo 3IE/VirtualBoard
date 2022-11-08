@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit;
 using Utils;
 
-namespace Board.Shapes
+namespace Shapes
 {
     /// <summary>
     ///     Singleton class, handles the input for the shapes.

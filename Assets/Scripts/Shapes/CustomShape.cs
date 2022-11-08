@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using Utils;
 
-namespace Board.Shapes
+namespace Shapes
 {
     /// <inheritdoc />
     public class CustomShape : Cube

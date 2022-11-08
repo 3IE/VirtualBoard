@@ -7,7 +7,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 using Utils;
 using EventCode = Utils.EventCode;
 
-namespace Board.Shapes
+namespace Shapes
 {
     /// <summary>
     ///     3D Object which can be spawned in the scene
