@@ -172,6 +172,7 @@ GameObject:
   - component: {fileID: 8401917775233437459}
   - component: {fileID: 1232914448074766663}
   - component: {fileID: 7959743974999051075}
+  - component: {fileID: 735177204716393184}
   m_Layer: 13
   m_Name: Board
   m_TagString: Board
@@ -258,8 +259,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 232d1a24ad246194b94133895d10ab03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boardRenderer: {fileID: 7959743974999051074}
-  boardResetRenderer: {fileID: 0}
   renderTexture: {fileID: 8400000, guid: 486f2a03430748d45919fdcd9d853a01, type: 2}
   boardSetter: {fileID: 542012520782233567}
 --- !u!65 &1232914448074766663
@@ -289,3 +288,17 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &735177204716393184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7959743974999051072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de9b759837c55ad418ecd67ac7bae004, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  renderTexture: {fileID: 8400000, guid: 486f2a03430748d45919fdcd9d853a01, type: 2}
+  test: 0

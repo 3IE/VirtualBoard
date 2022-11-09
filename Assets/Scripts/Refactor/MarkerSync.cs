@@ -4,6 +4,7 @@ using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
 using EventCode = Utils.EventCode;
 
 namespace Refactor
@@ -16,14 +17,20 @@ namespace Refactor
         [SerializeField] private Transform tip;
         [SerializeField] private Transform trace;
 
+        [SerializeField] private XRGrabInteractable grabInteractable;
+
+        public Transform controller;
+
         private bool _send;
         private bool _empty;
+        private bool _snap;
 
         private float _factor;
         private float _boardMaxDistance;
 
         private Transform _transform;
 
+        private Vector3    _snapPosition;
         private Vector3    _lastPosition;
         private Vector3    _lastSentPosition;
         private Quaternion _lastSentRotation;
@@ -70,6 +77,19 @@ namespace Refactor
 
         private void Update()
         {
+            if (_snap)
+            {
+                Vector3 position = controller.position;
+
+                if (Mathf.Abs(position.z - _snapPosition.z) <= 0.1f)
+                {
+                    position.z          = _snapPosition.z;
+                    _transform.position = position;
+                }
+                else
+                    _transform.position = position;
+            }
+
             if (_send)
                 SendTransform();
             else
@@ -158,6 +178,19 @@ namespace Refactor
         public void StopSend()
         {
             _send = false;
+        }
+
+        public void Snap()
+        {
+            _snap                          = true;
+            _snapPosition                  = _transform.position;
+            grabInteractable.trackPosition = false;
+        }
+
+        public void UnSnap()
+        {
+            _snap                          = false;
+            grabInteractable.trackPosition = true;
         }
     }
 }
