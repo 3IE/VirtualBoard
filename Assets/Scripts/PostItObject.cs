@@ -127,7 +127,12 @@ public class PostItObject : XRGrabInteractable, IPunObservable
             stream.SendNext(inputField.text);
             stream.SendNext(transformComponent.position);
             if (ownedByMe)
+            {
+                photonTransformView.enabled = true;
                 stream.SendNext(transformComponent.rotation);
+            }
+            else
+                photonTransformView.enabled = false;
         }
         else
         {
@@ -140,6 +145,8 @@ public class PostItObject : XRGrabInteractable, IPunObservable
                 photonTransformView.m_SynchronizeRotation = true;
                 transformComponent.rotation               = (Quaternion) stream.ReceiveNext();
             }
+            else
+                photonTransformView.m_SynchronizeRotation = false;
         }
     }
 }

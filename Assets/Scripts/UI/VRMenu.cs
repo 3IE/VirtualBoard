@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -86,7 +87,7 @@ namespace UI
         [SerializeField] private GameObject postItPrefab;
         public void SpawnPostIt()
         {
-            Instantiate(postItPrefab, transform.position + new Vector3(0, 0.5f, 0),
+            PhotonNetwork.Instantiate("postItPrefab", transform.position + new Vector3(0, 0.5f, 0),
                         Quaternion.identity * Quaternion.Euler(0, transform.rotation.eulerAngles.y,0));
         }
 
