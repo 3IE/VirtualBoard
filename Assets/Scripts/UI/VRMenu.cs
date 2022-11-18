@@ -83,6 +83,13 @@ namespace UI
             gameObject.SetActive(false);
         }
 
+        [SerializeField] private GameObject postItPrefab;
+        public void SpawnPostIt()
+        {
+            Instantiate(postItPrefab, transform.position + new Vector3(0, 0.5f, 0),
+                        Quaternion.identity * Quaternion.Euler(0, transform.rotation.eulerAngles.y,0));
+        }
+
         /// <summary>
         ///     Switches the active panel to the one specified by the index
         /// </summary>
